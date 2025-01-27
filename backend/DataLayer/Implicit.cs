@@ -1,0 +1,14 @@
+﻿global using System.Diagnostics.CodeAnalysis;
+global using Microsoft.IdentityModel.Tokens;
+global using System.Security.Claims;
+global using System.Text;
+global using Microsoft.Extensions.Configuration;
+global using System.IdentityModel.Tokens.Jwt;
+global using Microsoft.Extensions.Logging;
+global using Microsoft.AspNetCore.Identity;
+global using DataLayer.Enums;
+global using DataLayer.Models;
+global using MongoDB.Bson;
+global using MongoDB.Driver;
+global using DataLayer.DTOs.User;
+global using MongoDB.Bson.Serialization.Attributes;

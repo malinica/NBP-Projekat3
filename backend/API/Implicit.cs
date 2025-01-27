@@ -1,5 +1,9 @@
 global using Microsoft.AspNetCore.Mvc;
-global using Microsoft.EntityFrameworkCore;
-global using System.ComponentModel.DataAnnotations;
-global using System.ComponentModel.DataAnnotations.Schema;
+global using DataLayer;
+global using DataLayer.Services;
+global using DataLayer.DTOs.User;
 global using System.Text.Json.Serialization;
+global using Microsoft.OpenApi.Models;
+global using System.Text;
+global using Microsoft.AspNetCore.Authentication.JwtBearer;
+global using Microsoft.IdentityModel.Tokens;
