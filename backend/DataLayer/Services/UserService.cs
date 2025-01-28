@@ -3,13 +3,14 @@ namespace DataLayer.Services;
 
 public class UserService
 {
-    private IMongoCollection<User> _usersCollection = DbConnection.GetDatabase.GetCollection<User>("users_collection");
-    private readonly PasswordHasher<User> passwordHasher = new PasswordHasher<User>();
-    private readonly TokenService tokenService;
+    private readonly IMongoCollection<User> _usersCollection =
+        DbConnection.GetDatabase().GetCollection<User>("users_collection");
+    private readonly PasswordHasher<User> _passwordHasher = new PasswordHasher<User>();
+    private readonly TokenService _tokenService;
 
     public UserService(TokenService tokenService)
     {
-        this.tokenService = tokenService;
+        this._tokenService = tokenService;
     }
     
     public async Task<Result<AuthResponseDTO, ErrorMessage>> Register(CreateUserDTO userDto)
@@ -34,7 +35,7 @@ public class UserService
             {
                 Username = userDto.Username,
                 Email = userDto.Email,
-                PasswordHash = passwordHasher.HashPassword(null!, userDto.Password),
+                PasswordHash = _passwordHasher.HashPassword(null!, userDto.Password),
                 Role = UserRole.User
             };
 
@@ -46,12 +47,44 @@ public class UserService
                 Username = newUser.Username,
                 Email = newUser.Email,
                 Role = UserRole.User,
-                Token = tokenService.CreateToken(newUser)
+                Token = _tokenService.CreateToken(newUser)
             };
         }
         catch (Exception)
         {
-            return "Došlo je do greške prilikom kreiranja korisnika.".ToError();
+            return "Došlo je do greške prilikom registracije korisnika.".ToError();
+        }
+    }
+    
+    public async Task<Result<AuthResponseDTO, ErrorMessage>> Login(LoginRequestDTO request)
+    {
+        try
+        {
+            var user = await _usersCollection
+                .Find(u => u.Email == request.Email)
+                .FirstOrDefaultAsync();
+            
+            if (user == null)
+                return "Neispravan email ili lozinka.".ToError(403);
+            
+            var verificationResult = _passwordHasher.VerifyHashedPassword(null!, user.PasswordHash!, request.Password);
+            if (verificationResult == PasswordVerificationResult.Failed)
+                return "Neispravan email ili lozinka.".ToError(403);
+            
+            var accessToken = _tokenService.CreateToken(user);
+            
+            return new AuthResponseDTO
+            {
+                Id = user.Id!,
+                Username = user.Username,
+                Email = user.Email,
+                Token = accessToken,
+                Role = user.Role
+            };
+        }
+        catch (Exception)
+        {
+            return "Došlo je do greške prilikom prijavljivanja.".ToError();
         }
     }
 

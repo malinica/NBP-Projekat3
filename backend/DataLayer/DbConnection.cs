@@ -4,14 +4,19 @@ namespace DataLayer;
 
 public static class DbConnection
 {
-    public static IMongoDatabase GetDatabase
+    private static readonly Lazy<IMongoClient> LazyClient = new(() =>
     {
-        get
-        {
-            var connectionString = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json").Build().GetSection("ConnectionStrings")["MongoDB"];
-            var client = new MongoClient(connectionString);
-            return client.GetDatabase("nbp");
-        }
+        var connectionString = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json")
+            .Build()
+            .GetSection("ConnectionStrings")["MongoDB"];
+        return new MongoClient(connectionString);
+    });
+
+    private static IMongoClient MongoClient => LazyClient.Value;
+
+    public static IMongoDatabase GetDatabase(string databaseName = "nbp")
+    {
+        return MongoClient.GetDatabase(databaseName);
     }
 }
