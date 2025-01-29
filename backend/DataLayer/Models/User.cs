@@ -7,8 +7,8 @@ public class User
     [BsonRepresentation(BsonType.ObjectId)]
     public string? Id { get; set; }
     public required string Username { get; init; }
-    public string? Email { get; init; }
-    public string? PasswordHash { get; set; }
+    public required string Email { get; init; }
+    public required string PasswordHash { get; init; }
     public UserRole Role { get; init; }
 
     // VEZE

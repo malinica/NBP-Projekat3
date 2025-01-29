@@ -1,0 +1,30 @@
+.StranicaPrijave{
+    display: grid;
+    grid-column: 200px auto;
+    background-color: #B388FF;
+}
+
+.fields {
+    border: 3px solid #B388FF !important;
+}
+
+.password_eye {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+.input_placeholder {
+    color: #b2b0b0;
+}
+
+.dugme {
+    transition: 0.4s;
+    background-color: #35AC7A;
+}
+
+.dugme:hover {
+    background-color: #006400;
+}

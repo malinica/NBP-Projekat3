@@ -1,5 +1,4 @@
-﻿
-namespace DataLayer.Services;
+﻿namespace DataLayer.Services;
 
 public class UserService
 {
@@ -17,6 +16,18 @@ public class UserService
     {
         try
         {
+            string usernamePattern = @"^[a-zA-Z0-9._]+$";
+            Regex usernameRegex = new Regex(usernamePattern);
+            
+            if (!usernameRegex.IsMatch(userDto.Username))
+                return "Korisničko ime nije u validnom formatu. Dozvoljena su mala i velika slova abecede, brojevi, _ i .".ToError();
+            
+            string emailPattern = @"^[^\s@]+@[^\s@]+\.[^\s@]+$";
+            Regex emailRegex = new Regex(emailPattern);
+            
+            if (!emailRegex.IsMatch(userDto.Email))
+                return "E-mail nije u ispravnom formatu.".ToError();
+            
             var existingUserByUsername = await _usersCollection
                 .Find(u => u.Username == userDto.Username)
                 .FirstOrDefaultAsync();
