@@ -5,6 +5,8 @@ import {Toaster} from "react-hot-toast";
 import {Home} from "./Components/Home/Home.tsx";
 import {LoginPage} from "./Components/LoginPage/LoginPage.tsx";
 import {RegisterPage} from "./Components/RegisterPage/RegisterPage.tsx";
+import {Navbar} from "./Components/Navbar/Navbar.tsx";
+
 
 function App() {
 
@@ -13,7 +15,7 @@ function App() {
       <BrowserRouter>
         <UserProvider>
           <div className="App">
-            {/*<Navbar/>*/}
+            <Navbar/>
             <div className="content">
               <Routes>
                 <Route path="/" element={<Home/>}/>
