@@ -99,4 +99,52 @@ public class UserService
         }
     }
 
+    public Result<string, ErrorMessage> GetCurrentUserId(ClaimsPrincipal user) {
+        try
+        {
+            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId != null)
+                return userId;
+
+            return "Došlo je do greške prilikom učitavanja korisnika.".ToError();
+        }
+        catch (Exception)
+        {
+            return "Došlo je do greške prilikom učitavanja korisnika.".ToError();
+        }
+    }
+    
+    public async Task<Result<UserResultDTO, ErrorMessage>> GetCurrentUser(ClaimsPrincipal user) {
+        try
+        {
+            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if(userId != null)
+                return await GetById(userId);
+
+            return "Došlo je do greške prilikom učitavanja korisnika.".ToError();
+        }
+        catch (Exception)
+        {
+            return "Došlo je do greške prilikom učitavanja korisnika.".ToError();
+        }
+    }
+    
+    public async Task<Result<UserResultDTO, ErrorMessage>> GetById(string id)
+    {
+        try
+        {
+            var user = await _usersCollection
+                            .Find(u => u.Id == id)
+                            .FirstOrDefaultAsync();
+            
+            if(user == null)
+                return "Korisnik nije pronađen.".ToError(404);
+
+            return new UserResultDTO(user);
+        }
+        catch (Exception)
+        {
+            return "Došlo je do greške prilikom preuzimanja podataka o korisniku.".ToError();
+        }
+    }
 }

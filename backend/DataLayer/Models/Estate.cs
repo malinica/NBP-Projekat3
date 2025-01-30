@@ -7,11 +7,16 @@ public class Estate
     [BsonRepresentation(BsonType.ObjectId)]
     public string? Id { get; set; }
     public required string Title { get; set; }
-    public required string Location { get; set; }
-    // ovo mozda treba da se napravi na longitude i latitude
-    public required double Price { get; set; }
     public required string Description { get; set; }
-
+    public required double Price { get; set; }
+    public required int SquareMeters  { get; set; }
+    public required int TotalRooms { get; set; }
+    public required EstateCategory Category { get; set; }
+    public int? FloorNumber { get; set; }
+    public required List<string> Images { get; set; }
+    public double Longitude { get; set; }
+    public double Latitude { get; set; }
+    
     // VEZE
 
     [BsonRepresentation(BsonType.ObjectId)]

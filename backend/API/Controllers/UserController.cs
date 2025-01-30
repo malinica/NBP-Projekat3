@@ -4,17 +4,17 @@
 [Route("api/[controller]")]
 public class UserController : ControllerBase
 {
-    private readonly UserService userService;
+    private readonly UserService _userService;
 
     public UserController(UserService userService)
     {
-        this.userService = userService;
+        _userService = userService;
     }
     
     [HttpPost("Register")]
     public async Task<IActionResult> Register([FromBody] CreateUserDTO userDto)
     {
-        (bool isError, var response, ErrorMessage? error) = await userService.Register(userDto);
+        (bool isError, var response, ErrorMessage? error) = await _userService.Register(userDto);
 
         if (isError)
         {
@@ -27,7 +27,7 @@ public class UserController : ControllerBase
     [HttpPost("Login")]
     public async Task<IActionResult> Login([FromBody] LoginRequestDTO request)
     {
-        (bool isError, var response, ErrorMessage? error) = await userService.Login(request);
+        (bool isError, var response, ErrorMessage? error) = await _userService.Login(request);
 
         if (isError)
         {

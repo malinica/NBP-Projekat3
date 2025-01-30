@@ -14,11 +14,11 @@ public class User
     // VEZE
 
     [BsonRepresentation(BsonType.ObjectId)]
-    public List<string> EstateIds { get; set; } = new(); // Lista nekretnina koje je korisnik objavio
+    public List<string> EstateIds { get; set; } = new(); // Lista ID-a nekretnina koje je korisnik objavio
 
     [BsonRepresentation(BsonType.ObjectId)]
-    public List<string> PostIds { get; set; } = new(); // Lista objava korisnika na forumu
+    public List<string> PostIds { get; set; } = new(); // Lista ID-a objava korisnika na forumu
 
     [BsonRepresentation(BsonType.ObjectId)]
-    public List<string> CommentIds { get; set; } = new(); // Lista komentara koje je korisnik napisao
+    public List<string> CommentIds { get; set; } = new(); // Lista ID-a komentara koje je korisnik napisao
 }

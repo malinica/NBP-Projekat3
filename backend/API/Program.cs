@@ -9,6 +9,9 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<PostService>();
+builder.Services.AddScoped<CommentService>();
+builder.Services.AddScoped<EstateService>();
 
 builder.Services.AddControllers().AddJsonOptions(opt =>
 {

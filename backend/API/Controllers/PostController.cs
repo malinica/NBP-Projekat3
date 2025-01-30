@@ -1,0 +1,36 @@
+﻿namespace API.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class PostController : ControllerBase
+{
+    private readonly PostService _postService;
+    private readonly UserService _userService;
+
+    public PostController(PostService postService, UserService userService)
+    {
+        _postService = postService;
+        _userService = userService;
+    }
+
+    [HttpPost("Create")]
+    [Authorize]
+    public async Task<IActionResult> CreatePost([FromBody] CreatePostDTO postDto)
+    {
+        var userResult = _userService.GetCurrentUserId(User);
+        
+        if (userResult.IsError)
+        {
+            return StatusCode(userResult.Error?.StatusCode ?? 400, userResult.Error?.Message);
+        }
+        
+        (bool isError, var response, ErrorMessage? error) = await _postService.CreatePost(postDto, userResult.Data);
+
+        if (isError)
+        {
+            return StatusCode(error?.StatusCode ?? 400, error?.Message);
+        }
+
+        return Ok(response);
+    }
+}
