@@ -12,6 +12,7 @@ public class Estate
     public required int SquareMeters  { get; set; }
     public required int TotalRooms { get; set; }
     public required EstateCategory Category { get; set; }
+    // ukoliko je rent mozda da se doda nesto za trajanje (minimalno il sta vec)
     public int? FloorNumber { get; set; }
     public required List<string> Images { get; set; }
     public double Longitude { get; set; }
