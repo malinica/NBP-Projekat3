@@ -16,50 +16,50 @@
   cursor: pointer;
 }
 
-.bg-light-yellow {
-  background-color: #FFFEE0;
+.bg-beige {
+  background-color: #fff9f0;
 }
 
-.bg-yellow {
-  background-color: #fcde9c;
+.bg-sand {
+  background-color: #e3d5a5;
 }
 
-.bg-orange {
-  background-color: #ffa552;
+.bg-golden {
+  background-color: #cf8a40;
 }
 
-.bg-red {
-  background-color: #ba5624;
+.bg-light-blue {
+  background-color: #8cc4da;
 }
 
-.bg-purple {
-  background-color: #381d2a;
+.bg-blue {
+  background-color: #2e4a70;
 }
 
-.bg-green {
-  background-color: #c4d680;
+.bg-gray {
+  background-color: #85a0a9;
 }
 
-.text-light-yellow {
-  color: #FFFEE0;
+.text-beige {
+  color: #fff9f0;
 }
 
-.text-yellow {
-  color: #fcde9c;
+.text-sand {
+  color: #e3d5a5;
 }
 
-.text-orange {
-  color: #ffa552;
+.text-golden {
+  color: #cf8a40;
 }
 
-.text-red {
-  color: #ba5624;
+.text-light-blue {
+  color: #8cc4da;
 }
 
-.text-purple {
-  color: #381d2a;
+.text-blue {
+  color: #2e4a70;
 }
 
-.text-green {
-  color: #c4d680;
+.text-gray {
+  color: #85a0a9;
 }

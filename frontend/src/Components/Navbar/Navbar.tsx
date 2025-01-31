@@ -30,7 +30,7 @@ export const Navbar = () => {
 
     return (
         <>
-            <nav className={`navbar navbar-expand-xl bg-light-yellow`} id="mainNav">
+            <nav className={`navbar navbar-expand-xl bg-beige`} id="mainNav">
                 <div className={`container text-center`}>
                     <div className={`${styles.navbarBrandContainer}`}>
                         <Link className={`navbar-brand`} to="/">

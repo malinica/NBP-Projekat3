@@ -7,18 +7,18 @@
 }
 
 .dugme1 {
-    background-color: #ffa552;
+    background-color: #2e4a70;
     font-size: 1.5rem; 
     padding: 1rem 2rem; 
     transition: 0.4s;
 }
 
 .dugme1:hover {
-    background-color: #ba5624;
+    background-color: #85a0a9;
 }
 
 .dugme2 {
-    background-color: #ba5624;
+    background-color: #85a0a9;
     font-size: 1.5rem; 
     padding: 1rem 2rem;
     white-space: nowrap;
@@ -26,7 +26,19 @@
 }
 
 .dugme2:hover {
-    background-color: #381d2a;
+    background-color: #2e4a70;
+}
+
+.dugme3 {
+  background-color: #cf8a40;
+  font-size: 1.5rem; 
+  padding: 1rem 2rem;
+  white-space: nowrap;
+  transition: 0.4s;
+}
+
+.dugme3:hover {
+  background-color: #85a0a9;
 }
 
 .pocetak {
@@ -42,7 +54,7 @@
   }
   
   .pocetak:hover {
-    background-color: #ba5624;
+    background-color: #85a0a9;
   }
   
   .slika {
