@@ -73,6 +73,6 @@ public class PostController : ControllerBase
             return StatusCode(error?.StatusCode ?? 400, error?.Message);
         }
 
-        return Ok(response);
+        return NoContent();
     }
 }

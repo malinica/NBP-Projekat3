@@ -7,6 +7,7 @@ import {LoginPage} from "./Components/LoginPage/LoginPage.tsx";
 import {RegisterPage} from "./Components/RegisterPage/RegisterPage.tsx";
 import {Navbar} from "./Components/Navbar/Navbar.tsx";
 import {Footer} from "./Components/Footer/Footer.tsx";
+import {ForumPage} from "./Components/ForumPage/ForumPage.tsx";
 
 function App() {
 
@@ -21,6 +22,7 @@ function App() {
                 <Route path="/" element={<Home/>}/>
                 <Route path="/login" element={<LoginPage/>}/>
                 <Route path="/register" element={<RegisterPage/>}/>
+                <Route path="/forum" element={<ForumPage/>}/>
               </Routes>
             </div>
             <Footer/>
