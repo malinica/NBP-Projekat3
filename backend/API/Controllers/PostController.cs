@@ -33,4 +33,46 @@ public class PostController : ControllerBase
 
         return Ok(response);
     }
+    
+    [HttpGet("GetAll")]
+    // [Authorize]
+    public async Task<IActionResult> GetAll([FromQuery] int? page, [FromQuery] int? pageSize)
+    {
+        (bool isError, var response, ErrorMessage? error) = await _postService.GetAllPosts(page ?? 1, pageSize ?? 1);
+
+        if (isError)
+        {
+            return StatusCode(error?.StatusCode ?? 400, error?.Message);
+        }
+
+        return Ok(response);
+    }
+    
+    [HttpPut("Update/{postId}")]
+    // [Authorize]
+    public async Task<IActionResult> Update([FromRoute] string postId, [FromBody] UpdatePostDTO postDto)
+    {
+        (bool isError, var response, ErrorMessage? error) = await _postService.UpdatePost(postId, postDto);
+
+        if (isError)
+        {
+            return StatusCode(error?.StatusCode ?? 400, error?.Message);
+        }
+
+        return Ok(response);
+    }
+    
+    [HttpDelete("Delete/{postId}")]
+    // [Authorize]
+    public async Task<IActionResult> Delete([FromRoute] string postId)
+    {
+        (bool isError, var response, ErrorMessage? error) = await _postService.DeletePost(postId);
+
+        if (isError)
+        {
+            return StatusCode(error?.StatusCode ?? 400, error?.Message);
+        }
+
+        return Ok(response);
+    }
 }

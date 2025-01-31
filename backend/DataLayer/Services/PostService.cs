@@ -1,4 +1,5 @@
-﻿using DataLayer.DTOs.Post;
+﻿using DataLayer.DTOs.Pagination;
+using DataLayer.DTOs.Post;
 
 namespace DataLayer.Services;
 
@@ -52,6 +53,120 @@ public class PostService
         catch (Exception)
         {
             return "Došlo je do greške prilikom kreiranja objave.".ToError();
+        }
+    }
+    
+    public async Task<Result<PaginatedResponseDTO<PostResultDTO>, ErrorMessage>> GetAllPosts(int page = 1, int pageSize = 10)
+    {
+        try
+        {
+            var posts = await _postsCollection.Aggregate()
+                .Sort(Builders<Post>.Sort.Descending(p => p.CreatedAt))
+                .Skip((page - 1) * pageSize)
+                .Limit(pageSize)
+                .Lookup("users_collection", "AuthorId", "_id", "AuthorData") 
+                .Lookup("estates_collection", "EstateId", "_id", "EstateData")
+                .As<BsonDocument>()
+                .ToListAsync();
+
+            
+            var postsDtos = posts.Select(post =>
+            {
+                var authorDoc = post["AuthorData"].AsBsonArray.FirstOrDefault();
+                var estateDoc = post["EstateData"].AsBsonArray.FirstOrDefault();
+
+                return new PostResultDTO
+                {
+                    Id = post["_id"].AsObjectId.ToString(),
+                    Title = post["Title"].AsString,
+                    Content = post["Content"].AsString,
+                    CreatedAt = post["CreatedAt"].ToUniversalTime(),
+
+                    Author = authorDoc != null ? new UserResultDTO
+                    {
+                        Id = authorDoc["_id"].AsObjectId.ToString(),
+                        Username = authorDoc["Username"].AsString,
+                        Email = authorDoc["Email"].AsString,
+                        Role = (UserRole) authorDoc["Role"].AsInt32
+                    } : null!,
+
+                    // Estate = estateDoc != null ? new EstateResultDTO
+                    // {
+                    //     Id = estateDoc["_id"].AsObjectId.ToString(),
+                    //     Address = estateDoc["Address"].AsString,
+                    //     Price = estateDoc["Price"].ToDecimal()
+                    // } : null
+                };
+            }).ToList();
+            
+            var totalCount = await _postsCollection.CountDocumentsAsync(_ => true);
+
+            return new PaginatedResponseDTO<PostResultDTO>()
+            {
+                Data = postsDtos,
+                TotalLength = totalCount
+            };
+        }
+        catch (Exception)
+        {
+            return "Došlo je do greške prilikom preuzimanja objava.".ToError();
+        }
+    }
+    
+    //metoda za pribavljanje objava za konkretnu nekretninu, ista kao GetAll s tim sto ima i estateId
+    //ne moze dok se ne napravi EstateResult
+    
+    public async Task<Result<bool, ErrorMessage>> UpdatePost(string postId, UpdatePostDTO postDto)
+    {
+        try
+        {
+            var existingPost = await _postsCollection
+                .Find(p => p.Id == postId)
+                .FirstOrDefaultAsync();
+
+            if (existingPost == null)
+            {
+                return "Objava sa datim ID-jem ne postoji.".ToError(404);
+            }
+
+            existingPost.Title = postDto.Title;
+            existingPost.Content = postDto.Content;
+            
+            var res = await _postsCollection.ReplaceOneAsync(p => p.Id == postId, existingPost);
+
+            return true;
+        }
+        catch (Exception)
+        {
+            return "Došlo je do greške prilikom ažuriranja objave.".ToError();
+        }
+    }
+    
+    public async Task<Result<bool, ErrorMessage>> DeletePost(string postId)
+    {
+        try
+        {
+            var existingPost = await _postsCollection
+                .Find(p => p.Id == postId)
+                .FirstOrDefaultAsync();
+
+            if (existingPost == null)
+            {
+                return "Objava sa datim ID-jem ne postoji.".ToError();
+            }
+            // var deleteCommentsResult = await _commentService.DeleteManyAsync(existingPost.CommentIds);
+            var deleteResult = await _postsCollection.DeleteOneAsync(p => p.Id == postId);
+
+            if (deleteResult.DeletedCount == 0)
+            {
+                return "Došlo je do greške prilikom brisanja objave.".ToError();
+            }
+
+            return true;
+        }
+        catch (Exception)
+        {
+            return "Došlo je do greške prilikom brisanja objave.".ToError();
         }
     }
 }

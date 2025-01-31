@@ -1,5 +1,4 @@
-﻿using DataLayer.DTOs.Estate;
-
+﻿
 namespace DataLayer.DTOs.Post;
 
 public class PostResultDTO

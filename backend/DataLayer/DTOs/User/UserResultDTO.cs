@@ -15,4 +15,9 @@ public class UserResultDTO
         this.Email = user.Email;
         this.Role = user.Role;
     }
+
+    public UserResultDTO()
+    {
+        
+    }
 }
