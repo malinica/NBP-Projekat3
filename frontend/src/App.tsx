@@ -8,6 +8,7 @@ import {RegisterPage} from "./Components/RegisterPage/RegisterPage.tsx";
 import {Navbar} from "./Components/Navbar/Navbar.tsx";
 import {Footer} from "./Components/Footer/Footer.tsx";
 import {ForumPage} from "./Components/ForumPage/ForumPage.tsx";
+import CreateEstate from './Components/CreateEstate/CreateEstate.tsx';
 
 function App() {
 
@@ -23,6 +24,8 @@ function App() {
                 <Route path="/login" element={<LoginPage/>}/>
                 <Route path="/register" element={<RegisterPage/>}/>
                 <Route path="/forum" element={<ForumPage/>}/>
+                <Route path="/create-estate" element={<CreateEstate/>}/>
+
               </Routes>
             </div>
             <Footer/>

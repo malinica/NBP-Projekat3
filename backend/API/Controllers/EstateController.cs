@@ -20,7 +20,7 @@ public class EstateController : ControllerBase
     // Zakomentariso sam sve za authorize da bi mogo testiram jel radi u sweger
 
     [HttpPost("CreateEstate/{collectionName}")]
-    //[Authorize]
+    [Authorize]
     public async Task<IActionResult> CreateEstate(string collectionName, [FromBody] EstateCreateDTO newEstate)
     {
         // var userResult = userService.GetCurrentUserId(User);
@@ -29,8 +29,8 @@ public class EstateController : ControllerBase
         // {
         //     return StatusCode(userResult.Error?.StatusCode ?? 400, userResult.Error?.Message);
         // }
-
-        (bool isError, var response, ErrorMessage? error) = await estateService.CreateEstate(collectionName, newEstate);
+        var user=userService.GetCurrentUserId(User);
+        (bool isError, var response, ErrorMessage? error) = await estateService.CreateEstate(collectionName, newEstate,user.IsError ? null : user.Data);
 
         if (isError)
         {

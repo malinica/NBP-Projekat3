@@ -5,9 +5,11 @@
 
         private const string ConnectionString = "mongodb://localhost:27017";
         private const string DatabaseName = "estateDatabase";
+        private readonly UserService userService;
 
-        public EstateService()
+        public EstateService(UserService userS)
         {
+            this.userService=userS;
             var mongoClient = new MongoClient(ConnectionString);
             var mongoDatabase = mongoClient.GetDatabase(DatabaseName);
         }
@@ -51,10 +53,14 @@
             }
         }
 
-        public async Task<Result<Estate, ErrorMessage>> CreateEstate(string collectionName, EstateCreateDTO newEstateDTO)
+        public async Task<Result<Estate, ErrorMessage>> CreateEstate(string collectionName, EstateCreateDTO newEstateDTO,string? userID)
         {
             try
             {
+                //var userCreator=await userService.GetCurrentUser(User)//GetById(newEstateDTO.UserId);
+                if(userID!=null)
+                {
+
                 var estate = new Estate
                 {
                     Title = newEstateDTO.Title,
@@ -67,15 +73,19 @@
                     Images = newEstateDTO.Images,
                     Longitude = newEstateDTO.Longitude,
                     Latitude = newEstateDTO.Latitude,
-                    UserId = newEstateDTO.UserId.ToString()
+                    UserId=userID
                 };
 
                 var collection = GetCollection(collectionName);
                 await collection.InsertOneAsync(estate);
                 return estate;
+                }
+                else
+                return "Došlo je do greške prilikom trazenja korisnika".ToError();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
                 return "Došlo je do greške prilikom kreiranja nekretnine.".ToError();
             }
         }

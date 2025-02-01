@@ -12,6 +12,6 @@ namespace DataLayer.Models
         public required List<string> Images { get; set; }
         public double Longitude { get; set; }
         public double Latitude { get; set; }
-        public required string UserId { get; set; }
+      //  public required string UserId { get; set; }
     }
 }
