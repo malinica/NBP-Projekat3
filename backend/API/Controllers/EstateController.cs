@@ -17,18 +17,85 @@ public class EstateController : ControllerBase
         this.userService = userService;
     }
 
-    [HttpPost("CreateEstate/{collectionName}")]
-public async Task<IActionResult> CreateEstate(string collectionName, [FromBody] EstateCreateDTO newEstate)
-{
-    var (isError, result, error) = await estateService.CreateEstate(collectionName, newEstate);
+    // Zakomentariso sam sve za authorize da bi mogo testiram jel radi u sweger
 
-    if (isError)
+    [HttpPost("CreateEstate/{collectionName}")]
+    //[Authorize]
+    public async Task<IActionResult> CreateEstate(string collectionName, [FromBody] EstateCreateDTO newEstate)
     {
-        return StatusCode(error?.StatusCode ?? 400, error?.Message);
+        // var userResult = userService.GetCurrentUserId(User);
+
+        // if (userResult.IsError)
+        // {
+        //     return StatusCode(userResult.Error?.StatusCode ?? 400, userResult.Error?.Message);
+        // }
+
+        (bool isError, var response, ErrorMessage? error) = await estateService.CreateEstate(collectionName, newEstate);
+
+        if (isError)
+        {
+            return StatusCode(error?.StatusCode ?? 400, error?.Message);
+        }
+
+        return Ok("Estate created");
     }
 
-           return Ok("Estate created");
+    [HttpGet("GetAllEstates/{collectionName}")]
+    public async Task<IActionResult> GetAllEstates(string collectionName)
+    {
+        (bool isError, var response, ErrorMessage? error) = await estateService.GetAllEstatesFromCollection(collectionName);
+        if (isError)
+        {
+            return StatusCode(error?.StatusCode ?? 400, error?.Message);
+        }
+        return Ok(response);
+    }
 
-}
+    [HttpGet("GetEstate/{collectionName}/{id}")]
+    public async Task<IActionResult> GetEstate(string collectionName, string id)
+    {
+        (bool isError, var response, ErrorMessage? error) = await estateService.GetEstate(collectionName, id);
+        if (isError)
+        {
+            return StatusCode(error?.StatusCode ?? 400, error?.Message);
+        }
+        return Ok(response);
+    }
+
+    [HttpPut("UpdateEstate/{collectionName}/{id}")]
+    //[Authorize]
+    public async Task<IActionResult> UpdateEstate(string collectionName, string id, [FromBody] EstateUpdateDTO updatedEstate)
+    {
+        // var userResult = userService.GetCurrentUserId(User);
+        // if (userResult.IsError)
+        // {
+        //     return StatusCode(userResult.Error?.StatusCode ?? 400, userResult.Error?.Message);
+        // }
+
+        (bool isError, _, ErrorMessage? error) = await estateService.UpdateEstate(collectionName, id, updatedEstate);
+        if (isError)
+        {
+            return StatusCode(error?.StatusCode ?? 400, error?.Message);
+        }
+        return Ok("Estate updated");
+    }
+
+    [HttpDelete("RemoveEstate/{collectionName}/{id}")]
+    //[Authorize]
+    public async Task<IActionResult> RemoveEstate(string collectionName, string id)
+    {
+        // var userResult = userService.GetCurrentUserId(User);
+        // if (userResult.IsError)
+        // {
+        //     return StatusCode(userResult.Error?.StatusCode ?? 400, userResult.Error?.Message);
+        // }
+
+        (bool isError, _, ErrorMessage? error) = await estateService.RemoveEstate(collectionName, id);
+        if (isError)
+        {
+            return StatusCode(error?.StatusCode ?? 400, error?.Message);
+        }
+        return Ok("Estate removed");
+    }
 
 }

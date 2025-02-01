@@ -7,81 +7,80 @@
         private const string DatabaseName = "estateDatabase";
 
         public EstateService()
-{
-    var mongoClient = new MongoClient(ConnectionString);
-    var mongoDatabase = mongoClient.GetDatabase(DatabaseName);
-}
+        {
+            var mongoClient = new MongoClient(ConnectionString);
+            var mongoDatabase = mongoClient.GetDatabase(DatabaseName);
+        }
 
-private IMongoCollection<Estate> GetCollection(string collectionName)
-{
-    var mongoClient = new MongoClient(ConnectionString);
-    var mongoDatabase = mongoClient.GetDatabase(DatabaseName);
-    return mongoDatabase.GetCollection<Estate>(collectionName);
-}
+        private IMongoCollection<Estate> GetCollection(string collectionName)
+        {
+            var mongoClient = new MongoClient(ConnectionString);
+            var mongoDatabase = mongoClient.GetDatabase(DatabaseName);
+            return mongoDatabase.GetCollection<Estate>(collectionName);
+        }
 
-
-        public async Task<(bool isError, List<Estate>? result, ErrorMessage? error)> GetAllEstatesFromCollection(string collectionName)
+        public async Task<Result<List<Estate>, ErrorMessage>> GetAllEstatesFromCollection(string collectionName)
         {
             try
             {
                 var collection = GetCollection(collectionName);
                 var estates = await collection.Find(_ => true).ToListAsync();
-                return (false, estates, null);
+                return estates;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return (true, null, new ErrorMessage(ex.Message, 500));
+                return "Došlo je do greške prilikom preuzimanja nekretnina.".ToError();
             }
         }
 
-        public async Task<(bool isError, Estate? result, ErrorMessage? error)> GetEstate(string collectionName, string id)
+        public async Task<Result<Estate, ErrorMessage>> GetEstate(string collectionName, string id)
         {
             try
             {
                 var collection = GetCollection(collectionName);
                 var estate = await collection.Find(x => x.Id == id).FirstOrDefaultAsync();
-                if (estate == null)
+                if (estate != null)
                 {
-                    return (true, null, new ErrorMessage("Estate not found", 404));
+                    return estate;
                 }
-                return (false, estate, null);
+                return "Nije pronadjena nekretnina.".ToError();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return (true, null, new ErrorMessage(ex.Message, 500));
+                return "Došlo je do greške prilikom preuzimanja nekretnine.".ToError();
             }
         }
 
-        public async Task<(bool isError, Estate? result, ErrorMessage? error)> CreateEstate(string collectionName, EstateCreateDTO newEstateDTO)
+        public async Task<Result<Estate, ErrorMessage>> CreateEstate(string collectionName, EstateCreateDTO newEstateDTO)
         {
             try
             {
-                 var estate = new Estate
-        {
-            Title = newEstateDTO.Title,
-            Description = newEstateDTO.Description,
-            Price = newEstateDTO.Price,
-            SquareMeters = newEstateDTO.SquareMeters,
-            TotalRooms = newEstateDTO.TotalRooms,
-            Category = newEstateDTO.Category,
-            FloorNumber = newEstateDTO.FloorNumber,
-            Images = newEstateDTO.Images,
-            Longitude = newEstateDTO.Longitude,
-            Latitude = newEstateDTO.Latitude,
-            UserId = newEstateDTO.UserId.ToString()
-        };
+                var estate = new Estate
+                {
+                    Title = newEstateDTO.Title,
+                    Description = newEstateDTO.Description,
+                    Price = newEstateDTO.Price,
+                    SquareMeters = newEstateDTO.SquareMeters,
+                    TotalRooms = newEstateDTO.TotalRooms,
+                    Category = newEstateDTO.Category,
+                    FloorNumber = newEstateDTO.FloorNumber,
+                    Images = newEstateDTO.Images,
+                    Longitude = newEstateDTO.Longitude,
+                    Latitude = newEstateDTO.Latitude,
+                    UserId = newEstateDTO.UserId.ToString()
+                };
 
                 var collection = GetCollection(collectionName);
                 await collection.InsertOneAsync(estate);
-                return (false, estate, null);
+                return estate;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return (true, null, new ErrorMessage(ex.Message, 500));
+                return "Došlo je do greške prilikom kreiranja nekretnine.".ToError();
             }
         }
 
-        public async Task<(bool isError, Estate? result, ErrorMessage? error)> UpdateEstate(string collectionName, string id, Estate updatedEstate)
+        public async Task<Result<Estate, ErrorMessage>> UpdateEstate(string collectionName, string id, EstateUpdateDTO updatedEstate)
         {
             try
             {
@@ -89,18 +88,32 @@ private IMongoCollection<Estate> GetCollection(string collectionName)
                 var existingEstate = await collection.Find(x => x.Id == id).FirstOrDefaultAsync();
                 if (existingEstate == null)
                 {
-                    return (true, null, new ErrorMessage("Estate not found", 404));
+                    return "Nije pronadjena nekretnina.".ToError();
                 }
-                await collection.ReplaceOneAsync(x => x.Id == id, updatedEstate);
-                return (false, updatedEstate, null);
+
+                existingEstate.Title = updatedEstate.Title;
+                existingEstate.Description = updatedEstate.Description;
+                existingEstate.Price = updatedEstate.Price;
+                existingEstate.SquareMeters = updatedEstate.SquareMeters;
+                existingEstate.TotalRooms = updatedEstate.TotalRooms;
+                existingEstate.Category = updatedEstate.Category;
+                existingEstate.FloorNumber = updatedEstate.FloorNumber;
+                existingEstate.Images = updatedEstate.Images;
+                existingEstate.Longitude = updatedEstate.Longitude;
+                existingEstate.Latitude = updatedEstate.Latitude;
+                existingEstate.UserId = updatedEstate.UserId;
+
+                await collection.ReplaceOneAsync(x => x.Id == id, existingEstate);
+
+                return existingEstate;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return (true, null, new ErrorMessage(ex.Message, 500));
+                return "Došlo je do greške prilikom ažuriranja nekretnine.".ToError();
             }
         }
 
-        public async Task<(bool isError, string? result, ErrorMessage? error)> RemoveEstate(string collectionName, string id)
+        public async Task<Result<bool, ErrorMessage>> RemoveEstate(string collectionName, string id)
         {
             try
             {
@@ -108,14 +121,19 @@ private IMongoCollection<Estate> GetCollection(string collectionName)
                 var existingEstate = await collection.Find(x => x.Id == id).FirstOrDefaultAsync();
                 if (existingEstate == null)
                 {
-                    return (true, null, new ErrorMessage("Estate not found", 404));
+                    return "Nije pronadjena nekretnina.".ToError();
                 }
-                await collection.DeleteOneAsync(x => x.Id == id);
-                return (false, id, null);
+                
+                var result = await collection.DeleteOneAsync(x => x.Id == id);
+                if (result.DeletedCount > 0)
+                {
+                    return true;
+                }
+                return false;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return (true, null, new ErrorMessage(ex.Message, 500));
+                return "Došlo je do greške prilikom brisanja nekretnine.".ToError();
             }
         }
     }
