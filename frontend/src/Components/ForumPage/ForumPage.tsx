@@ -61,22 +61,27 @@ export const ForumPage = () => {
   }
 
   return (
-    <div className="container">
-      <div>
-        <CreatePost onCreatePost={handleCreatePost}/>
+    <div className={`container-fluid bg-beige`}>
+      <div className={`row`}>
+        <div className={`col-md-4`}>
+          <CreatePost onCreatePost={handleCreatePost}/>
+        </div>
+      
+        <div className={`col-md-8 my-5`}>
+          <h2 className={`text-blue`}>Objave</h2>
+          {isLoading ? (<>
+            <p className={`text-center text-muted`}>Učitavanje objava...</p>
+          </>) : (
+            <>
+              {posts.length > 0 && posts.map(post => (
+                <PostCard key={post.id} post={post} />
+              ))}
+            </>
+          )}
+          {totalPostsCount > 0 &&
+          <Pagination totalLength={totalPostsCount} onPaginateChange={handlePaginateChange}/>}
+        </div>
       </div>
-      <h2>Objave</h2>
-      {isLoading ? (<>
-        <p className={`text-center`}>Učitavanje objava...</p>
-      </>) : (
-        <>
-          {posts.length > 0 && posts.map(post => (
-            <PostCard key={post.id} post={post} />
-          ))}
-        </>
-      )}
-      {totalPostsCount > 0 &&
-      <Pagination totalLength={totalPostsCount} onPaginateChange={handlePaginateChange}/>}
     </div>
   );
 };

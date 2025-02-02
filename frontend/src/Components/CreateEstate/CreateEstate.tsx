@@ -1,10 +1,11 @@
-import  "./CreateEstate.module";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../Context/useAuth";
 import { useState } from 'react';
 import { EstateCategory } from "../../Enums/EstateCategory";
 import { createEstateAPI } from "../../Services/EstateService";
+import styles from "./CreateEstate.module.css";
+
 
 const CreateEstate = () => {
     const [title, setTitle] = useState('');
@@ -42,112 +43,149 @@ const CreateEstate = () => {
         
       else toast.error("Unesite sve podatke!");
     };
+
     return (
         <>
           {user ? (
             <>
-              <div>
-                <label>Title:</label>
-                <input 
-                  type="text" 
-                  value={title} 
-                  onChange={(e) => setTitle(e.target.value)} 
-                />
-              </div>
+              <div className={`conatiner-fluid bg-beige d-flex justify-content-center`}>
+                <div className={`col-xxl-7 col-xl-7 col-lg-8 col-md-10 col-sm-12 m-4 p-4 rounded-3 d-flex flex-column bg-white shadow`}>
+                  <div className={`row justify-content-center py-3 px-3`}>
+                    <h1 className={`text-center text-gray pb-5`}>Kreiraj Nekretninu</h1>
+                    <div className={`mb-2 row`}>
+                      <label className={`col-sm-2 col-form-label text-blue`}>Title:</label>
+                      <div className={`col-sm-10`}>
+                        <input 
+                          type="text" 
+                          value={title} 
+                          onChange={(e) => setTitle(e.target.value)}
+                          className={`form-control ${styles.fields}`} 
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className={`mb-2 row`}>
+                      <label className={`col-sm-2 col-form-label text-blue`}>Description:</label>
+                      <div className={`col-sm-10`}>
+                        <textarea 
+                          value={desc} 
+                          onChange={(e) => setDesc(e.target.value)} 
+                          className={`form-control ${styles.fields}`}
+                        />
+                      </div>
+                    </div>
               
-              <div>
-                <label>Description:</label>
-                <textarea 
-                  value={desc} 
-                  onChange={(e) => setDesc(e.target.value)} 
-                />
+                    <div className={`mb-2 row`}>
+                      <label className={`col-sm-2 col-form-label text-blue`}>Category:</label>
+                      <div className={`col-sm-10`}>
+                        <select 
+                          value={category} 
+                          onChange={(e) => setCategory(e.target.value as EstateCategory)} 
+                          className={`form-control ${styles.fields}`}
+                        >
+                          {Object.values(EstateCategory).map((option) => (
+                            <option key={option} value={option} className={``}>
+                              {option}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+              
+                    <div className={`mb-2 row`}>
+                      <label className={`col-sm-2 col-form-label text-blue`}>Total Rooms:</label>
+                      <div className={`col-sm-10`}>
+                        <input 
+                          type="number" 
+                          value={totalRooms ?? ''} 
+                          onChange={(e) => setTotalRooms(Number(e.target.value))}
+                          className={`form-control ${styles.fields}`}
+                        />
+                        </div>
+                    </div>
+              
+                    <div className={`mb-2 row`}>
+                      <label className={`col-sm-2 col-form-label text-blue`}>Square Meters:</label>
+                      <div className={`col-sm-10`}>
+                        <input 
+                          type="number" 
+                          value={squareMeters ?? ''} 
+                          onChange={(e) => setSquareMeters(Number(e.target.value))}
+                          className={`form-control ${styles.fields}`}
+                        />
+                      </div>
+                    </div>
+              
+                    <div className={`mb-2 row`}>
+                      <label className={`col-sm-2 col-form-label text-blue`}>Floor Number:</label>
+                      <div className={`col-sm-10`}>
+                        <input 
+                          type="number" 
+                          value={floorNumber ?? ''} 
+                          onChange={(e) => setFloornumber(Number(e.target.value))}
+                          className={`form-control ${styles.fields}`}
+                        />
+                      </div>
+                    </div>
+              
+                    <div className={`mb-2 row`}>
+                      <label className={`col-sm-2 col-form-label text-blue`}>Price:</label>
+                      <div className={`col-sm-10`}>
+                        <input 
+                          type="number" 
+                          value={price ?? ''} 
+                          onChange={(e) => setPrice(Number(e.target.value))}
+                          className={`form-control ${styles.fields}`}
+                        />
+                      </div>
+                    </div>
+              
+                    <div className={`mb-2 row`}>
+                      <label className={`col-sm-2 col-form-label text-blue`}>Longitude:</label>
+                      <div className={`col-sm-10`}>
+                        <input 
+                          type="number" 
+                          value={long ?? ''} 
+                          onChange={(e) => setLong(Number(e.target.value))}
+                          className={`form-control ${styles.fields}`}
+                        />
+                      </div>
+                    </div>
+              
+                    <div className={`mb-2 row`}>
+                      <label className={`col-sm-2 col-form-label text-blue`}>Latitude:</label>
+                      <div className={`col-sm-10`}>
+                        <input 
+                          type="number" 
+                          value={lat ?? ''} 
+                          onChange={(e) => setLat(Number(e.target.value))}
+                          className={`form-control ${styles.fields}`}
+                        />
+                      </div>
+                    </div>
+              
+                    <div className={`mb-4 row`}>
+                      <label className={`col-sm-2 col-form-label text-blue`}>Pictures:</label>
+                      <div className={`col-sm-10`}>
+                        <input
+                          type="file"
+                          className={`form-control ${styles.fields}`}
+                          onChange={handlePicturesChange}
+                          multiple
+                          required
+                        />
+                      </div>
+                    </div>
+              
+                    <div className={`d-flex justify-content-end me-4`}>
+                      <button className={`btn-lg text-white text-center rounded-3 border-0 py-2 px-2 ${styles.slova} ${styles.dugme1} ${styles.linija_ispod_dugmeta}`} onClick={handleSubmit}>Dodaj Nekretninu</button>
+                    </div>
+                  </div>
+                </div>
               </div>
-        
-              <div>
-                <label>Category:</label>
-                <select 
-                  value={category} 
-                  onChange={(e) => setCategory(e.target.value as EstateCategory)} 
-                >
-                  {Object.values(EstateCategory).map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              </div>
-        
-              <div>
-                <label>Total Rooms:</label>
-                <input 
-                  type="number" 
-                  value={totalRooms ?? ''} 
-                  onChange={(e) => setTotalRooms(Number(e.target.value))}
-                />
-              </div>
-        
-              <div>
-                <label>Square Meters:</label>
-                <input 
-                  type="number" 
-                  value={squareMeters ?? ''} 
-                  onChange={(e) => setSquareMeters(Number(e.target.value))}
-                />
-              </div>
-        
-              <div>
-                <label>Floor Number:</label>
-                <input 
-                  type="number" 
-                  value={floorNumber ?? ''} 
-                  onChange={(e) => setFloornumber(Number(e.target.value))}
-                />
-              </div>
-        
-              <div>
-                <label>Price:</label>
-                <input 
-                  type="number" 
-                  value={price ?? ''} 
-                  onChange={(e) => setPrice(Number(e.target.value))}
-                />
-              </div>
-        
-              <div>
-                <label>Longitude:</label>
-                <input 
-                  type="number" 
-                  value={long ?? ''} 
-                  onChange={(e) => setLong(Number(e.target.value))}
-                />
-              </div>
-        
-              <div>
-                <label>Latitude:</label>
-                <input 
-                  type="number" 
-                  value={lat ?? ''} 
-                  onChange={(e) => setLat(Number(e.target.value))}
-                />
-              </div>
-        
-                <div>
-                <label>Pictures:</label>
-              <label className={`text-metal mb-1 mt-3`}>Slike:</label>
-              <input
-                type="file"
-                className={`form-control`}
-                onChange={handlePicturesChange}
-                multiple
-                required
-              />
-            </div>
-        
-            <button onClick={handleSubmit}>Dodaj nekretninu</button>
-
             </>
           ) : (
-            <p>Morate se prijaviti da biste dodali nekretninu</p>
+            <p className={`text-muted text-center`}>Morate se prijaviti da biste dodali nekretninu</p>
           )}
         </>
       );

@@ -56,17 +56,17 @@ export const Navbar = () => {
                                 ?
                                 <>
                                     <li className={`my-2 text-end`}>
-                                        <Link to={"/create-estate"} className={`${getLinkClass("/")}`}>KREIRAJ NEKRETNINU</Link>
+                                        <Link to={"/create-estate"} className={`${getLinkClass("/create-estate")}`}>KREIRAJ NEKRETNINU</Link>
                                     </li>
-                                    <li className={`my-2 text-end`}>
+                                    {/*<li className={`my-2 text-end`}>
                                         <Link to={"/"} className={`${getLinkClass("/")}`}>NEKRETNINE</Link>
-                                    </li>
+                                    </li>*/}
                                     <li className={`my-2 text-end`}>
                                         <Link to={"/forum"} className={`${getLinkClass("/forum")}`}>FORUM</Link>
                                     </li>
-                                    <li className={`my-2 text-end`}>
+                                    {/*<li className={`my-2 text-end`}>
                                         <Link to={"/"} className={`${getLinkClass("/")}`}>OMILJENO</Link>
-                                    </li>
+                                    </li>*/}
                                     
                                     <li className={`ms-3 text-end`}>
                                         <Dropdown>
