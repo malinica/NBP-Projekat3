@@ -7,6 +7,7 @@ public class Comment
     [BsonRepresentation(BsonType.ObjectId)]
     public string? Id { get; set; }
     public required string Content { get; set; }
+    public DateTime CreatedAt { get; set; }
 
     // VEZE
 

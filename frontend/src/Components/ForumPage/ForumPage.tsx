@@ -62,6 +62,8 @@ export const ForumPage = () => {
 
   return (
     <div className={`container-fluid bg-beige`}>
+      <div className="container">
+
       <div className={`row`}>
         <div className={`col-md-4`}>
           <CreatePost onCreatePost={handleCreatePost}/>
@@ -82,6 +84,8 @@ export const ForumPage = () => {
           <Pagination totalLength={totalPostsCount} onPaginateChange={handlePaginateChange}/>}
         </div>
       </div>
+      </div>
+
     </div>
   );
 };

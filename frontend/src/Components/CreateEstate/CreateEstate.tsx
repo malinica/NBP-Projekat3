@@ -2,7 +2,7 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../Context/useAuth";
 import { useEffect, useState } from 'react';
-import { EstateCategory, getEstateCategoryTranslation  } from "../../Enums/EstateCategory";
+import { EstateCategory, getEstateCategoryTranslation  } from "../../Enums/EstateCategory.ts";
 import { createEstateAPI } from "../../Services/EstateService";
 import styles from "./CreateEstate.module.css";
 import MapWithMarker from "../Map/MapWithMarker";

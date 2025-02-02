@@ -12,5 +12,8 @@ global using MongoDB.Bson;
 global using MongoDB.Driver;
 global using DataLayer.DTOs.User;
 global using DataLayer.DTOs.Estate;
+global using DataLayer.DTOs.Comment;
+global using DataLayer.DTOs.Pagination;
+global using DataLayer.DTOs.Post;
 global using MongoDB.Bson.Serialization.Attributes;
 global using System.Text.RegularExpressions;

@@ -48,8 +48,22 @@ public class PostController : ControllerBase
         return Ok(response);
     }
     
-    [HttpPut("Update/{postId}")]
+    [HttpGet("GetById/{postId}")]
     // [Authorize]
+    public async Task<IActionResult> GetById([FromRoute] string postId)
+    {
+        (bool isError, var response, ErrorMessage? error) = await _postService.GetPostById(postId);
+
+        if (isError)
+        {
+            return StatusCode(error?.StatusCode ?? 400, error?.Message);
+        }
+
+        return Ok(response);
+    }
+    
+    [HttpPut("Update/{postId}")]
+    [Authorize]
     public async Task<IActionResult> Update([FromRoute] string postId, [FromBody] UpdatePostDTO postDto)
     {
         (bool isError, var response, ErrorMessage? error) = await _postService.UpdatePost(postId, postDto);
@@ -63,7 +77,7 @@ public class PostController : ControllerBase
     }
     
     [HttpDelete("Delete/{postId}")]
-    // [Authorize]
+    [Authorize]
     public async Task<IActionResult> Delete([FromRoute] string postId)
     {
         (bool isError, var response, ErrorMessage? error) = await _postService.DeletePost(postId);

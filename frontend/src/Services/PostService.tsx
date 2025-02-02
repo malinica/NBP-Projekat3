@@ -26,6 +26,15 @@ export const getAllPostsAPI = async (page: number = 1, pageSize: number = 10) =>
   }
 };
 
+export const getPostById = async (postId: string) => {
+  try {
+    return await axios.get<Post>(`${apiUrl}/GetPostById/${postId}`);
+  } catch (error: any) {
+    toast.error(error.response?.data ?? "Greška pri preuzimanju objave.");
+    return undefined;
+  }
+};
+
 export const updatePostAPI = async (postId: string, title: string, content: string) => {
   try {
     return await axios.put<boolean>(`${apiUrl}/Update/${postId}`, {title, content});

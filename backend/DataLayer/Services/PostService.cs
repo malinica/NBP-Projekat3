@@ -1,7 +1,4 @@
-﻿using DataLayer.DTOs.Pagination;
-using DataLayer.DTOs.Post;
-
-namespace DataLayer.Services;
+﻿namespace DataLayer.Services;
 
 public class PostService
 {
@@ -113,6 +110,54 @@ public class PostService
         }
     }
     
+    public async Task<Result<PostResultDTO, ErrorMessage>> GetPostById(string postId)
+    {
+        try
+        {
+            var post = await _postsCollection.Aggregate()
+                .Match(Builders<Post>.Filter.Eq("_id", ObjectId.Parse(postId)))
+                .Lookup("users_collection", "AuthorId", "_id", "AuthorData")
+                .Lookup("estates_collection", "EstateId", "_id", "EstateData")
+                .As<BsonDocument>()
+                .FirstOrDefaultAsync();
+
+            if (post == null)
+                return "Post nije pronađen.".ToError(404);
+
+            var authorDoc = post["AuthorData"].AsBsonArray.FirstOrDefault();
+            var estateDoc = post["EstateData"].AsBsonArray.FirstOrDefault();
+
+            var postDto = new PostResultDTO
+            {
+                Id = post["_id"].AsObjectId.ToString(),
+                Title = post["Title"].AsString,
+                Content = post["Content"].AsString,
+                CreatedAt = post["CreatedAt"].ToUniversalTime(),
+
+                Author = authorDoc != null ? new UserResultDTO
+                {
+                    Id = authorDoc["_id"].AsObjectId.ToString(),
+                    Username = authorDoc["Username"].AsString,
+                    Email = authorDoc["Email"].AsString,
+                    Role = (UserRole)authorDoc["Role"].AsInt32
+                } : null!,
+
+                // Estate = estateDoc != null ? new EstateResultDTO
+                // {
+                //     Id = estateDoc["_id"].AsObjectId.ToString(),
+                //     Address = estateDoc["Address"].AsString,
+                //     Price = estateDoc["Price"].ToDecimal()
+                // } : null
+            };
+
+            return postDto;
+        }
+        catch (Exception)
+        {
+            return "Došlo je do greške prilikom preuzimanja objave.".ToError();
+        }
+    }
+    
     //metoda za pribavljanje objava za konkretnu nekretninu, ista kao GetAll s tim sto ima i estateId
     //ne moze dok se ne napravi EstateResult
     
@@ -167,6 +212,28 @@ public class PostService
         catch (Exception)
         {
             return "Došlo je do greške prilikom brisanja objave.".ToError();
+        }
+    }
+    
+    public async Task<Result<bool, ErrorMessage>> AddCommentToPost(string postId, string commentId)
+    {
+        try
+        {
+            var updateResult = await _postsCollection.UpdateOneAsync(
+                p => p.Id == postId,
+                Builders<Post>.Update.Push(p => p.CommentIds, commentId)
+            );
+
+            if (updateResult.ModifiedCount == 0)
+            {
+                return "Post nije pronađen ili nije ažuriran.".ToError();
+            }
+
+            return true;
+        }
+        catch (Exception)
+        {
+            return "Došlo je do greške prilikom dodavanja komentara objavi.".ToError();
         }
     }
 }

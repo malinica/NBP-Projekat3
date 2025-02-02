@@ -1,12 +1,15 @@
 import {Post} from "../../Interfaces/Post/Post.ts";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faUser} from "@fortawesome/free-solid-svg-icons";
+import {useNavigate} from "react-router";
 
 type Props = {
   post: Post;
 }
 
 export const PostCard = ({post}:Props) => {
+  const navigate = useNavigate();
+
   return (
     <div className={`card mb-4 shadow`}>
       <div className={`card-body d-flex justify-content-between`}>
@@ -32,6 +35,9 @@ export const PostCard = ({post}:Props) => {
           </div>
         )}
       </div>
+      <button className={`bg-blue text-beige`} onClick={() => navigate(`/forum/${post.id}`, {state: {post}})}>
+        Pogledaj detalje
+      </button>
     </div>
   );
 };

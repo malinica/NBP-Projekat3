@@ -1,4 +1,4 @@
-import { EstateCategory } from "../../Enums/EstateCategory";
+import { EstateCategory } from "../../Enums/EstateCategory.ts";
 
 export interface Estate {
   Title: string;
