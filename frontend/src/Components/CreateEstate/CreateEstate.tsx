@@ -1,10 +1,11 @@
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../Context/useAuth";
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { EstateCategory, getEstateCategoryTranslation  } from "../../Enums/EstateCategory";
 import { createEstateAPI } from "../../Services/EstateService";
 import styles from "./CreateEstate.module.css";
+import MapWithMarker from "../Map/MapWithMarker";
 
 
 const CreateEstate = () => {
@@ -18,6 +19,7 @@ const CreateEstate = () => {
     const [price, setPrice] = useState<number | null>(null);
     const [long, setLong] = useState<number | null>(null);
     const [lat, setLat] = useState<number | null>(null);
+
     const user=useAuth();
 
     const handlePicturesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -25,6 +27,8 @@ const CreateEstate = () => {
         setPictures(e.target.files);
       }
     };
+
+    
 
     const handleSubmit = () => {
       if(price! && squareMeters && totalRooms && long && lat && floorNumber && pictures  && price)
@@ -43,7 +47,18 @@ formData.append("Latitude", lat.toString());
 Array.from(pictures).forEach((file) => {
     formData.append("Images", file);
 });
-createEstateAPI(category, formData);
+var response=createEstateAPI(category, formData);
+if (response!=null  && response !=null) {
+  setLat(null);
+  setLong(null);
+  setPrice(null);
+  setFloornumber(null);
+  setSquareMeters(null);
+  setTotalRooms(null);
+  setPictures(null);
+  setDesc('');
+  setTitle('');
+}
 
 
       }
@@ -145,33 +160,8 @@ createEstateAPI(category, formData);
                           className={`form-control ${styles.fields}`}
                         />
                       </div>
-                    </div>
-              
-                    <div className={`mb-2 row`}>
-                      <label className={`col-sm-2 col-form-label text-blue`}>Longitude:</label>
-                      <div className={`col-sm-10`}>
-                        <input 
-                          type="number" 
-                          value={long ?? ''} 
-                          onChange={(e) => setLong(Number(e.target.value))}
-                          className={`form-control ${styles.fields}`}
-                        />
-                      </div>
-                    </div>
-              
-                    <div className={`mb-2 row`}>
-                      <label className={`col-sm-2 col-form-label text-blue`}>Latitude:</label>
-                      <div className={`col-sm-10`}>
-                        <input 
-                          type="number" 
-                          value={lat ?? ''} 
-                          onChange={(e) => setLat(Number(e.target.value))}
-                          className={`form-control ${styles.fields}`}
-                        />
-                      </div>
-                    </div>
-              
-                    <div className={`mb-4 row`}>
+
+                      <div className={`mb-4 row`}>
                       <label className={`col-sm-2 col-form-label text-blue`}>Pictures:</label>
                       <div className={`col-sm-10`}>
                         <input
@@ -183,6 +173,14 @@ createEstateAPI(category, formData);
                         />
                       </div>
                     </div>
+
+                    </div>
+                    <div style={{ width: '600px', height: '400px', overflow: 'hidden' }}>
+                    <MapWithMarker lat={lat} long={long} setLat={setLat} setLong={setLong} />
+                    </div>
+
+              
+                    
               
                     <div className={`d-flex justify-content-end me-4`}>
                       <button className={`btn-lg text-white text-center rounded-3 border-0 py-2 px-2 ${styles.slova} ${styles.dugme1} ${styles.linija_ispod_dugmeta}`} onClick={handleSubmit}>Dodaj Nekretninu</button>
