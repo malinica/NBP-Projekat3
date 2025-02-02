@@ -54,4 +54,50 @@ public class CommentService
             return "Došlo je do greške prilikom kreiranja komentara.".ToError();
         }
     }
+    
+     public async Task<Result<PaginatedResponseDTO<CommentResultDTO>, ErrorMessage>> GetCommentsForPost(string postId, int page = 1, int pageSize = 10)
+    {
+        try
+        {
+            var comments = await _commentsCollection.Aggregate()
+                .Match(comment => comment.PostId == postId)
+                .Sort(Builders<Comment>.Sort.Descending(p => p.CreatedAt))
+                .Skip((page - 1) * pageSize)
+                .Limit(pageSize)
+                .Lookup("users_collection", "AuthorId", "_id", "AuthorData") 
+                .As<BsonDocument>()
+                .ToListAsync();
+            
+            var commentsDtos = comments.Select(comment =>
+            {
+                var authorDoc = comment["AuthorData"].AsBsonArray.FirstOrDefault();
+
+                return new CommentResultDTO
+                {
+                    Id = comment["_id"].AsObjectId.ToString(),
+                    Content = comment["Content"].AsString,
+                    CreatedAt = comment["CreatedAt"].ToUniversalTime(),
+                    Author = authorDoc != null ? new UserResultDTO
+                    {
+                        Id = authorDoc["_id"].AsObjectId.ToString(),
+                        Username = authorDoc["Username"].AsString,
+                        Email = authorDoc["Email"].AsString,
+                        Role = (UserRole) authorDoc["Role"].AsInt32
+                    } : null!
+                };
+            }).ToList();
+            
+            var totalCount = await _commentsCollection.CountDocumentsAsync(comment => comment.PostId == postId);
+
+            return new PaginatedResponseDTO<CommentResultDTO>()
+            {
+                Data = commentsDtos,
+                TotalLength = totalCount
+            };
+        }
+        catch (Exception)
+        {
+            return "Došlo je do greške prilikom preuzimanja komentara.".ToError();
+        }
+    }
 }

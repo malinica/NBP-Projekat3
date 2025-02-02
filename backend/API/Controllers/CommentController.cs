@@ -12,19 +12,36 @@ public class CommentController : ControllerBase
         _commentService = commentService;
         _userService = userService;
     }
-    
+
     [HttpPost("Create")]
     [Authorize]
     public async Task<IActionResult> CreateComment([FromBody] CreateCommentDTO commentDto)
     {
         var userResult = _userService.GetCurrentUserId(User);
-        
+
         if (userResult.IsError)
         {
             return StatusCode(userResult.Error?.StatusCode ?? 400, userResult.Error?.Message);
         }
-        
-        (bool isError, var response, ErrorMessage? error) = await _commentService.CreateComment(commentDto, userResult.Data);
+
+        (bool isError, var response, ErrorMessage? error) =
+            await _commentService.CreateComment(commentDto, userResult.Data);
+
+        if (isError)
+        {
+            return StatusCode(error?.StatusCode ?? 400, error?.Message);
+        }
+
+        return Ok(response);
+    }
+
+    [HttpGet("GetCommentsForPost/{postId}")]
+    // [Authorize]
+    public async Task<IActionResult> GetCommentForPost([FromRoute] string postId, [FromQuery] int? page,
+        [FromQuery] int? pageSize)
+    {
+        (bool isError, var response, ErrorMessage? error) =
+            await _commentService.GetCommentsForPost(postId, page ?? 1, pageSize ?? 1);
 
         if (isError)
         {
