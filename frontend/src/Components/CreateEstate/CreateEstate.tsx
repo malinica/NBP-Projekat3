@@ -2,7 +2,7 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../Context/useAuth";
 import { useState } from 'react';
-import { EstateCategory } from "../../Enums/EstateCategory";
+import { EstateCategory, getEstateCategoryTranslation  } from "../../Enums/EstateCategory";
 import { createEstateAPI } from "../../Services/EstateService";
 import styles from "./CreateEstate.module.css";
 
@@ -27,19 +27,26 @@ const CreateEstate = () => {
     };
 
     const handleSubmit = () => {
-      if(price! && squareMeters && totalRooms && long && lat && floorNumber && pictures)
-        createEstateAPI(category, {
-          Title: title,
-          Description: desc,
-          Price: price,
-          SquareMeters: squareMeters,
-          TotalRooms: totalRooms,
-          Category: category,
-          FloorNumber: floorNumber,
-          Images: Array.from(pictures).map(file => file.name),
-          Longitude: long,
-          Latitude: lat
-        });
+      if(price! && squareMeters && totalRooms && long && lat && floorNumber && pictures  && price)
+      {
+        const formData = new FormData();
+formData.append("Title", title);
+formData.append("Description", desc);
+formData.append("Price", price.toString());
+formData.append("SquareMeters", squareMeters.toString());
+formData.append("TotalRooms", totalRooms.toString());
+formData.append("Category", category);
+formData.append("FloorNumber", floorNumber.toString());
+formData.append("Longitude", long.toString());
+formData.append("Latitude", lat.toString());
+
+Array.from(pictures).forEach((file) => {
+    formData.append("Images", file);
+});
+createEstateAPI(category, formData);
+
+
+      }
         
       else toast.error("Unesite sve podatke!");
     };
@@ -78,18 +85,18 @@ const CreateEstate = () => {
                     <div className={`mb-2 row`}>
                       <label className={`col-sm-2 col-form-label text-blue`}>Category:</label>
                       <div className={`col-sm-10`}>
-                        <select 
-                          value={category} 
-                          onChange={(e) => setCategory(e.target.value as EstateCategory)} 
-                          className={`form-control ${styles.fields}`}
-                        >
-                          {Object.values(EstateCategory).map((option) => (
-                            <option key={option} value={option} className={``}>
-                              {option}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
+    <select 
+        value={category} 
+        onChange={(e) => setCategory(e.target.value as EstateCategory)} 
+        className={`form-control ${styles.fields}`}
+    >
+        {Object.values(EstateCategory).map((option) => (
+            <option key={option} value={option}>
+                {getEstateCategoryTranslation(option as EstateCategory)}
+            </option>
+        ))}
+    </select>
+</div>
                     </div>
               
                     <div className={`mb-2 row`}>

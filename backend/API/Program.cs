@@ -71,6 +71,19 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+
+var rootFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+var projectsImagesFolder = Path.Combine(rootFolder, "EstateImages");
+if (!Directory.Exists(rootFolder))
+{
+    Directory.CreateDirectory(rootFolder);
+}
+if (!Directory.Exists(projectsImagesFolder))
+{
+    Directory.CreateDirectory(projectsImagesFolder);
+}
+
+
 var databaseDirectoryPath = Path.Combine(Directory.GetCurrentDirectory(), "..", "mongodb_data");
 if (!Directory.Exists(databaseDirectoryPath))
     Directory.CreateDirectory(databaseDirectoryPath);

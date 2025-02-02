@@ -1,6 +1,17 @@
 export enum EstateCategory {
-    House = "Kuca",
-    Flat = "Stan",
-    Office = "Kancelarija",
-    Retail = "Maloprodaja",
+    House = "House",
+    Flat = "Flat",
+    Office = "Office",
+    Retail = "Retail",
+}
+
+export const EstateCategoryTranslations: Record<EstateCategory, string> = {
+    [EstateCategory.House]: "Kuća",
+    [EstateCategory.Flat]: "Stan",
+    [EstateCategory.Office]: "Kancelarija",
+    [EstateCategory.Retail]: "Maloprodaja",
+};
+
+export function getEstateCategoryTranslation(category: EstateCategory): string {
+    return EstateCategoryTranslations[category];
 }

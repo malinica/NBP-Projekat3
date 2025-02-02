@@ -53,42 +53,66 @@
             }
         }
 
-        public async Task<Result<Estate, ErrorMessage>> CreateEstate(string collectionName, EstateCreateDTO newEstateDTO,string? userID)
+        public async Task<Result<Estate, ErrorMessage>> CreateEstate(string collectionName, EstateCreateDTO newEstateDTO, string? userID)
+{
+    try
+    {
+        if (userID != null)
         {
-            try
+            var imagePaths = new List<string>();
+
+            foreach (var file in newEstateDTO.Images)
             {
-                //var userCreator=await userService.GetCurrentUser(User)//GetById(newEstateDTO.UserId);
-                if(userID!=null)
-                {
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "EstateImages");
 
-                var estate = new Estate
+                if (!Directory.Exists(path))
                 {
-                    Title = newEstateDTO.Title,
-                    Description = newEstateDTO.Description,
-                    Price = newEstateDTO.Price,
-                    SquareMeters = newEstateDTO.SquareMeters,
-                    TotalRooms = newEstateDTO.TotalRooms,
-                    Category = newEstateDTO.Category,
-                    FloorNumber = newEstateDTO.FloorNumber,
-                    Images = newEstateDTO.Images,
-                    Longitude = newEstateDTO.Longitude,
-                    Latitude = newEstateDTO.Latitude,
-                    UserId=userID
-                };
-
-                var collection = GetCollection(collectionName);
-                await collection.InsertOneAsync(estate);
-                return estate;
+                    Directory.CreateDirectory(path);
                 }
-                else
-                return "Došlo je do greške prilikom trazenja korisnika".ToError();
+
+                var filePath = Path.Combine(path, fileName);
+
+                await using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                imagePaths.Add("/EstateImages/" + fileName);
             }
-            catch (Exception ex)
+
+            var estate = new Estate
             {
-                Console.WriteLine(ex.Message);
-                return "Došlo je do greške prilikom kreiranja nekretnine.".ToError();
-            }
+                Title = newEstateDTO.Title,
+                Description = newEstateDTO.Description,
+                Price = newEstateDTO.Price,
+                SquareMeters = newEstateDTO.SquareMeters,
+                TotalRooms = newEstateDTO.TotalRooms,
+                Category = newEstateDTO.Category,
+                FloorNumber = newEstateDTO.FloorNumber,
+                Images = imagePaths,
+                Longitude = newEstateDTO.Longitude,
+                Latitude = newEstateDTO.Latitude,
+                UserId = userID
+            };
+
+            var collection = GetCollection(collectionName);
+            await collection.InsertOneAsync(estate);
+
+            return estate;
         }
+        else
+        {
+            return "Došlo je do greške prilikom traženja korisnika.".ToError();
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine(ex.Message);
+        return "Došlo je do greške prilikom kreiranja nekretnine.".ToError();
+    }
+}
+
 
         public async Task<Result<Estate, ErrorMessage>> UpdateEstate(string collectionName, string id, EstateUpdateDTO updatedEstate)
         {

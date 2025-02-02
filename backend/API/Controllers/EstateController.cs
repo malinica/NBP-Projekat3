@@ -17,20 +17,18 @@ public class EstateController : ControllerBase
         this.userService = userService;
     }
 
-    // Zakomentariso sam sve za authorize da bi mogo testiram jel radi u sweger
 
     [HttpPost("CreateEstate/{collectionName}")]
     [Authorize]
-    public async Task<IActionResult> CreateEstate(string collectionName, [FromBody] EstateCreateDTO newEstate)
+    public async Task<IActionResult> CreateEstate(string collectionName, [FromForm] EstateCreateDTO newEstate)
     {
-        // var userResult = userService.GetCurrentUserId(User);
 
-        // if (userResult.IsError)
-        // {
-        //     return StatusCode(userResult.Error?.StatusCode ?? 400, userResult.Error?.Message);
-        // }
         var user=userService.GetCurrentUserId(User);
-        (bool isError, var response, ErrorMessage? error) = await estateService.CreateEstate(collectionName, newEstate,user.IsError ? null : user.Data);
+        if (user.IsError)
+        {
+            return StatusCode(400, "Failed to retrieve user ID.");
+        }
+        (bool isError, var response, ErrorMessage? error) = await estateService.CreateEstate(collectionName, newEstate,user.Data);
 
         if (isError)
         {

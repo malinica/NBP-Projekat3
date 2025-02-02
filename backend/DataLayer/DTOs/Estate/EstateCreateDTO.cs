@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Http;
+
 namespace DataLayer.Models
 {
     public class EstateCreateDTO
@@ -9,7 +11,7 @@ namespace DataLayer.Models
         public required int TotalRooms { get; set; }
         public required EstateCategory Category { get; set; }
         public int? FloorNumber { get; set; }
-        public required List<string> Images { get; set; }
+        public required IFormFile[] Images { get; set; }
         public double Longitude { get; set; }
         public double Latitude { get; set; }
       //  public required string UserId { get; set; }
