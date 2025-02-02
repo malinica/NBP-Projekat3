@@ -3,30 +3,20 @@
     public class EstateService
     {
 
-        private const string ConnectionString = "mongodb://localhost:27017";
-        private const string DatabaseName = "estateDatabase";
+        private readonly IMongoCollection<Estate> _estatesCollection =
+            DbConnection.GetDatabase().GetCollection<Estate>("estates_collection");
         private readonly UserService userService;
 
         public EstateService(UserService userS)
         {
             this.userService=userS;
-            var mongoClient = new MongoClient(ConnectionString);
-            var mongoDatabase = mongoClient.GetDatabase(DatabaseName);
         }
-
-        private IMongoCollection<Estate> GetCollection(string collectionName)
-        {
-            var mongoClient = new MongoClient(ConnectionString);
-            var mongoDatabase = mongoClient.GetDatabase(DatabaseName);
-            return mongoDatabase.GetCollection<Estate>(collectionName);
-        }
-
+        
         public async Task<Result<List<Estate>, ErrorMessage>> GetAllEstatesFromCollection(string collectionName)
         {
             try
             {
-                var collection = GetCollection(collectionName);
-                var estates = await collection.Find(_ => true).ToListAsync();
+                var estates = await _estatesCollection.Find(_ => true).ToListAsync();
                 return estates;
             }
             catch (Exception)
@@ -39,8 +29,7 @@
         {
             try
             {
-                var collection = GetCollection(collectionName);
-                var estate = await collection.Find(x => x.Id == id).FirstOrDefaultAsync();
+                var estate = await _estatesCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
                 if (estate != null)
                 {
                     return estate;
@@ -95,9 +84,8 @@
                 Latitude = newEstateDTO.Latitude,
                 UserId = userID
             };
-
-            var collection = GetCollection(collectionName);
-            await collection.InsertOneAsync(estate);
+            
+            await _estatesCollection.InsertOneAsync(estate);
 
             return estate;
         }
@@ -118,8 +106,8 @@
         {
             try
             {
-                var collection = GetCollection(collectionName);
-                var existingEstate = await collection.Find(x => x.Id == id).FirstOrDefaultAsync();
+                
+                var existingEstate = await _estatesCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
                 if (existingEstate == null)
                 {
                     return "Nije pronadjena nekretnina.".ToError();
@@ -137,7 +125,7 @@
                 existingEstate.Latitude = updatedEstate.Latitude;
                 existingEstate.UserId = updatedEstate.UserId;
 
-                await collection.ReplaceOneAsync(x => x.Id == id, existingEstate);
+                await _estatesCollection.ReplaceOneAsync(x => x.Id == id, existingEstate);
 
                 return existingEstate;
             }
@@ -151,14 +139,13 @@
         {
             try
             {
-                var collection = GetCollection(collectionName);
-                var existingEstate = await collection.Find(x => x.Id == id).FirstOrDefaultAsync();
+                var existingEstate = await _estatesCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
                 if (existingEstate == null)
                 {
                     return "Nije pronadjena nekretnina.".ToError();
                 }
                 
-                var result = await collection.DeleteOneAsync(x => x.Id == id);
+                var result = await _estatesCollection.DeleteOneAsync(x => x.Id == id);
                 if (result.DeletedCount > 0)
                 {
                     return true;
