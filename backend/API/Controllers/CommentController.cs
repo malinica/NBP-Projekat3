@@ -37,7 +37,7 @@ public class CommentController : ControllerBase
 
     [HttpGet("GetCommentsForPost/{postId}")]
     // [Authorize]
-    public async Task<IActionResult> GetCommentForPost([FromRoute] string postId, [FromQuery] int? page,
+    public async Task<IActionResult> GetCommentsForPost([FromRoute] string postId, [FromQuery] int? page,
         [FromQuery] int? pageSize)
     {
         (bool isError, var response, ErrorMessage? error) =

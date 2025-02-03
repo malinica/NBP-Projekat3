@@ -100,4 +100,20 @@ public class CommentService
             return "Došlo je do greške prilikom preuzimanja komentara.".ToError();
         }
     }
+     
+    public async Task<Result<bool, ErrorMessage>> DeleteManyAsync(List<string> commentIds)
+    {
+        try
+        {
+            var filter = Builders<Comment>.Filter.In(c => c.Id, commentIds);
+            var deleteResult = await _commentsCollection.DeleteManyAsync(filter);
+
+            return deleteResult.DeletedCount > 0;
+        }
+        catch (Exception)
+        {
+            return "Došlo je do greške prilikom brisanja komentara objave.".ToError();
+        }
+    }
+
 }

@@ -1,4 +1,6 @@
-﻿namespace DataLayer.Services;
+﻿using Microsoft.Extensions.DependencyInjection;
+
+namespace DataLayer.Services;
 
 public class PostService
 {
@@ -6,10 +8,12 @@ public class PostService
         DbConnection.GetDatabase().GetCollection<Post>("posts_collection");
     
     private readonly UserService _userService;
-
-    public PostService(UserService userService)
+    private readonly IServiceProvider _serviceProvider;
+    
+    public PostService(UserService userService, IServiceProvider serviceProvider)
     {
         _userService = userService;
+        _serviceProvider = serviceProvider;
     }
 
     public async Task<Result<PostResultDTO, ErrorMessage>> CreatePost(CreatePostDTO postDto, string userId)
@@ -199,7 +203,13 @@ public class PostService
             {
                 return "Objava sa datim ID-jem ne postoji.".ToError();
             }
-            // var deleteCommentsResult = await _commentService.DeleteManyAsync(existingPost.CommentIds);
+
+            var commentService = _serviceProvider.GetRequiredService<CommentService>();
+            var deleteCommentsResult = await commentService.DeleteManyAsync(existingPost.CommentIds);
+
+            if (deleteCommentsResult.IsError)
+                return deleteCommentsResult.Error;
+            
             var deleteResult = await _postsCollection.DeleteOneAsync(p => p.Id == postId);
 
             if (deleteResult.DeletedCount == 0)
