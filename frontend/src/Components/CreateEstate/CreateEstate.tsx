@@ -1,5 +1,5 @@
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../Context/useAuth";
 import { useEffect, useState } from 'react';
 import { EstateCategory, getEstateCategoryTranslation } from "../../Enums/EstateCategory.ts";
@@ -22,15 +22,15 @@ const CreateEstate = () => {
 
   const user = useAuth();
 
+  const navigate = useNavigate();
+
   const handlePicturesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setPictures(e.target.files);
     }
   };
 
-
-
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (price! && squareMeters && totalRooms && long && lat && floorNumber && pictures && price) {
       const formData = new FormData();
       formData.append("Title", title);
@@ -46,8 +46,8 @@ const CreateEstate = () => {
       Array.from(pictures).forEach((file) => {
         formData.append("Images", file);
       });
-      var response = createEstateAPI(category, formData);
-      if (response != null && response != null) {
+      //var response = createEstateAPI(category, formData);
+      /*if (response != null && response != null) {
         setLat(null);
         setLong(null);
         setPrice(null);
@@ -57,12 +57,33 @@ const CreateEstate = () => {
         setPictures(null);
         setDesc('');
         setTitle('');
+      }*/
+
+        try {
+          const response = await createEstateAPI(category, formData);
+          if (response) {
+            toast.success("Nekretnina uspešno kreirana!");
+            setLat(null);
+            setLong(null);
+            setPrice(null);
+            setFloornumber(null);
+            setSquareMeters(null);
+            setTotalRooms(null);
+            setPictures(null);
+            setDesc('');
+            setTitle('');
+            console.log(response.data);
+
+            navigate(`/${response.data.Category}/${response.data.id}`); 
+          }
+          else {
+            toast.error("Unesite sve podatke!")
+          }
+        }
+        catch (error) {
+            toast.error("Greška pri kreiranju nekretnine.");
+        }
       }
-
-
-    }
-
-    else toast.error("Unesite sve podatke!");
   };
 
   return (

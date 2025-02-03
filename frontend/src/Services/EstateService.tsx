@@ -39,3 +39,13 @@ export const getEstatesCreatedByUserAPI = async (userId: string) => {
         return undefined;
     }
 };
+
+export const getEstate = async (collectionName: string, id: string) => {
+    try {
+      const response = await axios.get(`${apiUrl}/GetEstate/${collectionName}/${id}`);
+      return response.data;
+    } catch (error: any) {
+      toast.error(error.response?.data ?? "Greška pri preuzimanju nekretnine.");
+      return undefined;
+    }
+};
