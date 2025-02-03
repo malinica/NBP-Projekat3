@@ -14,13 +14,31 @@ export const createCommentAPI = async (content: string, postId: string) => {
   }
 };
 
-export const getCommentsForPostAPI = async (postId: string, page: number = 1, pageSize: number = 10) => {
+export const getCommentsForPostAPI = async (postId: string, skip: number = 0, limit: number = 10) => {
   try {
     return await axios.get<PaginatedResponseDTO<Comment>>(`${apiUrl}/GetCommentsForPost/${postId}`, {
-      params: { page, pageSize },
+      params: { skip, limit },
     });
   } catch (error: any) {
     toast.error(error.response?.data ?? "Greška pri učitavanju komentara.");
+    return undefined;
+  }
+};
+
+export const updateCommentAPI = async (commentId: string, content: string) => {
+  try {
+    return await axios.put<Comment>(`${apiUrl}/Update/${commentId}`, { content });
+  } catch (error: any) {
+    toast.error(error.response?.data ?? "Greška pri ažuriranju komentara.");
+    return undefined;
+  }
+};
+
+export const deleteCommentAPI = async (commentId: string) => {
+  try {
+    return await axios.delete(`${apiUrl}/Delete/${commentId}`);
+  } catch (error: any) {
+    toast.error(error.response?.data ?? "Greška pri brisanju komentara.");
     return undefined;
   }
 };

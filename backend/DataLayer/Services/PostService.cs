@@ -246,4 +246,24 @@ public class PostService
             return "Došlo je do greške prilikom dodavanja komentara objavi.".ToError();
         }
     }
+    
+    public async Task<Result<bool, ErrorMessage>> RemoveCommentFromPost(string postId, string commentId)
+    {
+        try
+        {
+            var filter = Builders<Post>.Filter.Eq(p => p.Id, postId);
+            var update = Builders<Post>.Update.Pull(p => p.CommentIds, commentId);
+
+            var updateResult = await _postsCollection.UpdateOneAsync(filter, update);
+
+            if (updateResult.ModifiedCount == 0)
+                return "Komentar nije pronađen na postu.".ToError();
+
+            return true;
+        }
+        catch (Exception)
+        {
+            return "Došlo je do greške prilikom uklanjanja komentara sa posta.".ToError();
+        }
+    }
 }

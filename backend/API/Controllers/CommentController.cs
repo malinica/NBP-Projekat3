@@ -36,12 +36,12 @@ public class CommentController : ControllerBase
     }
 
     [HttpGet("GetCommentsForPost/{postId}")]
-    // [Authorize]
-    public async Task<IActionResult> GetCommentsForPost([FromRoute] string postId, [FromQuery] int? page,
-        [FromQuery] int? pageSize)
+    [Authorize]
+    public async Task<IActionResult> GetCommentsForPost([FromRoute] string postId, [FromQuery] int? skip,
+        [FromQuery] int? limit)
     {
         (bool isError, var response, ErrorMessage? error) =
-            await _commentService.GetCommentsForPost(postId, page ?? 1, pageSize ?? 1);
+            await _commentService.GetCommentsForPost(postId, skip ?? 0, limit ?? 10);
 
         if (isError)
         {
@@ -49,5 +49,35 @@ public class CommentController : ControllerBase
         }
 
         return Ok(response);
+    }
+    
+    [HttpPut("Update/{commentId}")]
+    [Authorize]
+    public async Task<IActionResult> Update([FromRoute] string commentId, [FromBody] UpdateCommentDTO commentDto)
+    {
+        (bool isError, var response, ErrorMessage? error) =
+            await _commentService.UpdateComment(commentId, commentDto);
+
+        if (isError)
+        {
+            return StatusCode(error?.StatusCode ?? 400, error?.Message);
+        }
+
+        return Ok(response);
+    }
+    
+    [HttpDelete("Delete/{commentId}")]
+    [Authorize]
+    public async Task<IActionResult> Delete([FromRoute] string commentId)
+    {
+        (bool isError, var response, ErrorMessage? error) =
+            await _commentService.DeleteComment(commentId);
+
+        if (isError)
+        {
+            return StatusCode(error?.StatusCode ?? 400, error?.Message);
+        }
+
+        return NoContent();
     }
 }

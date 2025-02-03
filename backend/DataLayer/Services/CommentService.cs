@@ -55,15 +55,15 @@ public class CommentService
         }
     }
     
-     public async Task<Result<PaginatedResponseDTO<CommentResultDTO>, ErrorMessage>> GetCommentsForPost(string postId, int page = 1, int pageSize = 10)
+    public async Task<Result<PaginatedResponseDTO<CommentResultDTO>, ErrorMessage>> GetCommentsForPost(string postId, int skip = 0, int limit = 10)
     {
         try
         {
             var comments = await _commentsCollection.Aggregate()
                 .Match(comment => comment.PostId == postId)
                 .Sort(Builders<Comment>.Sort.Descending(p => p.CreatedAt))
-                .Skip((page - 1) * pageSize)
-                .Limit(pageSize)
+                .Skip(skip)
+                .Limit(limit)
                 .Lookup("users_collection", "AuthorId", "_id", "AuthorData") 
                 .As<BsonDocument>()
                 .ToListAsync();
@@ -113,6 +113,72 @@ public class CommentService
         catch (Exception)
         {
             return "Došlo je do greške prilikom brisanja komentara objave.".ToError();
+        }
+    }
+
+    public async Task<Result<CommentResultDTO, ErrorMessage>> UpdateComment(string commentId,
+        UpdateCommentDTO commentDto)
+    {
+        try
+        {
+            var filter = Builders<Comment>.Filter.Eq(c => c.Id, commentId);
+            var update = Builders<Comment>.Update.Set(c => c.Content, commentDto.Content);
+
+            var updateResult = await _commentsCollection.UpdateOneAsync(filter, update);
+
+            if (updateResult.ModifiedCount == 0)
+                return "Komentar nije pronađen ili nije izvršena promena.".ToError();
+
+            var updatedComment = await _commentsCollection.Find(filter).FirstOrDefaultAsync();
+            if (updatedComment == null)
+                return "Komentar nije pronađen.".ToError();
+
+            var userResult = await _userService.GetById(updatedComment.AuthorId);
+            if (userResult.IsError)
+                return userResult.Error;
+
+            var resultDto = new CommentResultDTO
+            {
+                Id = updatedComment.Id!,
+                Content = updatedComment.Content,
+                CreatedAt = updatedComment.CreatedAt,
+                Author = userResult.Data
+            };
+
+            return resultDto;
+        }
+        catch (Exception)
+        {
+            return "Došlo je do greške prilikom ažuriranja komentara.".ToError();
+        }
+    }
+
+    public async Task<Result<bool, ErrorMessage>> DeleteComment(string commentId)
+    {
+        try
+        {
+            var comment = await _commentsCollection.Find(c => c.Id == commentId).FirstOrDefaultAsync();
+
+            if (comment == null)
+                return "Komentar nije pronađen.".ToError();
+
+            var filter = Builders<Comment>.Filter.Eq(c => c.Id, commentId);
+            var deleteResult = await _commentsCollection.DeleteOneAsync(filter);
+            
+            if (deleteResult.DeletedCount > 0)
+            {
+                var postUpdateResult = await _postService.RemoveCommentFromPost(comment.PostId, commentId);
+                if (postUpdateResult.IsError)
+                    return postUpdateResult.Error;
+
+                return true;
+            }
+
+            return "Došlo je do greške prilikom brisanja komentara.".ToError();
+        }
+        catch (Exception)
+        {
+            return "Došlo je do greške prilikom brisanja komentara.".ToError();
         }
     }
 

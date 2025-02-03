@@ -6,7 +6,7 @@ import {faUser} from "@fortawesome/free-solid-svg-icons";
 import {deletePostAPI, getPostById, updatePostAPI} from "../../Services/PostService.tsx";
 import toast from "react-hot-toast";
 import {CreateComment} from "../CreateComment/CreateComment.tsx";
-import {createCommentAPI, getCommentsForPostAPI} from "../../Services/CommentService.tsx";
+import {createCommentAPI, deleteCommentAPI, getCommentsForPostAPI} from "../../Services/CommentService.tsx";
 import {Comment} from "../../Interfaces/Comment/Comment.ts";
 import {CommentCard} from "../CommentCard/CommentCard.tsx";
 import {useAuth} from "../../Context/useAuth.tsx";
@@ -27,7 +27,7 @@ export const PostPage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(post?.title || "");
   const [editedContent, setEditedContent] = useState(post?.content || "");
-  const [page, setPage] = useState(0);
+  // const [page, setPage] = useState(0);
   const [scrollPosition, setScrollPosition] = useState(0);
 
   useEffect(() => {
@@ -42,7 +42,7 @@ export const PostPage = () => {
 
   useEffect(() => {
     window.scrollTo({
-      top: scrollPosition + 380,
+      top: scrollPosition,
       behavior: "instant",
     })
   }, [scrollPosition]);
@@ -86,8 +86,8 @@ export const PostPage = () => {
     try {
       setIsCommentsLoading(true);
       const scrollY = window.scrollY;
-      const nextPage = page + 1;
-      const response = await getCommentsForPostAPI(postId!, nextPage, 5);
+      // const nextPage = page + 1;
+      const response = await getCommentsForPostAPI(postId!, comments.length, 5);
       if (response?.status == 200) {
         const newComments = response.data.data;
         setComments(prevComments => [
@@ -97,7 +97,7 @@ export const PostPage = () => {
           ),
         ]);
         setTotalCommentsCount(response.data.totalLength);
-        setPage(nextPage)
+        // setPage(nextPage)
         setIsCommentsLoading(false);
       }
       setScrollPosition(scrollY);
@@ -108,7 +108,7 @@ export const PostPage = () => {
     }
   }
 
-  const confirmDeletion = async () => {
+  const confirmPostDeletion = async () => {
     Swal.fire({
       title: "Da li sigurno želite da obrišete objavu?",
       text: "Uz objavu će biti obrisani i svi njeni komentari!",
@@ -121,12 +121,12 @@ export const PostPage = () => {
       confirmButtonText: "Obriši"
     }).then(async (result) => {
       if (result.isConfirmed) {
-        await handleDelete();
+        await handleDeletePost();
       }
     });
   }
 
-  const handleDelete = async () => {
+  const handleDeletePost = async () => {
     try {
       const response = await deletePostAPI(postId!);
       if (response?.status == 204) {
@@ -166,6 +166,37 @@ export const PostPage = () => {
       toast.error("Došlo je do greške prilikom izmene objave.");
     }
   };
+
+  const confirmCommentDeletion = async (commentId: string) => {
+    Swal.fire({
+      title: "Da li sigurno želite da obrišete komentar?",
+      icon: "warning",
+      position: "top",
+      showCancelButton: true,
+      confirmButtonColor: "#8cc4da",
+      cancelButtonColor: "#d33",
+      cancelButtonText: "Otkaži",
+      confirmButtonText: "Obriši"
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await handleDeleteComment(commentId);
+      }
+    });
+  }
+
+  const handleDeleteComment = async (id: string) => {
+    try {
+      const response = await deleteCommentAPI(id);
+      if(response?.status == 204) {
+        toast.success("Uspešno brisanje komentara.");
+        setComments(comments => comments.filter(c => c.id !== id));
+        setTotalCommentsCount(total => total - 1);
+      }
+    }
+    catch {
+      toast.error("Greška pri brisanju komentara.");
+    }
+  }
 
   return (
     <>
@@ -219,7 +250,7 @@ export const PostPage = () => {
                       <button onClick={() => setIsEditing(true)}
                               className={`bg-blue text-beige rounded-2 border-0 px-3 py-1`}>Izmeni
                       </button>
-                      <button onClick={confirmDeletion} className={`bg-golden text-beige rounded-2 border-0 px-3 py-1`}>Obriši
+                      <button onClick={confirmPostDeletion} className={`bg-golden text-beige rounded-2 border-0 px-3 py-1`}>Obriši
                       </button>
                     </div>
                   }
@@ -251,7 +282,7 @@ export const PostPage = () => {
           </>) : (
             <>
               {comments.length > 0 && comments.map(comment => (
-                <CommentCard key={comment.id} comment={comment}/>
+                <CommentCard key={comment.id} comment={comment} onDelete={confirmCommentDeletion}/>
               ))}
             </>
           )}
