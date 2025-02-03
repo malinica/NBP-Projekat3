@@ -9,9 +9,9 @@
 
         public EstateService(UserService userS)
         {
-            this.userService=userS;
+            this.userService = userS;
         }
-        
+
         public async Task<Result<List<Estate>, ErrorMessage>> GetAllEstatesFromCollection(string collectionName)
         {
             try
@@ -43,70 +43,70 @@
         }
 
         public async Task<Result<Estate, ErrorMessage>> CreateEstate(string collectionName, EstateCreateDTO newEstateDTO, string? userID)
-{
-    try
-    {
-        if (userID != null)
         {
-            var imagePaths = new List<string>();
-
-            foreach (var file in newEstateDTO.Images)
+            try
             {
-                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-                var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "EstateImages");
-
-                if (!Directory.Exists(path))
+                if (userID != null)
                 {
-                    Directory.CreateDirectory(path);
+                    var imagePaths = new List<string>();
+
+                    foreach (var file in newEstateDTO.Images)
+                    {
+                        var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                        var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "EstateImages");
+
+                        if (!Directory.Exists(path))
+                        {
+                            Directory.CreateDirectory(path);
+                        }
+
+                        var filePath = Path.Combine(path, fileName);
+
+                        await using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await file.CopyToAsync(stream);
+                        }
+
+                        imagePaths.Add("/EstateImages/" + fileName);
+                    }
+
+                    var estate = new Estate
+                    {
+                        Title = newEstateDTO.Title,
+                        Description = newEstateDTO.Description,
+                        Price = newEstateDTO.Price,
+                        SquareMeters = newEstateDTO.SquareMeters,
+                        TotalRooms = newEstateDTO.TotalRooms,
+                        Category = newEstateDTO.Category,
+                        FloorNumber = newEstateDTO.FloorNumber,
+                        Images = imagePaths,
+                        Longitude = newEstateDTO.Longitude,
+                        Latitude = newEstateDTO.Latitude,
+                        UserId = userID
+                    };
+
+                    await _estatesCollection.InsertOneAsync(estate);
+
+                    return estate;
                 }
-
-                var filePath = Path.Combine(path, fileName);
-
-                await using (var stream = new FileStream(filePath, FileMode.Create))
+                else
                 {
-                    await file.CopyToAsync(stream);
+                    return "Došlo je do greške prilikom traženja korisnika.".ToError();
                 }
-
-                imagePaths.Add("/EstateImages/" + fileName);
             }
-
-            var estate = new Estate
+            catch (Exception ex)
             {
-                Title = newEstateDTO.Title,
-                Description = newEstateDTO.Description,
-                Price = newEstateDTO.Price,
-                SquareMeters = newEstateDTO.SquareMeters,
-                TotalRooms = newEstateDTO.TotalRooms,
-                Category = newEstateDTO.Category,
-                FloorNumber = newEstateDTO.FloorNumber,
-                Images = imagePaths,
-                Longitude = newEstateDTO.Longitude,
-                Latitude = newEstateDTO.Latitude,
-                UserId = userID
-            };
-            
-            await _estatesCollection.InsertOneAsync(estate);
-
-            return estate;
+                Console.WriteLine(ex.Message);
+                return "Došlo je do greške prilikom kreiranja nekretnine.".ToError();
+            }
         }
-        else
-        {
-            return "Došlo je do greške prilikom traženja korisnika.".ToError();
-        }
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine(ex.Message);
-        return "Došlo je do greške prilikom kreiranja nekretnine.".ToError();
-    }
-}
 
 
         public async Task<Result<Estate, ErrorMessage>> UpdateEstate(string collectionName, string id, EstateUpdateDTO updatedEstate)
         {
             try
             {
-                
+
                 var existingEstate = await _estatesCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
                 if (existingEstate == null)
                 {
@@ -144,7 +144,7 @@
                 {
                     return "Nije pronadjena nekretnina.".ToError();
                 }
-                
+
                 var result = await _estatesCollection.DeleteOneAsync(x => x.Id == id);
                 if (result.DeletedCount > 0)
                 {
@@ -157,5 +157,24 @@
                 return "Došlo je do greške prilikom brisanja nekretnine.".ToError();
             }
         }
+
+        public async Task<Result<List<Estate>, ErrorMessage>> GetEstatesCreatedByUser(string userId)
+        {
+            try
+            {
+                var estates = await _estatesCollection.Find(x => x.UserId == userId).ToListAsync();
+                if (estates.Any())
+                {
+                    return estates;
+                }
+                return "Korisnik trenutno nema nekretnina.".ToError();
+            }
+            catch (Exception)
+            {
+                return "Došlo je do greške prilikom preuzimanja nekretnina.".ToError();
+            }
+        }
+
+
     }
 }

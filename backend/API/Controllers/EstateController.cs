@@ -17,7 +17,6 @@ public class EstateController : ControllerBase
         this.userService = userService;
     }
 
-
     [HttpPost("CreateEstate/{collectionName}")]
     [Authorize]
     public async Task<IActionResult> CreateEstate(string collectionName, [FromForm] EstateCreateDTO newEstate)
@@ -61,14 +60,14 @@ public class EstateController : ControllerBase
     }
 
     [HttpPut("UpdateEstate/{collectionName}/{id}")]
-    //[Authorize]
+    [Authorize]
     public async Task<IActionResult> UpdateEstate(string collectionName, string id, [FromBody] EstateUpdateDTO updatedEstate)
     {
-        // var userResult = userService.GetCurrentUserId(User);
-        // if (userResult.IsError)
-        // {
-        //     return StatusCode(userResult.Error?.StatusCode ?? 400, userResult.Error?.Message);
-        // }
+        var userResult = userService.GetCurrentUserId(User);
+        if (userResult.IsError)
+        {
+            return StatusCode(userResult.Error?.StatusCode ?? 400, userResult.Error?.Message);
+        }
 
         (bool isError, _, ErrorMessage? error) = await estateService.UpdateEstate(collectionName, id, updatedEstate);
         if (isError)
@@ -79,14 +78,14 @@ public class EstateController : ControllerBase
     }
 
     [HttpDelete("RemoveEstate/{collectionName}/{id}")]
-    //[Authorize]
+    [Authorize]
     public async Task<IActionResult> RemoveEstate(string collectionName, string id)
     {
-        // var userResult = userService.GetCurrentUserId(User);
-        // if (userResult.IsError)
-        // {
-        //     return StatusCode(userResult.Error?.StatusCode ?? 400, userResult.Error?.Message);
-        // }
+        var userResult = userService.GetCurrentUserId(User);
+        if (userResult.IsError)
+        {
+            return StatusCode(userResult.Error?.StatusCode ?? 400, userResult.Error?.Message);
+        }
 
         (bool isError, _, ErrorMessage? error) = await estateService.RemoveEstate(collectionName, id);
         if (isError)
@@ -94,6 +93,17 @@ public class EstateController : ControllerBase
             return StatusCode(error?.StatusCode ?? 400, error?.Message);
         }
         return Ok("Estate removed");
+    }
+
+    [HttpGet("GetEstatesCreatedByUser/{userId}")]
+    public async Task<IActionResult> GetEstatesCreatedByUser(string userId)
+    {
+        (bool isError, var response, ErrorMessage? error) = await estateService.GetEstatesCreatedByUser(userId);
+        if (isError)
+        {
+            return StatusCode(error?.StatusCode ?? 400, error?.Message);
+        }
+        return Ok(response);
     }
 
 }
