@@ -10,6 +10,7 @@ import {Footer} from "./Components/Footer/Footer.tsx";
 import {ForumPage} from "./Components/ForumPage/ForumPage.tsx";
 import CreateEstate from './Components/CreateEstate/CreateEstate.tsx';
 import {PostPage} from "./Components/PostPage/PostPage.tsx";
+import "leaflet/dist/leaflet.css";
 
 function App() {
 

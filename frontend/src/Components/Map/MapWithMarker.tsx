@@ -5,6 +5,8 @@ import { MapContainer, Marker, TileLayer } from "react-leaflet";
 import MapMarker from "./MapMarker";
 import { GeoCoordinates } from "../../Interfaces/GeoCoordinates/GeoCoordinates ";
 
+import locationPin from "../../assets/location-pin.png";
+
 interface Props {
     setLat: (latitude: number | null) => void;
     setLong: (longitude: number | null) => void;
@@ -17,7 +19,7 @@ const MapWithMarker: React.FC<Props> = ({ setLat, setLong, long, lat }) => {
     const mapaCentar = { lat: 43.32083030, lng: 21.89544071 };
 
     const customIcon = new Icon({
-        iconUrl: "../../assets/location-pin.png",
+        iconUrl: locationPin,
         iconSize: [38, 38],
     });
 
@@ -34,7 +36,7 @@ const MapWithMarker: React.FC<Props> = ({ setLat, setLong, long, lat }) => {
                 <MapContainer
                     center={mapaCentar}
                     zoom={14}
-                    style={{ width: '100%', height: '100%' }}
+                    style={{ width: '100%', height: '500px' }}
                     zoomControl={false}
                     attributionControl={false}
                 >
