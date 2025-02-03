@@ -31,18 +31,18 @@ export const Home = () => {
     return (
         <div className={`container-fluid p-0 bg-beige`}>
             <div className={`position-relative w-100`}>
-                <img src={pocetna} alt="pocetna slika" className={`w-100 vh-100 object-fit-cover position-absolute top-0 start-0`} />
+                <img src={pocetna} alt="pocetna slika" className={`w-100 vh-100 object-fit-cover position-absolute top-0 start-0`} style={{ filter: "brightness(70%)" }}/>
                 
                 <div className={`container position-relative d-flex flex-column align-items-start justify-content-center text-white`} style={{ minHeight: "100vh" }}>
                     <div className={`col-xxl-4 col-xl-5 col-lg-6 col-md-8 text-start ms-lg-5 mt-n5`}>
-                        <h1 className={`text-beige fw-bold mb-3 mt-n5`}>Tvoj idealan dom čeka na tebe!</h1>
-                        <p className={`lead text-beige fw-normal mb-4`}>
+                        <h1 className={`text-beige fw-bold mb-3 mt-n5 ${styles.senka}`}>Tvoj idealan dom čeka na tebe!</h1>
+                        <p className={`lead text-beige fw-normal mb-4 ${styles.senka}`}>
                             Bilo da tražiš savršen stan u centru grada, mirnu kuću na periferiji ili 
                             komercijalni prostor za tvoj biznis, tu smo da ti pomognemo u pronalaženju nekretnine iz snova.
                         </p>
                         <Link
                             to="/"
-                            className={`btn btn-lg text-white rounded shadow-lg py-3 px-4 ${styles.slova1} ${styles.dugme2} ${styles.linija_ispod_dugmeta}`}>
+                            className={`btn btn-lg text-white rounded shadow-lg py-3 px-4 ${styles.slova1} ${styles.dugme1} ${styles.linija_ispod_dugmeta}`}>
                             Pronađi Nekretninu
                         </Link>
                     </div>
@@ -54,10 +54,10 @@ export const Home = () => {
                     <div className={`col-md-3 mt-5`}>
                         <FontAwesomeIcon icon={faHouseChimney} className={`text-light-blue fs-1`} />            
                         <h5 className={`mt-3 text-golden`}>Ogroman broj ponuda</h5>
-                        <p className={`text-gray`}>Pregledaj najnovije i najatraktivnije nekretnine koje odgovaraju tvojim željama.</p>
+                        <p className={`text-blue`}>Pregledaj najnovije i najatraktivnije nekretnine koje odgovaraju tvojim željama.</p>
                         <Link
                                 to="/"
-                                className={`btn-lg text-white text-center rounded py-2 px-2 ${styles.slova} ${styles.dugme1} ${styles.linija_ispod_dugmeta}`}
+                                className={`btn-lg text-white text-center rounded py-2 px-2 ${styles.slova} ${styles.dugme2} ${styles.linija_ispod_dugmeta}`}
                             >
                                 Pregledaj Nekretnine
                         </Link>
@@ -65,10 +65,10 @@ export const Home = () => {
                     <div className={`col-md-3 mt-5`}>
                         <FontAwesomeIcon icon={faPlus} className={`text-light-blue fs-1`} />
                         <h5 className={`mt-3 text-golden`}>Jednostavno postavljanje oglasa</h5>
-                        <p className={`text-gray`}>Kreirajte oglas sa svim potrebnim informacijama o nekretnini.</p>
+                        <p className={`text-blue`}>Kreirajte oglas sa svim potrebnim informacijama o nekretnini.</p>
                         <Link
                                 to="/"
-                                className={`btn-lg text-white text-center rounded py-2 px-2 ${styles.slova} ${styles.dugme1} ${styles.linija_ispod_dugmeta}`}
+                                className={`btn-lg text-white text-center rounded py-2 px-2 ${styles.slova} ${styles.dugme2} ${styles.linija_ispod_dugmeta}`}
                             >
                                 Kreiraj Nekretninu
                         </Link>
@@ -76,10 +76,10 @@ export const Home = () => {
                     <div className={`col-md-3 mt-5`}>
                         <FontAwesomeIcon icon={faPeopleArrows} className={`text-light-blue fs-1`} />
                         <h5 className={`mt-3 text-golden`}>Poboljšajte našu uslugu</h5>
-                        <p className={`text-gray`}>Svaka povratna informacija nam pomaže da postanemo bolji!</p>
+                        <p className={`text-blue`}>Svaka povratna informacija nam pomaže da postanemo bolji!</p>
                         <Link
                                 to="/"
-                                className={`btn-lg text-white text-center rounded py-2 px-2 ${styles.slova} ${styles.dugme1} ${styles.linija_ispod_dugmeta}`}
+                                className={`btn-lg text-white text-center rounded py-2 px-2 ${styles.slova} ${styles.dugme2} ${styles.linija_ispod_dugmeta}`}
                             >
                                 Podeli Mišljenje
                         </Link>

@@ -2,6 +2,7 @@ import {Post} from "../../Interfaces/Post/Post.ts";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faUser} from "@fortawesome/free-solid-svg-icons";
 import {useNavigate} from "react-router";
+import styles from "./PostCard.module.css";
 
 type Props = {
   post: Post;
@@ -19,6 +20,10 @@ export const PostCard = ({post}:Props) => {
             <FontAwesomeIcon icon={faUser} className={`me-1`}/>
             {post.author.username}</p>
           <p className={`card-text content-text`}>{post.content}</p>
+
+          <button className={`btn-lg text-white text-center rounded-3 border-0 py-2 px-2 ${styles.slova} ${styles.dugme1} ${styles.linija_ispod_dugmeta}`} onClick={() => navigate(`/forum/${post.id}`, {state: {post}})}>
+            Pogledaj detalje
+          </button>
         </div>
 
         {post.estate && (
@@ -34,10 +39,9 @@ export const PostCard = ({post}:Props) => {
             </div>
           </div>
         )}
+
+
       </div>
-      <button className={`bg-blue text-beige`} onClick={() => navigate(`/forum/${post.id}`, {state: {post}})}>
-        Pogledaj detalje
-      </button>
     </div>
   );
 };

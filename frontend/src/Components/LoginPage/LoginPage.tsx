@@ -39,7 +39,7 @@ export const LoginPage = () => {
   }
 
   return (
-    <div className={`container-fluid bg-light-blue d-flex justify-content-center flex-grow-1`}>
+    <div className={`container-fluid bg-gray d-flex justify-content-center flex-grow-1`}>
       <div className={`col-xxl-7 col-xl-7 col-lg-6 col-md-10 col-sm-12 p-5 m-4 bg-light rounded d-flex flex-column`}>
         <div className={`m-4`}></div>
         <h4 className={`text-center text-blue`}>Prijavite Se</h4>

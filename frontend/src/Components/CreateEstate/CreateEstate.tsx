@@ -74,7 +74,7 @@ const CreateEstate = () => {
               <div className={`row justify-content-center py-3 px-3`}>
                 <h1 className={`text-center text-gray pb-5`}>Kreiraj Nekretninu</h1>
                 <div className={`mb-2 row`}>
-                  <label className={`col-sm-2 col-form-label text-blue`}>Title:</label>
+                  <label className={`col-sm-2 col-form-label text-blue`}>Naziv:</label>
                   <div className={`col-sm-10`}>
                     <input
                       type="text"
@@ -86,7 +86,7 @@ const CreateEstate = () => {
                 </div>
 
                 <div className={`mb-2 row`}>
-                  <label className={`col-sm-2 col-form-label text-blue`}>Description:</label>
+                  <label className={`col-sm-2 col-form-label text-blue`}>Opis:</label>
                   <div className={`col-sm-10`}>
                     <textarea
                       value={desc}
@@ -97,7 +97,7 @@ const CreateEstate = () => {
                 </div>
 
                 <div className={`mb-2 row`}>
-                  <label className={`col-sm-2 col-form-label text-blue`}>Category:</label>
+                  <label className={`col-sm-2 col-form-label text-blue`}>Kategorija:</label>
                   <div className={`col-sm-10`}>
                     <select
                       value={category}
@@ -114,7 +114,7 @@ const CreateEstate = () => {
                 </div>
 
                 <div className={`mb-2 row`}>
-                  <label className={`col-sm-2 col-form-label text-blue`}>Total Rooms:</label>
+                  <label className={`col-sm-2 col-form-label text-blue`}>Broj soba:</label>
                   <div className={`col-sm-10`}>
                     <input
                       type="number"
@@ -126,7 +126,7 @@ const CreateEstate = () => {
                 </div>
 
                 <div className={`mb-2 row`}>
-                  <label className={`col-sm-2 col-form-label text-blue`}>Square Meters:</label>
+                  <label className={`col-sm-2 col-form-label text-blue`}>Površina:</label>
                   <div className={`col-sm-10`}>
                     <input
                       type="number"
@@ -138,7 +138,7 @@ const CreateEstate = () => {
                 </div>
 
                 <div className={`mb-2 row`}>
-                  <label className={`col-sm-2 col-form-label text-blue`}>Floor Number:</label>
+                  <label className={`col-sm-2 col-form-label text-blue`}>Sprat:</label>
                   <div className={`col-sm-10`}>
                     <input
                       type="number"
@@ -150,7 +150,7 @@ const CreateEstate = () => {
                 </div>
 
                 <div className={`mb-2 row`}>
-                  <label className={`col-sm-2 col-form-label text-blue`}>Price:</label>
+                  <label className={`col-sm-2 col-form-label text-blue`}>Cena:</label>
                   <div className={`col-sm-10`}>
                     <input
                       type="number"
@@ -159,18 +159,18 @@ const CreateEstate = () => {
                       className={`form-control ${styles.fields}`}
                     />
                   </div>
+                </div>
 
-                  <div className={`mb-4 row`}>
-                    <label className={`col-sm-2 col-form-label text-blue`}>Pictures:</label>
-                    <div className={`col-sm-10`}>
-                      <input
-                        type="file"
-                        className={`form-control ${styles.fields}`}
-                        onChange={handlePicturesChange}
-                        multiple
-                        required
-                      />
-                    </div>
+                <div className={`mb-4 row`}>
+                  <label className={`col-sm-2 col-form-label text-blue`}>Slike:</label>
+                  <div className={`col-sm-10`}>
+                    <input
+                      type="file"
+                      className={`form-control ${styles.fields}`}
+                      onChange={handlePicturesChange}
+                      multiple
+                      required
+                    />
                   </div>
                 </div>
                 
@@ -178,7 +178,7 @@ const CreateEstate = () => {
                   <MapWithMarker lat={lat} long={long} setLat={setLat} setLong={setLong} />
                 </div>
 
-                <div className={`d-flex justify-content-end me-4`}>
+                <div className={`d-flex justify-content-end me-4 mt-4`}>
                   <button className={`btn-lg text-white text-center rounded-3 border-0 py-2 px-2 ${styles.slova} ${styles.dugme1} ${styles.linija_ispod_dugmeta}`} onClick={handleSubmit}>Dodaj Nekretninu</button>
                 </div>
               </div>

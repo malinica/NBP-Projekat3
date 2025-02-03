@@ -5,6 +5,7 @@ import {useAuth} from "../../Context/useAuth.tsx";
 import {useState} from "react";
 import {updateCommentAPI} from "../../Services/CommentService.tsx";
 import toast from "react-hot-toast";
+import styles from "./CommentCard.module.css";
 
 type Props = {
   comment: Comment;
@@ -40,12 +41,12 @@ export const CommentCard = ({comment:commentFromProps, onDelete}: Props) => {
   };
 
   return (
-    <div className="mb-4">
-      <div className="d-flex align-items-center mb-2">
-        <FontAwesomeIcon icon={faUser} className="text-muted me-2"/>
-        <span className="me-2">{comment.author.username}</span>
-        <FontAwesomeIcon icon={faCalendarAlt} className="text-muted me-1"/>
-        <span className="text-muted text-small">
+    <div className={`mb-4 p-4 bg-sand rounded-3`}>
+      <div className={`d-flex align-items-center mb-2`}>
+        <FontAwesomeIcon icon={faUser} className={`text-blue me-2`}/>
+        <span className={`me-2 text-blue`}>{comment.author.username}</span>
+        <FontAwesomeIcon icon={faCalendarAlt} className={`text-beige me-1`}/>
+        <span className={`text-beige text-small`}>
           {new Date(comment.createdAt).toLocaleDateString("sr")}
         </span>
       </div>
@@ -53,31 +54,31 @@ export const CommentCard = ({comment:commentFromProps, onDelete}: Props) => {
       {isEditing ? (
         <div>
           <textarea
-            className="form-control mb-2"
+            className={`form-control mb-2`}
             value={newContent}
             onChange={(e) => setNewContent(e.target.value)}
           />
-          <div className="d-flex justify-content-start">
-            <button onClick={handleSave} disabled={!newContent} className="btn btn-primary btn-sm me-2">
+          <div className={`d-flex justify-content-start`}>
+            <button onClick={handleSave} disabled={!newContent} className={`btn btn-sm me-2 text-beige ${styles.dugme1}`}>
               <FontAwesomeIcon icon={faSave}/>
             </button>
-            <button onClick={handleCancel} className="btn btn-secondary btn-sm">
+            <button onClick={handleCancel} className={`btn btn-sm text-beige ${styles.dugme2}`}>
               <FontAwesomeIcon icon={faTimes}/>
             </button>
           </div>
         </div>
       ) : (
-        <p className="mt-2 text-muted">{comment.content}</p>
+        <p className={`mt-2 text-muted`}>{comment.content}</p>
       )}
 
       {user?.id === comment.author.id && (
-        <div className="mt-2 d-flex justify-content-start">
+        <div className={`mt-2 d-flex justify-content-start`}>
           {!isEditing && (
-            <button onClick={() => setIsEditing(true)} className="btn btn-outline-primary btn-sm me-2">
+            <button onClick={() => setIsEditing(true)} className={`btn btn-sm me-2 text-beige ${styles.dugme1}`}>
               <FontAwesomeIcon icon={faEdit}/>
             </button>
           )}
-          <button onClick={() => onDelete(comment.id)} className="btn btn-outline-danger btn-sm">
+          <button onClick={() => onDelete(comment.id)} className={`btn btn-sm text-beige ${styles.dugme2}`}>
             <FontAwesomeIcon icon={faTrash}/>
           </button>
         </div>

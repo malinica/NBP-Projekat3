@@ -11,6 +11,7 @@ import {Comment} from "../../Interfaces/Comment/Comment.ts";
 import {CommentCard} from "../CommentCard/CommentCard.tsx";
 import {useAuth} from "../../Context/useAuth.tsx";
 import Swal from 'sweetalert2';
+import styles from "./PostPage.module.css";
 
 export const PostPage = () => {
 
@@ -200,95 +201,99 @@ export const PostPage = () => {
 
   return (
     <>
-      <div className="container mt-4">
-        {isPostLoading ?
-          (<><p>Učitavanje objave...</p></>) :
-          (post && <>
-            <div className="post-container p-4 rounded">
+      <div className={`container-fluid bg-beige`}>
+        <div className={`container mt-4`}>
+          {isPostLoading ?
+            (<><p className={`text-center text-muted`}>Učitavanje objave...</p></>) :
+            (post && <>
+              <div>
 
-              {isEditing ? (
-                <div className={`d-flex flex-column gap-2`}>
-                  <label htmlFor="postTitle">Naslov</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    value={editedTitle}
-                    id="postTitle"
-                    onChange={(e) => setEditedTitle(e.target.value)}
-                    required
-                  />
-                  <label htmlFor="postContent">Sadržaj</label>
-                  <textarea
-                    className="form-control"
-                    value={editedContent}
-                    id={`postContent`}
-                    onChange={(e) => setEditedContent(e.target.value)}
-                    required
-                  />
-                  <div className="mt-2 flex space-x-2">
-                    <button onClick={handleSaveEdit}
-                            className="bg-blue text-beige border-0 px-3 py-1 rounded"
-                            disabled={!editedTitle || !editedContent}>
-                      Sačuvaj
-                    </button>
-                    <button onClick={handleCancelEdit} className="bg-golden text-beige border-0 px-3 py-1 rounded">
-                      Otkaži
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <>
-                  <h2 className="text-primary">{post.title}</h2>
-                  <p className="text-muted">
-                    <FontAwesomeIcon icon={faUser} className="me-1"/>
-                    {post?.author.username}
-                  </p>
-                  <p className="content-text">{post.content}</p>
-
-                  {post?.author.id == user?.id &&
-                    <div className="d-flex">
-                      <button onClick={() => setIsEditing(true)}
-                              className={`bg-blue text-beige rounded-2 border-0 px-3 py-1`}>Izmeni
+                {isEditing ? (
+                  <div className={`d-flex flex-column gap-2 card rounded-3 p-4 shadow my-4`}>
+                    <label className={`text-blue`} htmlFor="postTitle">Naslov:</label>
+                    <input
+                      type="text"
+                      className={`form-control`}
+                      value={editedTitle}
+                      id="postTitle"
+                      onChange={(e) => setEditedTitle(e.target.value)}
+                      required
+                    />
+                    <label className={`text-blue`} htmlFor="postContent">Sadržaj:</label>
+                    <textarea
+                      className={`form-control`}
+                      value={editedContent}
+                      id={`postContent`}
+                      onChange={(e) => setEditedContent(e.target.value)}
+                      required
+                    />
+                    <div className={`mt-2 flex space-x-2`}>
+                      <button onClick={handleSaveEdit}
+                              className={`btn-lg text-white text-center rounded-3 border-0 py-2 px-2 me-1 ${styles.slova} ${styles.dugme1} ${styles.linija_ispod_dugmeta}`}
+                              disabled={!editedTitle || !editedContent}>
+                        Sačuvaj
                       </button>
-                      <button onClick={confirmPostDeletion} className={`bg-golden text-beige rounded-2 border-0 px-3 py-1`}>Obriši
+                      <button onClick={handleCancelEdit} 
+                              className={`btn-lg text-gray text-center rounded-3 border-0 py-2 px-2 ${styles.slova} ${styles.dugme2} ${styles.linija_ispod_dugmeta}`}>
+                        Otkaži
                       </button>
                     </div>
-                  }
-                </>
-              )}
+                  </div>
+                ) : (
+                  <>
+                    <div className={`card rounded-3 p-4 shadow my-4`}>
+                      <h2 className={`text-blue`}>{post.title}</h2>
+                      <p className={`text-golden`}>
+                        <FontAwesomeIcon icon={faUser} className={`me-1`}/>
+                        {post?.author.username}
+                      </p>
+                      <p className={`content-text`}>{post.content}</p>
 
-              {post.estate && (
-                <div className="estate-container mt-4 p-3 border rounded">
-                  <h5>Odnosi se na nekretninu</h5>
-                  <img
-                    src="https://picsum.photos/300/200"
-                    alt="Estate placeholder"
-                    className="img-fluid"
-                  />
-                  <p>Dodatne informacije o nekretnini</p>
-                </div>
-              )}
-            </div>
-          </>)}
+                      {post?.author.id == user?.id &&
+                        <div className={`d-flex`}>
+                          <button onClick={() => setIsEditing(true)} className={`btn-lg text-white text-center rounded-3 border-0 py-2 px-2 me-1 ${styles.slova} ${styles.dugme1} ${styles.linija_ispod_dugmeta}`}>
+                            Izmeni
+                          </button>
+                          <button onClick={confirmPostDeletion} className={`btn-lg text-gray text-center rounded-3 border-0 py-2 px-2 ${styles.slova} ${styles.dugme2} ${styles.linija_ispod_dugmeta}`}>
+                            Obriši
+                          </button>
+                        </div>
+                      }
+                    </div>
+                  </>
+                )}
 
-        <CreateComment content={newCommentContent} setContent={setNewCommentContent}
-                       onCommentCreated={handleAddComment}/>
+                {post.estate && (
+                  <div className={`estate-container mt-4 p-3 border rounded`}>
+                    <h5>Odnosi se na nekretninu</h5>
+                    <img
+                      src="https://picsum.photos/300/200"
+                      alt="Estate placeholder"
+                      className={`img-fluid`}
+                    />
+                    <p>Dodatne informacije o nekretnini</p>
+                  </div>
+                )}
+              </div>
+            </>)}
 
-        <h2 className={`mt-3`}>Komentari</h2>
+          <CreateComment content={newCommentContent} setContent={setNewCommentContent} onCommentCreated={handleAddComment}/>
 
-        <div className={`col-md-8 my-5`}>
-          {isCommentsLoading ? (<>
-            <p className={`text-center text-muted`}>Učitavanje komentara...</p>
-          </>) : (
-            <>
-              {comments.length > 0 && comments.map(comment => (
-                <CommentCard key={comment.id} comment={comment} onDelete={confirmCommentDeletion}/>
-              ))}
-            </>
-          )}
-          {comments.length < totalCommentsCount &&
-          <button onClick={loadMoreComments} className={`bg-gray text-blue border-0 rounded-2 px-3 py-1`}>Prikaži još</button>}
+          <h2 className={`my-3 text-gray`}>Komentari</h2>
 
+          <div className={`col-md-8 mb-5`}>
+            {isCommentsLoading ? (<>
+              <p className={`text-center text-muted`}>Učitavanje komentara...</p>
+            </>) : (
+              <>
+                {comments.length > 0 && comments.map(comment => (
+                  <CommentCard key={comment.id} comment={comment} onDelete={confirmCommentDeletion}/>
+                ))}
+              </>
+            )}
+            {comments.length < totalCommentsCount &&
+            <button onClick={loadMoreComments} className={`btn-lg text-white text-center rounded-3 border-0 py-2 px-2 ${styles.slova} ${styles.dugme1} ${styles.linija_ispod_dugmeta}`}>Prikaži još</button>}
+          </div>
         </div>
       </div>
     </>
