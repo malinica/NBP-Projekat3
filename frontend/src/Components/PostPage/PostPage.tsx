@@ -8,7 +8,6 @@ import toast from "react-hot-toast";
 import {CreateComment} from "../CreateComment/CreateComment.tsx";
 import {createCommentAPI, getCommentsForPostAPI} from "../../Services/CommentService.tsx";
 import {Comment} from "../../Interfaces/Comment/Comment.ts";
-import {Pagination} from "../Pagination/Pagination.tsx";
 import {CommentCard} from "../CommentCard/CommentCard.tsx";
 import {useAuth} from "../../Context/useAuth.tsx";
 import Swal from 'sweetalert2';
@@ -24,19 +23,29 @@ export const PostPage = () => {
   const [isCommentsLoading, setIsCommentsLoading] = useState<boolean>(false);
   const [comments, setComments] = useState<Comment[]>([]);
   const [totalCommentsCount, setTotalCommentsCount] = useState<number>(0);
-  const [newCommentContent, setNewCommentContent] = useState<string>(""); //za novi komentar
+  const [newCommentContent, setNewCommentContent] = useState<string>("");
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(post?.title || "");
   const [editedContent, setEditedContent] = useState(post?.content || "");
+  const [page, setPage] = useState(0);
+  const [scrollPosition, setScrollPosition] = useState(0);
 
   useEffect(() => {
     if (!post) {
       loadPost();
     }
 
-    loadComments(1, 10);
+    setComments([]);
+    loadMoreComments();
 
   }, [postId]);
+
+  useEffect(() => {
+    window.scrollTo({
+      top: scrollPosition + 380,
+      behavior: "instant",
+    })
+  }, [scrollPosition]);
 
   const loadPost = async () => {
     try {
@@ -65,26 +74,33 @@ export const PostPage = () => {
       if (response?.status == 200) {
         toast.success("Uspešno dodat komentar.");
         setNewCommentContent('');
-        await loadComments(1, 10);
+        setTotalCommentsCount(total => total + 1);
+        setComments(comments => [response.data, ...comments])
       }
     } catch {
       toast.error("Došlo je do greške prilikom kreiranja komentara.");
     }
   }
 
-  const handlePaginateChange = async (page: number, pageSize: number) => {
-    await loadComments(page, pageSize);
-  }
-
-  const loadComments = async (page: number, pageSize: number) => {
+  const loadMoreComments = async () => {
     try {
       setIsCommentsLoading(true);
-      const response = await getCommentsForPostAPI(postId!, page, pageSize);
+      const scrollY = window.scrollY;
+      const nextPage = page + 1;
+      const response = await getCommentsForPostAPI(postId!, nextPage, 5);
       if (response?.status == 200) {
-        setComments(response.data.data);
+        const newComments = response.data.data;
+        setComments(prevComments => [
+          ...prevComments,
+          ...newComments.filter(newComment =>
+            !prevComments.some(existingComment => existingComment.id === newComment.id)
+          ),
+        ]);
         setTotalCommentsCount(response.data.totalLength);
+        setPage(nextPage)
         setIsCommentsLoading(false);
       }
+      setScrollPosition(scrollY);
     } catch {
       toast.error("Došlo je do greške prilikom učitavanja komentara.");
     } finally {
@@ -168,6 +184,7 @@ export const PostPage = () => {
                     value={editedTitle}
                     id="postTitle"
                     onChange={(e) => setEditedTitle(e.target.value)}
+                    required
                   />
                   <label htmlFor="postContent">Sadržaj</label>
                   <textarea
@@ -175,9 +192,12 @@ export const PostPage = () => {
                     value={editedContent}
                     id={`postContent`}
                     onChange={(e) => setEditedContent(e.target.value)}
+                    required
                   />
                   <div className="mt-2 flex space-x-2">
-                    <button onClick={handleSaveEdit} className="bg-blue text-beige border-0 px-3 py-1 rounded">
+                    <button onClick={handleSaveEdit}
+                            className="bg-blue text-beige border-0 px-3 py-1 rounded"
+                            disabled={!editedTitle || !editedContent}>
                       Sačuvaj
                     </button>
                     <button onClick={handleCancelEdit} className="bg-golden text-beige border-0 px-3 py-1 rounded">
@@ -220,8 +240,6 @@ export const PostPage = () => {
             </div>
           </>)}
 
-
-
         <CreateComment content={newCommentContent} setContent={setNewCommentContent}
                        onCommentCreated={handleAddComment}/>
 
@@ -237,8 +255,8 @@ export const PostPage = () => {
               ))}
             </>
           )}
-          {totalCommentsCount > 0 &&
-            <Pagination totalLength={totalCommentsCount} onPaginateChange={handlePaginateChange}/>}
+          {comments.length < totalCommentsCount &&
+          <button onClick={loadMoreComments} className={`bg-gray text-blue border-0 rounded-2 px-3 py-1`}>Prikaži još</button>}
 
         </div>
       </div>
