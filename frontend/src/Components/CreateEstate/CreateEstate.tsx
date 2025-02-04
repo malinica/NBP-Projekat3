@@ -31,7 +31,7 @@ const CreateEstate = () => {
   };
 
   const handleSubmit = async () => {
-    if (price! && squareMeters && totalRooms && long && lat && floorNumber && pictures && price) {
+    if (price && squareMeters && totalRooms && long && lat && floorNumber && pictures!=null) {
       const formData = new FormData();
       formData.append("Title", title);
       formData.append("Description", desc);
@@ -46,23 +46,10 @@ const CreateEstate = () => {
       Array.from(pictures).forEach((file) => {
         formData.append("Images", file);
       });
-      //var response = createEstateAPI(category, formData);
-      /*if (response != null && response != null) {
-        setLat(null);
-        setLong(null);
-        setPrice(null);
-        setFloornumber(null);
-        setSquareMeters(null);
-        setTotalRooms(null);
-        setPictures(null);
-        setDesc('');
-        setTitle('');
-      }*/
 
         try {
-          const response = await createEstateAPI(category, formData);
+          const response = await createEstateAPI( formData);
           if (response) {
-            toast.success("Nekretnina uspešno kreirana!");
             setLat(null);
             setLong(null);
             setPrice(null);
@@ -72,19 +59,19 @@ const CreateEstate = () => {
             setPictures(null);
             setDesc('');
             setTitle('');
-            console.log(response.data);
-
             navigate(`/${response.data.Category}/${response.data.id}`); 
-          }
-          else {
-            toast.error("Unesite sve podatke!")
+          
+          
           }
         }
         catch (error) {
             toast.error("Greška pri kreiranju nekretnine.");
         }
       }
-  };
+    
+      else 
+      toast.error("Unesite sve podatke!");
+  }
 
   return (
     <>

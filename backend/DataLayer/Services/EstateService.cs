@@ -12,7 +12,7 @@
             this.userService = userS;
         }
 
-        public async Task<Result<List<Estate>, ErrorMessage>> GetAllEstatesFromCollection(string collectionName)
+        public async Task<Result<List<Estate>, ErrorMessage>> GetAllEstatesFromCollection()
         {
             try
             {
@@ -25,7 +25,7 @@
             }
         }
 
-        public async Task<Result<Estate, ErrorMessage>> GetEstate(string collectionName, string id)
+        public async Task<Result<Estate, ErrorMessage>> GetEstate(string id)
         {
             try
             {
@@ -42,7 +42,7 @@
             }
         }
 
-        public async Task<Result<Estate, ErrorMessage>> CreateEstate(string collectionName, EstateCreateDTO newEstateDTO, string? userID)
+        public async Task<Result<Estate, ErrorMessage>> CreateEstate( EstateCreateDTO newEstateDTO, string? userID)
         {
             try
             {
@@ -54,11 +54,14 @@
                     {
                         var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
                         var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "EstateImages");
-
+                        /* 
+                    Vec dodato u program.cs
                         if (!Directory.Exists(path))
                         {
                             Directory.CreateDirectory(path);
                         }
+
+                        */
 
                         var filePath = Path.Combine(path, fileName);
 
@@ -135,7 +138,7 @@
             }
         }
 
-        public async Task<Result<bool, ErrorMessage>> RemoveEstate(string collectionName, string id)
+        public async Task<Result<bool, ErrorMessage>> RemoveEstate( string id)
         {
             try
             {
