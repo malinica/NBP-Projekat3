@@ -59,9 +59,7 @@ const CreateEstate = () => {
             setPictures(null);
             setDesc('');
             setTitle('');
-            navigate(`/${response.data.Category}/${response.data.id}`); 
-          
-          
+            //navigate(`/${response.data.id}`); 
           }
         }
         catch (error) {
