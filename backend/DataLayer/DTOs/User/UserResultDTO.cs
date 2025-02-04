@@ -6,7 +6,12 @@ public class UserResultDTO
     public required string Username { get; set; }
     public required string Email { get; set; }
     public UserRole Role { get; set; }
-
+    
+    public UserResultDTO()
+    {
+        
+    }
+    
     [SetsRequiredMembers]
     public UserResultDTO(Models.User user)
     {
@@ -16,8 +21,12 @@ public class UserResultDTO
         this.Role = user.Role;
     }
 
-    public UserResultDTO()
+    [SetsRequiredMembers]
+    public UserResultDTO(BsonValue userDocument)
     {
-        
+        Id = userDocument["_id"].AsObjectId.ToString();
+        Username = userDocument["Username"].AsString;
+        Email = userDocument["Email"].AsString;
+        Role = (UserRole)userDocument["Role"].AsInt32;
     }
 }

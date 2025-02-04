@@ -21,6 +21,7 @@ export const UserProfile = () => {
 
   const fetchEstates = async () => {
     const estates = await getEstatesCreatedByUserAPI(user!.id);
+    console.log(estates);
     setEstates(estates || []);
   };
 
@@ -37,7 +38,7 @@ export const UserProfile = () => {
         {estates.length > 0 ? (
           estates.map((estate) => (
             <div key={estate.id} className="col">
-              <EstateCard id={estate.id} title={estate.title} desc={estate.description} />
+              <EstateCard estate={estate}/>
             </div>
           ))
         ) : (

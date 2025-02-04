@@ -9,4 +9,31 @@ public class PostResultDTO
     public DateTime CreatedAt { get; set; }
     public required UserResultDTO Author { get; set; }
     public EstateResultDTO? Estate { get; set; }
+
+    public PostResultDTO()
+    {
+        
+    }
+    
+    [SetsRequiredMembers]
+    public PostResultDTO(BsonDocument post)
+    {
+        var authorDoc = post["AuthorData"].AsBsonArray.FirstOrDefault();
+        var estateDoc = post["EstateData"].AsBsonArray.FirstOrDefault();
+
+        Id = post["_id"].AsObjectId.ToString();
+        Title = post["Title"].AsString;
+        Content = post["Content"].AsString;
+        CreatedAt = post["CreatedAt"].ToUniversalTime();
+        Author = authorDoc != null
+            ? new UserResultDTO
+            {
+                Id = authorDoc["_id"].AsObjectId.ToString(),
+                Username = authorDoc["Username"].AsString,
+                Email = authorDoc["Email"].AsString,
+                Role = (UserRole)authorDoc["Role"].AsInt32
+            }
+            : null!;
+        Estate = estateDoc != null ? new EstateResultDTO(estateDoc) : null;
+    }
 }

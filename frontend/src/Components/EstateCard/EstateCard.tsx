@@ -1,27 +1,32 @@
-import { useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
+import {Estate} from "../../Interfaces/Estate/Estate.ts";
 
 interface EstateCardProps {
-    id: string;
-    title: string;
-    desc: string;
-  }
-  
-  export const EstateCard = ({ id, title, desc }: EstateCardProps) => {
-    const navigate = useNavigate();
+  estate:Estate;
+}
+
+export const EstateCard = ({estate}: EstateCardProps) => {
+  const navigate = useNavigate();
 
   const handleNavigate = () => {
-    
-    navigate(`/estate-details/${id}`);
+    navigate(`/estate-details/${estate.id}`);
   };
-    return (
-      <div className="estate-card">
-        <h3>{title}</h3>
-        <p>{desc}</p>
-        <span>ID: {id}</span>
-        <br></br>
-        <button onClick={handleNavigate}>Pogledaj Detalje</button>
+
+  if(!estate)
+    return null;
+
+  return (
+    <div className="card" style={{width: "18rem"}}>
+      <img src={`${import.meta.env.VITE_SERVER_URL}/${estate.images[0]}`} className="card-img-top" alt={estate.title}/>
+      <div className="card-body">
+        <h5 className="card-title">{estate.title}</h5>
+        <p className="card-text">{estate.price}&nbsp;€</p>
+        <button className="btn btn-primary" onClick={handleNavigate}>
+          Pogledaj Detalje
+        </button>
       </div>
-    );
-  };
-  
+    </div>
+  );
+};
+
 export default EstateCard;

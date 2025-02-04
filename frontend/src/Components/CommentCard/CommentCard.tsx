@@ -68,7 +68,7 @@ export const CommentCard = ({comment:commentFromProps, onDelete}: Props) => {
           </div>
         </div>
       ) : (
-        <p className={`mt-2 text-muted`}>{comment.content}</p>
+        <p className={`mt-2 text-muted`} style={{whiteSpace:"pre-line"}}>{comment.content}</p>
       )}
 
       {user?.id === comment.author.id && (

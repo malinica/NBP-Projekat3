@@ -12,6 +12,7 @@ import {CommentCard} from "../CommentCard/CommentCard.tsx";
 import {useAuth} from "../../Context/useAuth.tsx";
 import Swal from 'sweetalert2';
 import styles from "./PostPage.module.css";
+import EstateCard from "../EstateCard/EstateCard.tsx";
 
 export const PostPage = () => {
 
@@ -150,7 +151,7 @@ export const PostPage = () => {
       const response = await updatePostAPI(postId!, editedTitle, editedContent);
       if (response?.status === 200) {
         toast.success("Uspešno izmenjena objava.");
-        if(location.state?.post)
+        if (location.state?.post)
           location.state.post = null;
         setPost(prev => {
           return prev ?
@@ -188,13 +189,12 @@ export const PostPage = () => {
   const handleDeleteComment = async (id: string) => {
     try {
       const response = await deleteCommentAPI(id);
-      if(response?.status == 204) {
+      if (response?.status == 204) {
         toast.success("Uspešno brisanje komentara.");
         setComments(comments => comments.filter(c => c.id !== id));
         setTotalCommentsCount(total => total - 1);
       }
-    }
-    catch {
+    } catch {
       toast.error("Greška pri brisanju komentara.");
     }
   }
@@ -233,7 +233,7 @@ export const PostPage = () => {
                               disabled={!editedTitle || !editedContent}>
                         Sačuvaj
                       </button>
-                      <button onClick={handleCancelEdit} 
+                      <button onClick={handleCancelEdit}
                               className={`btn-lg text-gray text-center rounded-3 border-0 py-2 px-2 ${styles.slova} ${styles.dugme2} ${styles.linija_ispod_dugmeta}`}>
                         Otkaži
                       </button>
@@ -251,33 +251,32 @@ export const PostPage = () => {
 
                       {post?.author.id == user?.id &&
                         <div className={`d-flex`}>
-                          <button onClick={() => setIsEditing(true)} className={`btn-lg text-white text-center rounded-3 border-0 py-2 px-2 me-1 ${styles.slova} ${styles.dugme1} ${styles.linija_ispod_dugmeta}`}>
+                          <button onClick={() => setIsEditing(true)}
+                                  className={`btn-lg text-white text-center rounded-3 border-0 py-2 px-2 me-1 ${styles.slova} ${styles.dugme1} ${styles.linija_ispod_dugmeta}`}>
                             Izmeni
                           </button>
-                          <button onClick={confirmPostDeletion} className={`btn-lg text-gray text-center rounded-3 border-0 py-2 px-2 ${styles.slova} ${styles.dugme2} ${styles.linija_ispod_dugmeta}`}>
+                          <button onClick={confirmPostDeletion}
+                                  className={`btn-lg text-gray text-center rounded-3 border-0 py-2 px-2 ${styles.slova} ${styles.dugme2} ${styles.linija_ispod_dugmeta}`}>
                             Obriši
                           </button>
                         </div>
                       }
+
+
+                      {post.estate && <>
+                        ova nekretnina mozda da se pomeri desno
+                        <EstateCard estate={post.estate}/>
+                      </>}
+
                     </div>
                   </>
                 )}
 
-                {post.estate && (
-                  <div className={`estate-container mt-4 p-3 border rounded`}>
-                    <h5>Odnosi se na nekretninu</h5>
-                    <img
-                      src="https://picsum.photos/300/200"
-                      alt="Estate placeholder"
-                      className={`img-fluid`}
-                    />
-                    <p>Dodatne informacije o nekretnini</p>
-                  </div>
-                )}
               </div>
             </>)}
 
-          <CreateComment content={newCommentContent} setContent={setNewCommentContent} onCommentCreated={handleAddComment}/>
+          <CreateComment content={newCommentContent} setContent={setNewCommentContent}
+                         onCommentCreated={handleAddComment}/>
 
           <h2 className={`my-3 text-gray`}>Komentari</h2>
 
@@ -292,7 +291,9 @@ export const PostPage = () => {
               </>
             )}
             {comments.length < totalCommentsCount &&
-            <button onClick={loadMoreComments} className={`btn-lg text-white text-center rounded-3 border-0 py-2 px-2 ${styles.slova} ${styles.dugme1} ${styles.linija_ispod_dugmeta}`}>Prikaži još</button>}
+              <button onClick={loadMoreComments}
+                      className={`btn-lg text-white text-center rounded-3 border-0 py-2 px-2 ${styles.slova} ${styles.dugme1} ${styles.linija_ispod_dugmeta}`}>Prikaži
+                još</button>}
           </div>
         </div>
       </div>

@@ -8,12 +8,14 @@ public class PostService
         DbConnection.GetDatabase().GetCollection<Post>("posts_collection");
 
     private readonly UserService _userService;
+    private readonly EstateService _estateService;
     private readonly IServiceProvider _serviceProvider;
 
-    public PostService(UserService userService, IServiceProvider serviceProvider)
+    public PostService(UserService userService, EstateService estateService,IServiceProvider serviceProvider)
     {
         _userService = userService;
         _serviceProvider = serviceProvider;
+        _estateService = estateService;
     }
 
     public async Task<Result<PostResultDTO, ErrorMessage>> CreatePost(CreatePostDTO postDto, string userId)
@@ -37,7 +39,16 @@ public class PostService
             if (userResult.IsError)
                 return userResult.Error;
 
-            //treba da se doda ucitavanje Estate-a kao User-a i da se i on vrati ako postoji
+            EstateResultDTO? estate = null;
+            if (postDto.EstateId != null)
+            {
+                var estateResult = await _estateService.GetEstate(postDto.EstateId);
+                
+                if (estateResult.IsError)
+                    return estateResult.Error;
+                
+                estate = new EstateResultDTO(estateResult.Data);
+            }
 
             var resultDto = new PostResultDTO
             {
@@ -46,7 +57,7 @@ public class PostService
                 Content = newPost.Content,
                 CreatedAt = newPost.CreatedAt,
                 Author = userResult.Data,
-                //Estate = estateResult.Data
+                Estate = estate
             };
 
             return resultDto;
@@ -71,34 +82,7 @@ public class PostService
                 .ToListAsync();
 
 
-            var postsDtos = posts.Select(post =>
-            {
-                var authorDoc = post["AuthorData"].AsBsonArray.FirstOrDefault();
-                var estateDoc = post["EstateData"].AsBsonArray.FirstOrDefault();
-
-                return new PostResultDTO
-                {
-                    Id = post["_id"].AsObjectId.ToString(),
-                    Title = post["Title"].AsString,
-                    Content = post["Content"].AsString,
-                    CreatedAt = post["CreatedAt"].ToUniversalTime(),
-
-                    Author = authorDoc != null ? new UserResultDTO
-                    {
-                        Id = authorDoc["_id"].AsObjectId.ToString(),
-                        Username = authorDoc["Username"].AsString,
-                        Email = authorDoc["Email"].AsString,
-                        Role = (UserRole)authorDoc["Role"].AsInt32
-                    } : null!,
-
-                    // Estate = estateDoc != null ? new EstateResultDTO
-                    // {
-                    //     Id = estateDoc["_id"].AsObjectId.ToString(),
-                    //     Address = estateDoc["Address"].AsString,
-                    //     Price = estateDoc["Price"].ToDecimal()
-                    // } : null
-                };
-            }).ToList();
+            var postsDtos = posts.Select(post => new PostResultDTO(post)).ToList();
 
             var totalCount = await _postsCollection.CountDocumentsAsync(_ => true);
 
@@ -128,31 +112,7 @@ public class PostService
             if (post == null)
                 return "Post nije pronađen.".ToError(404);
 
-            var authorDoc = post["AuthorData"].AsBsonArray.FirstOrDefault();
-            var estateDoc = post["EstateData"].AsBsonArray.FirstOrDefault();
-
-            var postDto = new PostResultDTO
-            {
-                Id = post["_id"].AsObjectId.ToString(),
-                Title = post["Title"].AsString,
-                Content = post["Content"].AsString,
-                CreatedAt = post["CreatedAt"].ToUniversalTime(),
-
-                Author = authorDoc != null ? new UserResultDTO
-                {
-                    Id = authorDoc["_id"].AsObjectId.ToString(),
-                    Username = authorDoc["Username"].AsString,
-                    Email = authorDoc["Email"].AsString,
-                    Role = (UserRole)authorDoc["Role"].AsInt32
-                } : null!,
-
-                // Estate = estateDoc != null ? new EstateResultDTO
-                // {
-                //     Id = estateDoc["_id"].AsObjectId.ToString(),
-                //     Address = estateDoc["Address"].AsString,
-                //     Price = estateDoc["Price"].ToDecimal()
-                // } : null
-            };
+            var postDto = new PostResultDTO(post);
 
             return postDto;
         }
@@ -162,8 +122,34 @@ public class PostService
         }
     }
 
-    //metoda za pribavljanje objava za konkretnu nekretninu, ista kao GetAll s tim sto ima i estateId
-    //ne moze dok se ne napravi EstateResult
+    public async Task<Result<PaginatedResponseDTO<PostResultDTO>, ErrorMessage>> GetAllPostsForEstate(string estateId, int page = 1, int pageSize = 10)
+    {
+        try
+        {
+            var posts = await _postsCollection.Aggregate()
+                .Match(post => post.EstateId == estateId)
+                .Sort(Builders<Post>.Sort.Descending(p => p.CreatedAt))
+                .Skip((page - 1) * pageSize)
+                .Limit(pageSize)
+                .Lookup("users_collection", "AuthorId", "_id", "AuthorData")
+                .As<BsonDocument>()
+                .ToListAsync();
+
+            var postsDtos = posts.Select(post => new PostResultDTO(post)).ToList();
+
+            var totalCount = await _postsCollection.CountDocumentsAsync(post => post.EstateId == estateId);
+
+            return new PaginatedResponseDTO<PostResultDTO>()
+            {
+                Data = postsDtos,
+                TotalLength = totalCount
+            };
+        }
+        catch (Exception)
+        {
+            return "Došlo je do greške prilikom preuzimanja objava.".ToError();
+        }
+    }
 
     public async Task<Result<bool, ErrorMessage>> UpdatePost(string postId, UpdatePostDTO postDto)
     {
@@ -281,26 +267,7 @@ public class PostService
             if (!posts.Any())
                 return "Korisnik trenutno nema objava.".ToError(404);
 
-            var postDtos = posts.Select(post =>
-            {
-                var authorDoc = post["AuthorData"].AsBsonArray.FirstOrDefault();
-
-                return new PostResultDTO
-                {
-                    Id = post["_id"].AsObjectId.ToString(),
-                    Title = post["Title"].AsString,
-                    Content = post["Content"].AsString,
-                    CreatedAt = post["CreatedAt"].ToUniversalTime(),
-
-                    Author = authorDoc != null ? new UserResultDTO
-                    {
-                        Id = authorDoc["_id"].AsObjectId.ToString(),
-                        Username = authorDoc["Username"].AsString,
-                        Email = authorDoc["Email"].AsString,
-                        Role = (UserRole)authorDoc["Role"].AsInt32
-                    } : null!,
-                };
-            }).ToList();
+            var postDtos = posts.Select(post => new PostResultDTO(post)).ToList();
 
             return postDtos;
         }
