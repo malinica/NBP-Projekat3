@@ -12,6 +12,8 @@ import CreateEstate from './Components/CreateEstate/CreateEstate.tsx';
 import {PostPage} from "./Components/PostPage/PostPage.tsx";
 import "leaflet/dist/leaflet.css";
 import { UserProfile } from './Components/UserProfile/UserProfile.tsx';
+import SearchEstate from './Components/SearchEstate/SearchEstate.tsx';
+import EstatePage from './Components/EstatePage/EstatePage.tsx';
 
 function App() {
 
@@ -30,6 +32,10 @@ function App() {
                 <Route path="/forum/:postId" element={<PostPage />} />
                 <Route path="/create-estate" element={<CreateEstate/>}/>
                 <Route path="/user-profile" element={<UserProfile/>}/>
+                <Route path="/search-estates" element={<SearchEstate/>}/>
+                <Route path="/estate-page/:id" element={<EstatePage />} /> 
+
+
               </Routes>
             </div>
             <Footer/>

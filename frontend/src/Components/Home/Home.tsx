@@ -56,7 +56,7 @@ export const Home = () => {
                         <h5 className={`mt-3 text-golden`}>Ogroman broj ponuda</h5>
                         <p className={`text-blue`}>Pregledaj najnovije i najatraktivnije nekretnine koje odgovaraju tvojim željama.</p>
                         <Link
-                                to="/"
+                                to="/search-estates"
                                 className={`btn-lg text-white text-center rounded py-2 px-2 ${styles.slova} ${styles.dugme2} ${styles.linija_ispod_dugmeta}`}
                             >
                                 Pregledaj Nekretnine
@@ -67,7 +67,7 @@ export const Home = () => {
                         <h5 className={`mt-3 text-golden`}>Jednostavno postavljanje oglasa</h5>
                         <p className={`text-blue`}>Kreirajte oglas sa svim potrebnim informacijama o nekretnini.</p>
                         <Link
-                                to="/"
+                                to="/create-estate"
                                 className={`btn-lg text-white text-center rounded py-2 px-2 ${styles.slova} ${styles.dugme2} ${styles.linija_ispod_dugmeta}`}
                             >
                                 Kreiraj Nekretninu
