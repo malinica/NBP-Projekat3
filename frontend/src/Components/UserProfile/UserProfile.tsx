@@ -21,13 +21,11 @@ export const UserProfile = () => {
 
   const fetchEstates = async () => {
     const estates = await getEstatesCreatedByUserAPI(user!.id);
-    console.log(estates);
     setEstates(estates || []);
   };
 
   const fetchPosts = async () => {
     const posts = await getUserPosts(user!.id);
-    console.log(posts);
     setPosts(posts || []);
   };
 

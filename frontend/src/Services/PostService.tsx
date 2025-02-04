@@ -35,6 +35,17 @@ export const getPostById = async (postId: string) => {
   }
 };
 
+export const getAllPostsForEstateAPI = async (estateId: string, page: number = 1, pageSize: number = 10) => {
+  try {
+    return await axios.get<PaginatedResponseDTO<Post>>(`${apiUrl}/GetAllPostsForEstate/${estateId}`, {
+      params: { page, pageSize }
+    });
+  } catch (error: any) {
+    toast.error(error.response?.data ?? "Greška pri preuzimanju objava.");
+    return undefined;
+  }
+};
+
 export const updatePostAPI = async (postId: string, title: string, content: string) => {
   try {
     return await axios.put<boolean>(`${apiUrl}/Update/${postId}`, {title, content});

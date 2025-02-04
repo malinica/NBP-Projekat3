@@ -19,7 +19,8 @@ public class PostResultDTO
     public PostResultDTO(BsonDocument post)
     {
         var authorDoc = post["AuthorData"].AsBsonArray.FirstOrDefault();
-        var estateDoc = post["EstateData"].AsBsonArray.FirstOrDefault();
+        var estateDoc = post.Contains("EstateData") && 
+                        !post["EstateData"].IsBsonNull ? post["EstateData"].AsBsonArray.FirstOrDefault() : null;
 
         Id = post["_id"].AsObjectId.ToString();
         Title = post["Title"].AsString;

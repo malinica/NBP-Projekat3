@@ -18,12 +18,12 @@ public class PostController : ControllerBase
     public async Task<IActionResult> CreatePost([FromBody] CreatePostDTO postDto)
     {
         var userResult = _userService.GetCurrentUserId(User);
-        
+
         if (userResult.IsError)
         {
             return StatusCode(userResult.Error?.StatusCode ?? 400, userResult.Error?.Message);
         }
-        
+
         (bool isError, var response, ErrorMessage? error) = await _postService.CreatePost(postDto, userResult.Data);
 
         if (isError)
@@ -33,9 +33,9 @@ public class PostController : ControllerBase
 
         return Ok(response);
     }
-    
+
     [HttpGet("GetAll")]
-    // [Authorize]
+    [Authorize]
     public async Task<IActionResult> GetAll([FromQuery] int? page, [FromQuery] int? pageSize)
     {
         (bool isError, var response, ErrorMessage? error) = await _postService.GetAllPosts(page ?? 1, pageSize ?? 1);
@@ -47,9 +47,9 @@ public class PostController : ControllerBase
 
         return Ok(response);
     }
-    
+
     [HttpGet("GetById/{postId}")]
-    // [Authorize]
+    [Authorize]
     public async Task<IActionResult> GetById([FromRoute] string postId)
     {
         (bool isError, var response, ErrorMessage? error) = await _postService.GetPostById(postId);
@@ -61,7 +61,23 @@ public class PostController : ControllerBase
 
         return Ok(response);
     }
-    
+
+    [HttpGet("GetAllPostsForEstate/{estateId}")]
+    [Authorize]
+    public async Task<IActionResult> GetAllPostsForEstate([FromRoute] string estateId, [FromQuery] int? page,
+        [FromQuery] int? pageSize)
+    {
+        (bool isError, var response, ErrorMessage? error) =
+            await _postService.GetAllPostsForEstate(estateId, page ?? 1, pageSize ?? 1);
+
+        if (isError)
+        {
+            return StatusCode(error?.StatusCode ?? 400, error?.Message);
+        }
+
+        return Ok(response);
+    }
+
     [HttpPut("Update/{postId}")]
     [Authorize]
     public async Task<IActionResult> Update([FromRoute] string postId, [FromBody] UpdatePostDTO postDto)
@@ -75,7 +91,7 @@ public class PostController : ControllerBase
 
         return Ok(response);
     }
-    
+
     [HttpDelete("Delete/{postId}")]
     [Authorize]
     public async Task<IActionResult> Delete([FromRoute] string postId)

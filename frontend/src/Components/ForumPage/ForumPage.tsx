@@ -12,10 +12,11 @@ export const ForumPage = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [totalPostsCount, setTotalPostsCount] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [page, setPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
 
   useEffect(() => {
-    loadPosts(1,10);
+    loadPosts(page, pageSize);
   }, []);
 
   const handleCreatePost = async (title: string, content: string) => {
@@ -27,17 +28,18 @@ export const ForumPage = () => {
       }
       const response = await createPostAPI(postDto);
 
-      if(response?.status == 200) {
+      if (response?.status == 200) {
         toast.success("Uspešno kreirana objava.");
+        setPage(1);
         await loadPosts(1, pageSize);
       }
-    }
-    catch {
+    } catch {
       toast.error("Došlo je do greške prilikom kreiranja objave.");
     }
   }
 
   const handlePaginateChange = async (page: number, pageSize: number) => {
+    setPage(page);
     setPageSize(pageSize);
     await loadPosts(page, pageSize);
   }
@@ -47,15 +49,13 @@ export const ForumPage = () => {
       setIsLoading(true);
       const response = await getAllPostsAPI(page, pageSize);
 
-      if(response?.status == 200){
+      if (response?.status == 200) {
         setPosts(response.data.data);
         setTotalPostsCount(response.data.totalLength);
       }
-    }
-    catch {
+    } catch {
       toast.error("Došlo je do greške prilikom učitavanja objava.");
-    }
-    finally {
+    } finally {
       setIsLoading(false);
     }
   }
@@ -64,26 +64,27 @@ export const ForumPage = () => {
     <div className={`container-fluid bg-beige`}>
       <div className="container">
 
-      <div className={`row`}>
-        <div className={`col-md-4`}>
-          <CreatePost onCreatePost={handleCreatePost}/>
+        <div className={`row`}>
+          <div className={`col-md-4`}>
+            <CreatePost onCreatePost={handleCreatePost}/>
+          </div>
+
+          <div className={`col-md-8 my-5`}>
+            <h2 className={`text-blue`}>Objave</h2>
+            {isLoading ? (<>
+              <p className={`text-center text-muted`}>Učitavanje objava...</p>
+            </>) : (
+              <>
+                {posts.length > 0 && posts.map(post => (
+                  <PostCard key={post.id} post={post}/>
+                ))}
+              </>
+            )}
+            {totalPostsCount > 0 &&
+              <Pagination totalLength={totalPostsCount} onPaginateChange={handlePaginateChange} currentPage={page}
+                          perPage={pageSize}/>}
+          </div>
         </div>
-      
-        <div className={`col-md-8 my-5`}>
-          <h2 className={`text-blue`}>Objave</h2>
-          {isLoading ? (<>
-            <p className={`text-center text-muted`}>Učitavanje objava...</p>
-          </>) : (
-            <>
-              {posts.length > 0 && posts.map(post => (
-                <PostCard key={post.id} post={post} />
-              ))}
-            </>
-          )}
-          {totalPostsCount > 0 &&
-          <Pagination totalLength={totalPostsCount} onPaginateChange={handlePaginateChange}/>}
-        </div>
-      </div>
       </div>
 
     </div>

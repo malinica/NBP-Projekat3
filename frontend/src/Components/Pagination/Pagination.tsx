@@ -11,17 +11,24 @@ import {
 type Props = {
   totalLength: number;
   onPaginateChange: (page: number, pageSize: number) => void;
+  currentPage?: number;
+  perPage?:number;
 };
 
-export const Pagination = ({ totalLength, onPaginateChange}: Props) => {
-  const [page, setPage] = useState<number>(1);
-  const [pageSize, setPageSize] = useState<number>(10);
+export const Pagination = ({ totalLength, onPaginateChange, currentPage, perPage}: Props) => {
+  const [page, setPage] = useState<number>(currentPage ?? 1);
+  const [pageSize, setPageSize] = useState<number>(perPage ?? 10);
 
   const pageCount = Math.ceil(totalLength / pageSize);
 
   useEffect(() => {
     onPaginateChange(page, pageSize);
   }, [page, pageSize]);
+
+  useEffect(() => {
+    setPage(currentPage ?? 1);
+    setPageSize(perPage ?? 10);
+  }, [currentPage, perPage]);
 
   const handlePageChange = (_: ChangeEvent<unknown>, value: number) => {
     setPage(value);
@@ -34,7 +41,7 @@ export const Pagination = ({ totalLength, onPaginateChange}: Props) => {
 
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "10px", justifyContent: "center", marginTop: "10px" }}>
-      <MaterialPagination count={pageCount} page={page} onChange={handlePageChange} color="primary" />
+      <MaterialPagination count={pageCount} page={page} onChange={handlePageChange} color="standard" />
 
       <FormControl variant="outlined" size="small">
         <InputLabel shrink>Po stranici</InputLabel>
