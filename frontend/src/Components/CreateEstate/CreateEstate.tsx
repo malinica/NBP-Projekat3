@@ -59,7 +59,7 @@ const CreateEstate = () => {
             setPictures(null);
             setDesc('');
             setTitle('');
-            //navigate(`/${response.data.id}`); 
+            navigate(`/estate-page/${response.data.id}`);          
           }
         }
         catch (error) {

@@ -25,6 +25,7 @@ export const EstatePage = () => {
     const [editedData, setEditedData] = useState<Partial<Estate>>({});
 
     useEffect(() => {
+        console.log(id);
         const fetchEstate = async () => {
             try {
                 if (!id) {
