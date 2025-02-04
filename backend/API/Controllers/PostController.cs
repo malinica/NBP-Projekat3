@@ -89,4 +89,18 @@ public class PostController : ControllerBase
 
         return NoContent();
     }
+
+    [HttpGet("GetUserPosts/{userId}")]
+    // [Authorize]
+    public async Task<IActionResult> GetUserPosts(string userId)
+    {
+        (bool isError, var response, ErrorMessage? error) = await _postService.GetUserPosts(userId);
+
+        if (isError)
+        {
+            return StatusCode(error?.StatusCode ?? 400, error?.Message);
+        }
+
+        return Ok(response);
+    }
 }

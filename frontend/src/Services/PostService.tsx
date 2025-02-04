@@ -52,3 +52,13 @@ export const deletePostAPI = async (postId: string) => {
     return undefined;
   }
 };
+
+export const getUserPosts = async (userId: string) => {
+  try {
+    const response = await axios.get<Post[]>(`${apiUrl}/GetUserPosts/${userId}`);
+    return response.data;
+  } catch (error: any) {
+    toast.error(error.response?.data ?? "Greška pri preuzimanju objava.");
+    return undefined;
+  }
+};

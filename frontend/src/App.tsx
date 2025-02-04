@@ -34,6 +34,7 @@ function App() {
                 <Route path="/user-profile" element={<UserProfile/>}/>
                 <Route path="/search-estates" element={<SearchEstate/>}/>
                 <Route path="/estate-page/:id" element={<EstatePage />} /> 
+                <Route path="/estate-details/:id" element={<EstatePage />} /> 
               </Routes>
             </div>
             <Footer/>

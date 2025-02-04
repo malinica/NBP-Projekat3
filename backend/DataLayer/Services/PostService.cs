@@ -6,10 +6,10 @@ public class PostService
 {
     private readonly IMongoCollection<Post> _postsCollection =
         DbConnection.GetDatabase().GetCollection<Post>("posts_collection");
-    
+
     private readonly UserService _userService;
     private readonly IServiceProvider _serviceProvider;
-    
+
     public PostService(UserService userService, IServiceProvider serviceProvider)
     {
         _userService = userService;
@@ -33,12 +33,12 @@ public class PostService
             await _postsCollection.InsertOneAsync(newPost);
 
             var userResult = await _userService.GetById(userId);
-            
+
             if (userResult.IsError)
                 return userResult.Error;
-            
+
             //treba da se doda ucitavanje Estate-a kao User-a i da se i on vrati ako postoji
-            
+
             var resultDto = new PostResultDTO
             {
                 Id = newPost.Id!,
@@ -56,7 +56,7 @@ public class PostService
             return "Došlo je do greške prilikom kreiranja objave.".ToError();
         }
     }
-    
+
     public async Task<Result<PaginatedResponseDTO<PostResultDTO>, ErrorMessage>> GetAllPosts(int page = 1, int pageSize = 10)
     {
         try
@@ -65,12 +65,12 @@ public class PostService
                 .Sort(Builders<Post>.Sort.Descending(p => p.CreatedAt))
                 .Skip((page - 1) * pageSize)
                 .Limit(pageSize)
-                .Lookup("users_collection", "AuthorId", "_id", "AuthorData") 
+                .Lookup("users_collection", "AuthorId", "_id", "AuthorData")
                 .Lookup("estates_collection", "EstateId", "_id", "EstateData")
                 .As<BsonDocument>()
                 .ToListAsync();
 
-            
+
             var postsDtos = posts.Select(post =>
             {
                 var authorDoc = post["AuthorData"].AsBsonArray.FirstOrDefault();
@@ -88,7 +88,7 @@ public class PostService
                         Id = authorDoc["_id"].AsObjectId.ToString(),
                         Username = authorDoc["Username"].AsString,
                         Email = authorDoc["Email"].AsString,
-                        Role = (UserRole) authorDoc["Role"].AsInt32
+                        Role = (UserRole)authorDoc["Role"].AsInt32
                     } : null!,
 
                     // Estate = estateDoc != null ? new EstateResultDTO
@@ -99,7 +99,7 @@ public class PostService
                     // } : null
                 };
             }).ToList();
-            
+
             var totalCount = await _postsCollection.CountDocumentsAsync(_ => true);
 
             return new PaginatedResponseDTO<PostResultDTO>()
@@ -113,7 +113,7 @@ public class PostService
             return "Došlo je do greške prilikom preuzimanja objava.".ToError();
         }
     }
-    
+
     public async Task<Result<PostResultDTO, ErrorMessage>> GetPostById(string postId)
     {
         try
@@ -161,10 +161,10 @@ public class PostService
             return "Došlo je do greške prilikom preuzimanja objave.".ToError();
         }
     }
-    
+
     //metoda za pribavljanje objava za konkretnu nekretninu, ista kao GetAll s tim sto ima i estateId
     //ne moze dok se ne napravi EstateResult
-    
+
     public async Task<Result<bool, ErrorMessage>> UpdatePost(string postId, UpdatePostDTO postDto)
     {
         try
@@ -180,7 +180,7 @@ public class PostService
 
             existingPost.Title = postDto.Title;
             existingPost.Content = postDto.Content;
-            
+
             var res = await _postsCollection.ReplaceOneAsync(p => p.Id == postId, existingPost);
 
             return true;
@@ -190,7 +190,7 @@ public class PostService
             return "Došlo je do greške prilikom ažuriranja objave.".ToError();
         }
     }
-    
+
     public async Task<Result<bool, ErrorMessage>> DeletePost(string postId)
     {
         try
@@ -209,7 +209,7 @@ public class PostService
 
             if (deleteCommentsResult.IsError)
                 return deleteCommentsResult.Error;
-            
+
             var deleteResult = await _postsCollection.DeleteOneAsync(p => p.Id == postId);
 
             if (deleteResult.DeletedCount == 0)
@@ -224,7 +224,7 @@ public class PostService
             return "Došlo je do greške prilikom brisanja objave.".ToError();
         }
     }
-    
+
     public async Task<Result<bool, ErrorMessage>> AddCommentToPost(string postId, string commentId)
     {
         try
@@ -246,7 +246,7 @@ public class PostService
             return "Došlo je do greške prilikom dodavanja komentara objavi.".ToError();
         }
     }
-    
+
     public async Task<Result<bool, ErrorMessage>> RemoveCommentFromPost(string postId, string commentId)
     {
         try
@@ -266,4 +266,48 @@ public class PostService
             return "Došlo je do greške prilikom uklanjanja komentara sa posta.".ToError();
         }
     }
+
+    public async Task<Result<List<PostResultDTO>, ErrorMessage>> GetUserPosts(string userId)
+    {
+        try
+        {
+            var posts = await _postsCollection.Aggregate()
+                .Match(Builders<Post>.Filter.Eq("AuthorId", ObjectId.Parse(userId)))
+                .Lookup("users_collection", "AuthorId", "_id", "AuthorData")
+                .Lookup("estates_collection", "EstateId", "_id", "EstateData")
+                .As<BsonDocument>()
+                .ToListAsync();
+
+            if (!posts.Any())
+                return "Korisnik trenutno nema objava.".ToError(404);
+
+            var postDtos = posts.Select(post =>
+            {
+                var authorDoc = post["AuthorData"].AsBsonArray.FirstOrDefault();
+
+                return new PostResultDTO
+                {
+                    Id = post["_id"].AsObjectId.ToString(),
+                    Title = post["Title"].AsString,
+                    Content = post["Content"].AsString,
+                    CreatedAt = post["CreatedAt"].ToUniversalTime(),
+
+                    Author = authorDoc != null ? new UserResultDTO
+                    {
+                        Id = authorDoc["_id"].AsObjectId.ToString(),
+                        Username = authorDoc["Username"].AsString,
+                        Email = authorDoc["Email"].AsString,
+                        Role = (UserRole)authorDoc["Role"].AsInt32
+                    } : null!,
+                };
+            }).ToList();
+
+            return postDtos;
+        }
+        catch (Exception)
+        {
+            return "Došlo je do greške prilikom preuzimanja objava.".ToError();
+        }
+    }
+
 }

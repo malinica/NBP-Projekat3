@@ -1,7 +1,4 @@
-import { useState } from "react";
-import { Estate } from "../../Interfaces/Estate/Estate";
 import { useNavigate } from "react-router-dom";
-
 
 interface EstateCardProps {
     id: string;
@@ -21,6 +18,7 @@ interface EstateCardProps {
         <h3>{title}</h3>
         <p>{desc}</p>
         <span>ID: {id}</span>
+        <br></br>
         <button onClick={handleNavigate}>Pogledaj Detalje</button>
       </div>
     );
