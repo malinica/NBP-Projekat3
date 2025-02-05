@@ -127,4 +127,29 @@ public class EstateController : ControllerBase
         return Ok("Estate added to favorites.");
     }
 
+    [HttpGet("SearchEstates")]
+    public async Task<IActionResult> SearchEstates(
+    [FromQuery] string? title = null,
+    [FromQuery] int? priceMin = null,
+    [FromQuery] int? priceMax = null,
+    [FromQuery] List<string>? categories = null,
+    [FromQuery] int skip = 0,
+    [FromQuery] int limit = 10)
+    {
+        (bool isError, var result, ErrorMessage? error) = await estateService.SearchEstatesFilter(
+            title,
+            priceMin,
+            priceMax,
+            categories,
+            skip,
+            limit);
+
+        if (isError)
+        {
+            return StatusCode(error?.StatusCode ?? 400, error?.Message);
+        }
+
+        return Ok(result);
+    }
+
 }

@@ -252,6 +252,71 @@
                 return "Došlo je do greške prilikom dodavanja nekretnine u omiljene.".ToError();
             }
         }
+public async Task<(bool isError, PaginatedResponseDTO<Estate> result, ErrorMessage? error)> SearchEstatesFilter(
+    string? title = null,
+    int? priceMin = null,
+    int? priceMax = null,
+    List<string>? categories = null,
+    int skip = 0,
+    int limit = 10)
+{
+    try
+    {
+        var filter = Builders<Estate>.Filter.Empty;
 
+        if (!string.IsNullOrWhiteSpace(title))
+            filter &= Builders<Estate>.Filter.Regex(x => x.Title, new BsonRegularExpression(title, "i"));
+
+        if (priceMin.HasValue)
+            filter &= Builders<Estate>.Filter.Gte(x => x.Price, priceMin.Value);
+
+        if (priceMax.HasValue)
+            filter &= Builders<Estate>.Filter.Lte(x => x.Price, priceMax.Value);
+
+        if (categories != null && categories.Any())
+  if (categories != null && categories.Any())
+        {
+            var categoryEnums = categories
+                .Select(category => Enum.TryParse<EstateCategory>(category, true, out var parsedCategory) ? parsedCategory : (EstateCategory?)null)
+                .Where(c => c.HasValue)
+                .Select(c => c.Value)
+                .ToList();
+
+            filter &= Builders<Estate>.Filter.In(x => x.Category, categoryEnums);
+        }
+        var estates = await _estatesCollection
+            .Find(filter)
+            .Skip(skip)
+            .Limit(limit)
+            .ToListAsync();
+
+        var totalCount = await _estatesCollection.CountDocumentsAsync(filter);
+
+        if (estates == null || !estates.Any())
+        {
+return (true, new PaginatedResponseDTO<Estate>
+{
+    Data = new List<Estate>(),
+    TotalLength = 0
+}
+, new ErrorMessage("No estates found.", 404));
+        }
+
+        return (false, new PaginatedResponseDTO<Estate>
+{
+    Data = estates,
+    TotalLength = estates.Count()
+}, null);
+    }
+    catch (Exception ex)
+    {
+return (true, new PaginatedResponseDTO<Estate>
+{
+    Data = new List<Estate>(),
+    TotalLength = 0
+}
+, new ErrorMessage(ex.Message));
+    }
+}
     }
 }

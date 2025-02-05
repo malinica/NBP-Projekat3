@@ -4,6 +4,8 @@ import { PaginatedResponseDTO } from "../../Interfaces/Pagination/PaginatedRespo
 import { Pagination } from "../Pagination/Pagination";
 import EstateCard from "../EstateCard/EstateCard";
 import { EstateCategory, EstateCategoryTranslations } from "../../Enums/EstateCategory";
+import toast from "react-hot-toast";
+import { searchEstatesAPI } from "../../Services/EstateService";
 
 
 export const SearchEstate=()=>
@@ -18,20 +20,39 @@ export const SearchEstate=()=>
     const [searchPriceMax,setPriceMaxSearch]=useState<number|null>(null);
     const [searchCategory, setSearchCategory] = useState<EstateCategory[]>([]);
     const handleSearch = () => {
-      
-        console.log({
-          searchTitle,
-          searchPriceMin,
-          searchPriceMax,
-          searchCategory,
-        });
-      
+      loadEstates(page, pageSize);
+     
       };
-      
+
+      useEffect(() => {
+        loadEstates(page, pageSize);
+      }, []); 
+
+      const loadEstates = async (page: number, pageSize: number) => {
+        setIsLoading(true);
+        const result = await searchEstatesAPI(
+          searchTitle ?? undefined,
+    searchPriceMin ?? undefined,
+    searchPriceMax ?? undefined,
+    searchCategory ?? undefined,
+    page ?? undefined,
+    pageSize ?? undefined
+          );
+        if (!result) {
+          toast.error("Nema podataka za prikaz!");
+          setEstates(null);
+          setEstatesCount(0);
+        } else {
+          setEstates(result.data);
+          setEstatesCount(result?.totalLength ?? 0);
+        }
+        setIsLoading(false);
+      };
+    
 
     const handlePaginateChange = async (page: number, pageSize: number) => {
-        //await loadEstatesAPI(page, pageSize);
-        //setLoading(false);
+        await loadEstates(page, pageSize);
+        setIsLoading(false);
       }
 
       return (
@@ -108,10 +129,8 @@ onChange={(e) => setPriceMaxSearch(e.target.value ? +e.target.value : null)}
                 <div className="estate-cards-container">
                   {estates.map((estate) => (
                     <EstateCard
-                      key={estate.id}
-                      id={estate.id}
-                      title={estate.Title}
-                      desc={estate.Description}
+                    key={estate.id}
+                      estate={estate}
                     />
                   ))}
                 </div>
