@@ -19,7 +19,7 @@ export const Navbar = () => {
 
     const handleProfileRedirect = () => {
         if (user) {
-            navigate(`/user-profile`);
+            navigate(`/user-profile/${user!.id}`);
         }
     };
 
