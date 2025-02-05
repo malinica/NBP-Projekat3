@@ -1,18 +1,21 @@
-import {useEffect, useState} from "react";
-import {useParams} from "react-router-dom";
-import {getEstate} from "../../Services/EstateService";
-import {Estate} from "../../Interfaces/Estate/Estate";
-import {toast} from "react-hot-toast";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { getEstate } from "../../Services/EstateService";
+import { Estate } from "../../Interfaces/Estate/Estate";
+import { toast } from "react-hot-toast";
 import styles from "./EstatePage.module.css";
-import {CreatePost} from "../CreatePost/CreatePost.tsx";
-import {PostCard} from "../PostCard/PostCard.tsx";
-import {Pagination} from "../Pagination/Pagination.tsx";
-import {Post} from "../../Interfaces/Post/Post.ts";
-import {createPostAPI, getAllPostsForEstateAPI} from "../../Services/PostService.tsx";
-import {CreatePostDTO} from "../../Interfaces/Post/CreatePostDTO.ts";
+import { CreatePost } from "../CreatePost/CreatePost.tsx";
+import { PostCard } from "../PostCard/PostCard.tsx";
+import { Pagination } from "../Pagination/Pagination.tsx";
+import { Post } from "../../Interfaces/Post/Post.ts";
+import { createPostAPI, getAllPostsForEstateAPI } from "../../Services/PostService.tsx";
+import { CreatePostDTO } from "../../Interfaces/Post/CreatePostDTO.ts";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHeart } from '@fortawesome/free-solid-svg-icons';
+
 
 export const EstatePage = () => {
-  const {id} = useParams();
+  const { id } = useParams();
   const [estate, setEstate] = useState<Estate | null>(null);
   const [isEstateLoading, setIsEstateLoading] = useState<boolean>(true);
   const [isPostsLoading, setIsPostsLoading] = useState<boolean>(true);
@@ -101,25 +104,25 @@ export const EstatePage = () => {
                     <div className={`carousel-indicators`}>
                       {estate.images.map((_, i) =>
                         <button type="button" key={i} data-bs-target="#carouselExampleIndicators"
-                                data-bs-slide-to={`${i}`} className={`${i == 0 ? 'active' : ''}`}></button>
+                          data-bs-slide-to={`${i}`} className={`${i == 0 ? 'active' : ''}`}></button>
                       )}
                     </div>
                     <div className={`carousel-inner`}>
                       {estate.images.map((pictureName, i) => (
-                          <div className={`carousel-item ${i === 0 ? "active" : ""}`} key={i}>
-                            <img src={`${import.meta.env.VITE_SERVER_URL}${pictureName}`} className={`d-block w-100`}
-                                 alt="..."/>
-                          </div>
-                        )
+                        <div className={`carousel-item ${i === 0 ? "active" : ""}`} key={i}>
+                          <img src={`${import.meta.env.VITE_SERVER_URL}${pictureName}`} className={`d-block w-100`}
+                            alt="..." />
+                        </div>
+                      )
                       )}
                     </div>
                     <button className={`carousel-control-prev`} type="button"
-                            data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+                      data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
                       <span className={`carousel-control-prev-icon`} aria-hidden="true"></span>
                       <span className={`visually-hidden`}>Previous</span>
                     </button>
                     <button className={`carousel-control-next`} type="button"
-                            data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+                      data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
                       <span className={`carousel-control-next-icon`} aria-hidden="true"></span>
                       <span className={`visually-hidden`}>Next</span>
                     </button>
@@ -155,6 +158,11 @@ export const EstatePage = () => {
                 </div>
               </div>
             </div>
+
+            <button className="position-absolute top-0 end-0 m-3 btn btn-outline-danger">
+              <FontAwesomeIcon icon={faHeart} />
+            </button>
+
           </div>
         ) : (
           <p className="text-center text-muted">Nema podataka o nekretnini.</p>
@@ -164,7 +172,7 @@ export const EstatePage = () => {
       {/*Objave*/}
       <div className={`row`}>
         <div className={`col-md-4`}>
-          <CreatePost onCreatePost={handleCreatePost}/>
+          <CreatePost onCreatePost={handleCreatePost} />
         </div>
 
         <div className={`col-md-8 my-5`}>
@@ -174,14 +182,16 @@ export const EstatePage = () => {
           </>) : (
             <>
               {posts.length > 0 ? posts.map(post => (
-                <PostCard key={post.id} post={post}/>
+                <PostCard key={post.id} post={post} />
               )) : <p>Nema objava (stavi neku sliku bolje je)</p>}
             </>
           )}
           {totalPostsCount > 0 &&
             <Pagination totalLength={totalPostsCount} onPaginateChange={handlePaginateChange} currentPage={page}
-                        perPage={pageSize}/>}
+              perPage={pageSize} />}
         </div>
+
+        <div className="my-4"></div>
       </div>
     </div>
   );

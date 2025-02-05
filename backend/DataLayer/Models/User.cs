@@ -21,4 +21,7 @@ public class User
 
     [BsonRepresentation(BsonType.ObjectId)]
     public List<string> CommentIds { get; set; } = new(); // Lista ID-a komentara koje je korisnik napisao
+
+    [BsonRepresentation(BsonType.ObjectId)]
+    public List<string> FavoriteEstateIds { get; set; } = new(); // Lista ID-a omiljenih nekretnina korisnika
 }

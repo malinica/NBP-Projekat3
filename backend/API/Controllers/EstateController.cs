@@ -19,15 +19,15 @@ public class EstateController : ControllerBase
 
     [HttpPost("CreateEstate")]
     [Authorize]
-    public async Task<IActionResult> CreateEstate( [FromForm] EstateCreateDTO newEstate)
+    public async Task<IActionResult> CreateEstate([FromForm] EstateCreateDTO newEstate)
     {
 
-        var user=userService.GetCurrentUserId(User);
+        var user = userService.GetCurrentUserId(User);
         if (user.IsError)
         {
             return StatusCode(400, "Failed to retrieve user ID.");
         }
-        (bool isError, var response, ErrorMessage? error) = await estateService.CreateEstate( newEstate,user.Data);
+        (bool isError, var response, ErrorMessage? error) = await estateService.CreateEstate(newEstate, user.Data);
 
         if (isError)
         {
@@ -104,6 +104,27 @@ public class EstateController : ControllerBase
             return StatusCode(error?.StatusCode ?? 400, error?.Message);
         }
         return Ok(response);
+    }
+
+    [HttpPost("AddToFavorites/{estateId}")]
+    [Authorize]
+    public async Task<IActionResult> AddToFavorites(string estateId)
+    {
+        var userResult = userService.GetCurrentUserId(User);
+        if (userResult.IsError)
+        {
+            return StatusCode(userResult.Error?.StatusCode ?? 400, userResult.Error?.Message);
+        }
+
+        var userId = userResult.Data;
+        (bool isError, var response, ErrorMessage? error) = await estateService.AddFavoriteEstate(userId, estateId);
+
+        if (isError)
+        {
+            return StatusCode(error?.StatusCode ?? 400, error?.Message);
+        }
+
+        return Ok("Estate added to favorites.");
     }
 
 }

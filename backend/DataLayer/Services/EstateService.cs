@@ -6,6 +6,8 @@
         private readonly IMongoCollection<Estate> _estatesCollection =
             DbConnection.GetDatabase().GetCollection<Estate>("estates_collection");
         private readonly UserService userService;
+        private readonly IMongoCollection<User> _usersCollection =
+            DbConnection.GetDatabase().GetCollection<User>("users_collection");
 
         public EstateService(UserService userS)
         {
@@ -219,5 +221,37 @@
                 return "Došlo je do greške prilikom uklanjanja objave sa nekretnine.".ToError();
             }
         }
+
+        public async Task<Result<bool, ErrorMessage>> AddFavoriteEstate(string userId, string estateId)
+        {
+            try
+            {
+                var user = await _usersCollection.Find(x => x.Id == userId).FirstOrDefaultAsync();
+                var estate = await _estatesCollection.Find(x => x.Id == estateId).FirstOrDefaultAsync();
+
+                if (user.FavoriteEstateIds.Contains(estateId))
+                {
+                    return "Nekretnina je već u omiljenim.".ToError();
+                }
+
+                user.FavoriteEstateIds.Add(estateId);
+
+                var updateResult = await _usersCollection.ReplaceOneAsync(
+                    x => x.Id == userId,
+                    user
+                );
+
+                if (updateResult.ModifiedCount > 0)
+                {
+                    return true;
+                }
+                return "Došlo je do greške prilikom ažuriranja omiljenih nekretnina.".ToError();
+            }
+            catch (Exception)
+            {
+                return "Došlo je do greške prilikom dodavanja nekretnine u omiljene.".ToError();
+            }
+        }
+
     }
 }
