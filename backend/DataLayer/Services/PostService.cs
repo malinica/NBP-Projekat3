@@ -34,16 +34,22 @@ public class PostService
 
             await _postsCollection.InsertOneAsync(newPost);
 
-            var userResult = await _userService.GetById(userId);
+            var userUpdateResult = await _userService.AddPostToUser(userId, newPost.Id!);
+            if (userUpdateResult.IsError)
+                return userUpdateResult.Error;
 
+            var userResult = await _userService.GetById(userId);
             if (userResult.IsError)
                 return userResult.Error;
 
             EstateResultDTO? estate = null;
             if (postDto.EstateId != null)
             {
-                var estateResult = await _estateService.GetEstate(postDto.EstateId);
+                var estateUpdateResult = await _estateService.AddPostToEstate(postDto.EstateId, newPost.Id!);
+                if (estateUpdateResult.IsError)
+                    return estateUpdateResult.Error;
                 
+                var estateResult = await _estateService.GetEstate(postDto.EstateId);
                 if (estateResult.IsError)
                     return estateResult.Error;
                 
@@ -145,7 +151,7 @@ public class PostService
                 TotalLength = totalCount
             };
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return "Došlo je do greške prilikom preuzimanja objava.".ToError();
         }
@@ -190,12 +196,24 @@ public class PostService
                 return "Objava sa datim ID-jem ne postoji.".ToError();
             }
 
+            var userUpdateResult = await _userService.RemovePostFromUser(existingPost.AuthorId, postId);
+            if (userUpdateResult.IsError)
+                return userUpdateResult.Error;
+
+            if (existingPost.EstateId != null)
+            {
+                var estateUpdateResult = await _estateService.RemovePostFromEstate(existingPost.EstateId, postId);
+                if (estateUpdateResult.IsError)
+                    return estateUpdateResult.Error;
+            }
+
             var commentService = _serviceProvider.GetRequiredService<CommentService>();
-            var deleteCommentsResult = await commentService.DeleteManyAsync(existingPost.CommentIds);
 
-            if (deleteCommentsResult.IsError)
-                return deleteCommentsResult.Error;
-
+            foreach (var commentId in existingPost.CommentIds)
+            {
+                await commentService.DeleteComment(commentId);
+            }
+            
             var deleteResult = await _postsCollection.DeleteOneAsync(p => p.Id == postId);
 
             if (deleteResult.DeletedCount == 0)
@@ -222,7 +240,7 @@ public class PostService
 
             if (updateResult.ModifiedCount == 0)
             {
-                return "Post nije pronađen ili nije ažuriran.".ToError();
+                return "Objava nije pronađena ili nije ažurirana.".ToError();
             }
 
             return true;
@@ -243,13 +261,13 @@ public class PostService
             var updateResult = await _postsCollection.UpdateOneAsync(filter, update);
 
             if (updateResult.ModifiedCount == 0)
-                return "Komentar nije pronađen na postu.".ToError();
+                return "Komentar nije pronađen na objavi.".ToError();
 
             return true;
         }
         catch (Exception)
         {
-            return "Došlo je do greške prilikom uklanjanja komentara sa posta.".ToError();
+            return "Došlo je do greške prilikom uklanjanja komentara sa objave.".ToError();
         }
     }
 

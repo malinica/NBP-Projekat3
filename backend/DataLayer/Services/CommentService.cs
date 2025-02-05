@@ -30,12 +30,14 @@ public class CommentService
             await _commentsCollection.InsertOneAsync(newComment);
 
             var postUpdateResult = await _postService.AddCommentToPost(commentDto.PostId, newComment.Id!);
-
             if (postUpdateResult.IsError)
                 return postUpdateResult.Error;
+
+            var userUpdateResult = await _userService.AddCommentToUser(userId, newComment.Id!);
+            if (userUpdateResult.IsError)
+                return userUpdateResult.Error;
             
             var userResult = await _userService.GetById(userId);
-            
             if (userResult.IsError)
                 return userResult.Error;
             
@@ -54,8 +56,9 @@ public class CommentService
             return "Došlo je do greške prilikom kreiranja komentara.".ToError();
         }
     }
-    
-    public async Task<Result<PaginatedResponseDTO<CommentResultDTO>, ErrorMessage>> GetCommentsForPost(string postId, int skip = 0, int limit = 10)
+
+    public async Task<Result<PaginatedResponseDTO<CommentResultDTO>, ErrorMessage>> GetCommentsForPost(string postId,
+        int skip = 0, int limit = 10)
     {
         try
         {
@@ -64,29 +67,12 @@ public class CommentService
                 .Sort(Builders<Comment>.Sort.Descending(p => p.CreatedAt))
                 .Skip(skip)
                 .Limit(limit)
-                .Lookup("users_collection", "AuthorId", "_id", "AuthorData") 
+                .Lookup("users_collection", "AuthorId", "_id", "AuthorData")
                 .As<BsonDocument>()
                 .ToListAsync();
-            
-            var commentsDtos = comments.Select(comment =>
-            {
-                var authorDoc = comment["AuthorData"].AsBsonArray.FirstOrDefault();
 
-                return new CommentResultDTO
-                {
-                    Id = comment["_id"].AsObjectId.ToString(),
-                    Content = comment["Content"].AsString,
-                    CreatedAt = comment["CreatedAt"].ToUniversalTime(),
-                    Author = authorDoc != null ? new UserResultDTO
-                    {
-                        Id = authorDoc["_id"].AsObjectId.ToString(),
-                        Username = authorDoc["Username"].AsString,
-                        Email = authorDoc["Email"].AsString,
-                        Role = (UserRole) authorDoc["Role"].AsInt32
-                    } : null!
-                };
-            }).ToList();
-            
+            var commentsDtos = comments.Select(comment => new CommentResultDTO(comment)).ToList();
+
             var totalCount = await _commentsCollection.CountDocumentsAsync(comment => comment.PostId == postId);
 
             return new PaginatedResponseDTO<CommentResultDTO>()
@@ -98,21 +84,6 @@ public class CommentService
         catch (Exception)
         {
             return "Došlo je do greške prilikom preuzimanja komentara.".ToError();
-        }
-    }
-     
-    public async Task<Result<bool, ErrorMessage>> DeleteManyAsync(List<string> commentIds)
-    {
-        try
-        {
-            var filter = Builders<Comment>.Filter.In(c => c.Id, commentIds);
-            var deleteResult = await _commentsCollection.DeleteManyAsync(filter);
-
-            return deleteResult.DeletedCount > 0;
-        }
-        catch (Exception)
-        {
-            return "Došlo je do greške prilikom brisanja komentara objave.".ToError();
         }
     }
 
@@ -161,20 +132,24 @@ public class CommentService
 
             if (comment == null)
                 return "Komentar nije pronađen.".ToError();
-
+            
             var filter = Builders<Comment>.Filter.Eq(c => c.Id, commentId);
             var deleteResult = await _commentsCollection.DeleteOneAsync(filter);
             
-            if (deleteResult.DeletedCount > 0)
+            if (deleteResult.DeletedCount <= 0)
             {
-                var postUpdateResult = await _postService.RemoveCommentFromPost(comment.PostId, commentId);
-                if (postUpdateResult.IsError)
-                    return postUpdateResult.Error;
-
-                return true;
+                return "Došlo je do greške prilikom brisanja komentara.".ToError();
             }
+            
+            var postUpdateResult = await _postService.RemoveCommentFromPost(comment.PostId, commentId);
+            if (postUpdateResult.IsError)
+                return postUpdateResult.Error;
+                
+            var userUpdateResult = await _userService.RemoveCommentFromUser(comment.AuthorId, commentId);
+            if (userUpdateResult.IsError)
+                return userUpdateResult.Error;
 
-            return "Došlo je do greške prilikom brisanja komentara.".ToError();
+            return true;
         }
         catch (Exception)
         {

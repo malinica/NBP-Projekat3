@@ -147,4 +147,88 @@ public class UserService
             return "Došlo je do greške prilikom preuzimanja podataka o korisniku.".ToError();
         }
     }
+    
+    public async Task<Result<bool, ErrorMessage>> AddCommentToUser(string userId, string commentId)
+    {
+        try
+        {
+            var updateResult = await _usersCollection.UpdateOneAsync(
+                u => u.Id == userId,
+                Builders<User>.Update.Push(u => u.CommentIds, commentId)
+            );
+
+            if (updateResult.ModifiedCount == 0)
+            {
+                return "Korisnik nije pronađen ili nije ažuriran.".ToError();
+            }
+
+            return true;
+        }
+        catch (Exception)
+        {
+            return "Došlo je do greške prilikom dodavanja komentara korisniku.".ToError();
+        }
+    }
+
+    public async Task<Result<bool, ErrorMessage>> RemoveCommentFromUser(string userId, string commentId)
+    {
+        try
+        {
+            var filter = Builders<User>.Filter.Eq(u => u.Id, userId);
+            var update = Builders<User>.Update.Pull(u => u.CommentIds, commentId);
+
+            var updateResult = await _usersCollection.UpdateOneAsync(filter, update);
+
+            if (updateResult.ModifiedCount == 0)
+                return "Komentar nije pronađen kod korisnika.".ToError();
+
+            return true;
+        }
+        catch (Exception)
+        {
+            return "Došlo je do greške prilikom uklanjanja korisnikovog komentara.".ToError();
+        }
+    }
+    
+    public async Task<Result<bool, ErrorMessage>> AddPostToUser(string userId, string postId)
+    {
+        try
+        {
+            var updateResult = await _usersCollection.UpdateOneAsync(
+                u => u.Id == userId,
+                Builders<User>.Update.Push(u => u.PostIds, postId)
+            );
+
+            if (updateResult.ModifiedCount == 0)
+            {
+                return "Korisnik nije pronađen ili nije ažuriran.".ToError();
+            }
+
+            return true;
+        }
+        catch (Exception)
+        {
+            return "Došlo je do greške prilikom dodavanja objave korisniku.".ToError();
+        }
+    }
+
+    public async Task<Result<bool, ErrorMessage>> RemovePostFromUser(string userId, string postId)
+    {
+        try
+        {
+            var filter = Builders<User>.Filter.Eq(u => u.Id, userId);
+            var update = Builders<User>.Update.Pull(u => u.PostIds, postId);
+
+            var updateResult = await _usersCollection.UpdateOneAsync(filter, update);
+
+            if (updateResult.ModifiedCount == 0)
+                return "Objava nije pronađena kod korisnika.".ToError();
+
+            return true;
+        }
+        catch (Exception)
+        {
+            return "Došlo je do greške prilikom uklanjanja korisnikove objave.".ToError();
+        }
+    }
 }

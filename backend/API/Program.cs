@@ -83,7 +83,6 @@ if (!Directory.Exists(projectsImagesFolder))
     Directory.CreateDirectory(projectsImagesFolder);
 }
 
-
 var databaseDirectoryPath = Path.Combine(Directory.GetCurrentDirectory(), "..", "mongodb_data");
 if (!Directory.Exists(databaseDirectoryPath))
     Directory.CreateDirectory(databaseDirectoryPath);

@@ -42,7 +42,7 @@
             }
         }
 
-        public async Task<Result<Estate, ErrorMessage>> CreateEstate( EstateCreateDTO newEstateDTO, string? userID)
+        public async Task<Result<Estate, ErrorMessage>> CreateEstate(EstateCreateDTO newEstateDTO, string? userID)
         {
             try
             {
@@ -55,7 +55,7 @@
                         var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
                         var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "EstateImages");
                         /* 
-                    Vec dodato u program.cs
+                        Vec dodato u program.cs
                         if (!Directory.Exists(path))
                         {
                             Directory.CreateDirectory(path);
@@ -178,6 +178,46 @@
             }
         }
 
+        public async Task<Result<bool, ErrorMessage>> AddPostToEstate(string estateId, string postId)
+        {
+            try
+            {
+                var updateResult = await _estatesCollection.UpdateOneAsync(
+                    e => e.Id == estateId,
+                    Builders<Estate>.Update.Push(e => e.PostIds, postId)
+                );
 
+                if (updateResult.ModifiedCount == 0)
+                {
+                    return "Nekretnina nije pronađena ili nije ažurirana.".ToError();
+                }
+
+                return true;
+            }
+            catch (Exception)
+            {
+                return "Došlo je do greške prilikom dodavanja objave kod nekretnine.".ToError();
+            }
+        }
+
+        public async Task<Result<bool, ErrorMessage>> RemovePostFromEstate(string estateId, string postId)
+        {
+            try
+            {
+                var filter = Builders<Estate>.Filter.Eq(e => e.Id, estateId);
+                var update = Builders<Estate>.Update.Pull(e => e.PostIds, postId);
+
+                var updateResult = await _estatesCollection.UpdateOneAsync(filter, update);
+
+                if (updateResult.ModifiedCount == 0)
+                    return "Objava nije pronađena kod nekretnine.".ToError();
+
+                return true;
+            }
+            catch (Exception)
+            {
+                return "Došlo je do greške prilikom uklanjanja objave sa nekretnine.".ToError();
+            }
+        }
     }
 }
