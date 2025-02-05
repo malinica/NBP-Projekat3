@@ -1,7 +1,7 @@
 import toast from "react-hot-toast";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../Context/useAuth";
-import { useEffect, useState } from 'react';
+import {ChangeEvent, useState} from 'react';
 import { EstateCategory, getEstateCategoryTranslation } from "../../Enums/EstateCategory.ts";
 import { createEstateAPI } from "../../Services/EstateService";
 import styles from "./CreateEstate.module.css";
@@ -15,18 +15,21 @@ const CreateEstate = () => {
   const [pictures, setPictures] = useState<FileList | null>(null);
   const [totalRooms, setTotalRooms] = useState<number | null>(null);
   const [squareMeters, setSquareMeters] = useState<number | null>(null);
-  const [floorNumber, setFloornumber] = useState<number | null>(null);
+  const [floorNumber, setFloorNumber] = useState<number | null>(null);
   const [price, setPrice] = useState<number | null>(null);
   const [long, setLong] = useState<number | null>(null);
   const [lat, setLat] = useState<number | null>(null);
+  const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
 
   const user = useAuth();
 
   const navigate = useNavigate();
 
-  const handlePicturesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePicturesChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setPictures(e.target.files);
+      const urls = Array.from(e.target.files).map((file) => URL.createObjectURL(file));
+      setImagePreviewUrls(urls);
     }
   };
 
@@ -53,7 +56,7 @@ const CreateEstate = () => {
             setLat(null);
             setLong(null);
             setPrice(null);
-            setFloornumber(null);
+            setFloorNumber(null);
             setSquareMeters(null);
             setTotalRooms(null);
             setPictures(null);
@@ -62,20 +65,19 @@ const CreateEstate = () => {
             navigate(`/estate-page/${response.data.id}`);          
           }
         }
-        catch (error) {
+        catch {
             toast.error("Greška pri kreiranju nekretnine.");
         }
       }
-    
       else 
-      toast.error("Unesite sve podatke!");
+        toast.error("Unesite sve podatke!");
   }
 
   return (
     <>
       {user ? (
         <>
-          <div className={`conatiner-fluid bg-beige d-flex justify-content-center`}>
+          <div className={`container-fluid bg-beige d-flex justify-content-center`}>
             <div className={`col-xxl-7 col-xl-7 col-lg-8 col-md-10 col-sm-12 m-4 p-4 rounded-3 d-flex flex-column bg-white shadow`}>
               <div className={`row justify-content-center py-3 px-3`}>
                 <h1 className={`text-center text-gray pb-5`}>Kreiraj Nekretninu</h1>
@@ -149,7 +151,7 @@ const CreateEstate = () => {
                     <input
                       type="number"
                       value={floorNumber ?? ''}
-                      onChange={(e) => setFloornumber(Number(e.target.value))}
+                      onChange={(e) => setFloorNumber(Number(e.target.value))}
                       className={`form-control ${styles.fields}`}
                     />
                   </div>
@@ -177,6 +179,13 @@ const CreateEstate = () => {
                       multiple
                       required
                     />
+                    <div className="d-flex flex-wrap mt-3">
+                      {imagePreviewUrls.map((url, index) => (
+                        <div key={index} className="m-2">
+                          <img src={url} alt={`Preview ${index}`} className="img-thumbnail" width={100} />
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
                 
