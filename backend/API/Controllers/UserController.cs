@@ -36,4 +36,17 @@ public class UserController : ControllerBase
 
         return Ok(response);
     }
+    
+    [HttpGet("GetUserById/{id}")]
+    public async Task<IActionResult> GetUserById([FromRoute] string id)
+    {
+        (bool isError, var response, ErrorMessage? error) = await _userService.GetById(id);
+
+        if (isError)
+        {
+            return StatusCode(error?.StatusCode ?? 400, error?.Message);
+        }
+
+        return Ok(response);
+    }
 }

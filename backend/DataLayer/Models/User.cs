@@ -8,6 +8,7 @@ public class User
     public string? Id { get; set; }
     public required string Username { get; init; }
     public required string Email { get; init; }
+    public required string PhoneNumber { get; set; }
     public required string PasswordHash { get; init; }
     public UserRole Role { get; init; }
 

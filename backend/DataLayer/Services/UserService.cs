@@ -46,6 +46,7 @@ public class UserService
             {
                 Username = userDto.Username,
                 Email = userDto.Email,
+                PhoneNumber = userDto.PhoneNumber,
                 PasswordHash = _passwordHasher.HashPassword(null!, userDto.Password),
                 Role = UserRole.User
             };
@@ -57,6 +58,7 @@ public class UserService
                 Id = newUser.Id!,
                 Username = newUser.Username,
                 Email = newUser.Email,
+                PhoneNumber = newUser.PhoneNumber,
                 Role = UserRole.User,
                 Token = _tokenService.CreateToken(newUser)
             };
@@ -89,6 +91,7 @@ public class UserService
                 Id = user.Id!,
                 Username = user.Username,
                 Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
                 Token = accessToken,
                 Role = user.Role
             };

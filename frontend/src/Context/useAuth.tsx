@@ -9,7 +9,7 @@ import {AuthResponseDTO} from "../Interfaces/User/AuthResponseDTO.ts";
 type UserContextType = {
   user: User | null;
   token: string | null;
-  registerUser: (email: string, username: string, password: string) => void;
+  registerUser: (email: string, username: string, password: string, phoneNumber: string) => void;
   loginUser: (email: string, password: string) => void;
   logout: () => void;
   isLoggedIn: () => boolean;
@@ -46,6 +46,7 @@ export const UserProvider = ({ children }: Props) => {
       id: authResponse.id,
       username: authResponse.username,
       email: authResponse.email,
+      phoneNumber: authResponse.phoneNumber,
       role: authResponse.role as UserRole
     };
 
@@ -58,8 +59,8 @@ export const UserProvider = ({ children }: Props) => {
     navigate(from, { replace: true });
   }
 
-  const registerUser = async (email: string, username: string, password: string) => {
-    await registerAPI(email, username, password)
+  const registerUser = async (email: string, username: string, password: string, phoneNumber: string) => {
+    await registerAPI(email, username, password, phoneNumber)
       .then((res) => {
         if (res) {
           storeUserData(res.data);

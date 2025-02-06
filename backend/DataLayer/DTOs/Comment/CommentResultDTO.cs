@@ -25,6 +25,7 @@ public class CommentResultDTO
                 Id = authorDoc["_id"].AsObjectId.ToString(),
                 Username = authorDoc["Username"].AsString,
                 Email = authorDoc["Email"].AsString,
+                PhoneNumber = authorDoc["PhoneNumber"].AsString,
                 Role = (UserRole)authorDoc["Role"].AsInt32
             }
             : null!;

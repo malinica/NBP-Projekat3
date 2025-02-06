@@ -3,13 +3,14 @@ import {ChangeEvent, useState} from "react";
 import {useAuth} from "../../Context/useAuth.tsx";
 import styles from './RegisterPage.module.css'
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faEye, faEyeSlash} from "@fortawesome/free-solid-svg-icons";
+import {faEye, faEyeSlash, faPhone} from "@fortawesome/free-solid-svg-icons";
 import {Link} from "react-router-dom";
 
 export const RegisterPage = () => {
   const [email, setEmail] = useState<string>("");
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [phoneNumber, setPhoneNumber] = useState<string>("");
 
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
 
@@ -23,6 +24,11 @@ export const RegisterPage = () => {
     setEmail(e.target.value);
   };
 
+  const handlePhoneNumberChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/[^0-9+ ]/g, "");
+    setPhoneNumber(value);
+  };
+
   const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
   };
@@ -34,10 +40,12 @@ export const RegisterPage = () => {
   const handleRegister = async () => {
     const trimmedEmail = email.trim();
     const trimmedUsername = username.trim();
+    const trimmedPhoneNumber = phoneNumber.trim();
     setEmail(trimmedEmail);
     setUsername(trimmedUsername);
+    setPhoneNumber(trimmedPhoneNumber);
 
-    if (!trimmedEmail || !password || !trimmedUsername) {
+    if (!trimmedEmail || !password || !trimmedUsername || !trimmedPhoneNumber) {
       toast.error("Niste popunili sva polja.")
       return;
     }
@@ -61,7 +69,7 @@ export const RegisterPage = () => {
     }
 
     try {
-      await registerUser(email, username, password);
+      await registerUser(email, username, password, phoneNumber);
     } catch (error) {
       console.error(error);
     }
@@ -86,6 +94,30 @@ export const RegisterPage = () => {
           <label htmlFor="username" className={`${styles.input_placeholder}`}>
             Unesite korisničko ime
           </label>
+        </div>
+        <div className="input-group mb-2 mt-2">
+        <span className={`input-group-text ${styles.fields}`}>
+          <FontAwesomeIcon icon={faPhone} />
+        </span>
+          <div className="form-floating">
+            <input
+              type="tel"
+              className={`form-control ${styles.fields}`}
+              id="phoneNumber"
+              placeholder="Unesite broj telefona"
+              onChange={handlePhoneNumberChange}
+              name="phoneNumber"
+              value={phoneNumber}
+              required
+              inputMode="numeric"
+              pattern="^\+?[0-9]{9,15}$"
+              maxLength={15}
+              minLength={9}
+            />
+            <label htmlFor="phoneNumber" className={`${styles.input_placeholder}`}>
+              Unesite broj telefona
+            </label>
+          </div>
         </div>
         <div className={`form-floating mb-2 mt-2`}>
           <input

@@ -17,7 +17,7 @@ export const EstateCard = ({ estate, loadEstates }: EstateCardProps) => {
     const response = await deleteEstateAPI(estate.id);
     if (response) {
       toast.success("Nekretnina uspešno obrisana.");
-      loadEstates(undefined,undefined);
+      await loadEstates(undefined,undefined);
 
     }
   };
