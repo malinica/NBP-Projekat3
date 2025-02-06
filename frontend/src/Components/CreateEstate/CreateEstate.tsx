@@ -8,8 +8,6 @@ import styles from "./CreateEstate.module.css";
 import MapWithMarker from "../Map/MapWithMarker";
 
 const CreateEstate = () => {
-  const location = useLocation();
-  const { estate } = location.state || {};
   const [title, setTitle] = useState('');
   const [desc, setDesc] = useState('');
   const [category, setCategory] = useState<EstateCategory>(EstateCategory.House);
@@ -23,36 +21,6 @@ const CreateEstate = () => {
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
   const user = useAuth();
   const navigate = useNavigate();
-  const [edit, setEdit] = useState<boolean>(estate !== null && estate!=undefined && estate.userId === user?.user?.id);
-
-
-  useEffect(() => {
-    
-    if (estate) {
-      setTitle(estate.title);
-      setDesc(estate.description);
-      setCategory(estate.category);
-      setPictures(estate.images); 
-      setTotalRooms(estate.totalRooms);
-      setSquareMeters(estate.squareMeters);
-      setFloorNumber(estate.floorNumber);
-      setPrice(estate.price);
-      setLong(estate.longitude);
-      setLat(estate.latitude);
-    } else {
-      setTitle('');
-      setDesc('');
-      setCategory(EstateCategory.House);
-      setPictures(null);
-      setTotalRooms(null);
-      setSquareMeters(null);
-      setFloorNumber(null);
-      setPrice(null);
-      setLong(null);
-      setLat(null);
-    }
-    
-  }, [estate]);
 
   
   const handlePicturesChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -63,37 +31,6 @@ const CreateEstate = () => {
     }
   };
 
-  
-  const handleChange = async () => {
-    if (price && squareMeters && totalRooms && long && lat && floorNumber && pictures!=null) {
-      const formData = new FormData();
-      formData.append("Title", title);
-      formData.append("Description", desc);
-      formData.append("Price", price.toString());
-      formData.append("SquareMeters", squareMeters.toString());
-      formData.append("TotalRooms", totalRooms.toString());
-      formData.append("Category", category);
-      formData.append("FloorNumber", floorNumber.toString());
-      formData.append("Longitude", long.toString());
-      formData.append("Latitude", lat.toString());
-
-      Array.from(pictures).forEach((file) => {
-        formData.append("Images", file);
-        
-      });
-        try {
-          const response =null // await editEstateAPI( formData);
-          if (response) {
-            setEdit(false);         
-          }
-        }
-        catch {
-            toast.error("Greška pri menjanju nekretnine.");
-        }
-      }
-      else 
-        toast.error("Unesite sve podatke!");
-  }
 
   const handleSubmit = async () => {
     if (price && squareMeters && totalRooms && long && lat && floorNumber && pictures!=null) {
@@ -144,7 +81,7 @@ const CreateEstate = () => {
             <div className={`col-xxl-7 col-xl-7 col-lg-8 col-md-10 col-sm-12 m-4 p-4 rounded-3 d-flex flex-column bg-white shadow`}>
               <div className={`row justify-content-center py-3 px-3`}>
               <h1 className={`text-center text-gray pb-5`}>
-                {edit ? 'Izmeni Nekretninu' : 'Kreiraj Nekretninu'}
+                Kreiraj Nekretninu
               </h1>
                 <div className={`mb-2 row`}>
                   <label className={`col-sm-2 col-form-label text-blue`}>Naziv:</label>
@@ -256,8 +193,8 @@ const CreateEstate = () => {
                 
                 <div style={{ width: '100%', height: '500px', overflow: 'hidden' }}>
                 <MapWithMarker
-  lat={estate ? estate.latitude : lat}
-  long={estate ? estate.longitude : long}
+  lat={lat}
+  long={long}
   setLat={setLat}
   setLong={setLong}
 />
@@ -266,9 +203,9 @@ const CreateEstate = () => {
                 <div className={`d-flex justify-content-end me-4 mt-4`}>
                 <button 
   className={`btn-lg text-white text-center rounded-3 border-0 py-2 px-2 ${styles.slova} ${styles.dugme1} ${styles.linija_ispod_dugmeta}`}
-  onClick={edit ? handleChange : handleSubmit}
+  onClick={handleSubmit}
 >
-  {edit ? 'Sačuvaj Nekretninu' : 'Dodaj Nekretninu'}
+  Dodaj Nekretninu
 </button>
                 </div>
               </div>

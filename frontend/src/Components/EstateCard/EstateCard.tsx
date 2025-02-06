@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 
 interface EstateCardProps {
   estate:Estate;
-  loadEstates: (pageNumber?: number, pageSizeNumber?: number) => Promise<void>;
+  loadEstates: () => Promise<void>;
 }
 
 export const EstateCard = ({ estate, loadEstates }: EstateCardProps) => {
@@ -17,13 +17,14 @@ export const EstateCard = ({ estate, loadEstates }: EstateCardProps) => {
     const response = await deleteEstateAPI(estate.id);
     if (response) {
       toast.success("Nekretnina uspešno obrisana.");
-      await loadEstates(undefined,undefined);
+      await loadEstates();
 
     }
   };
   
   const handleChange = () => {
-  navigate(`/estate-change/${estate.id}`, { state: { estate } });
+    navigate(`/estate-page/${estate.id}`, { state: { setEdit: true } });
+
   };
 
   const handleNavigate = () => {

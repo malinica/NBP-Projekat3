@@ -31,7 +31,6 @@ function App() {
                 <Route path="/forum" element={<ForumPage/>} />
                 <Route path="/forum/:postId" element={<PostPage />} />
                 <Route path="/create-estate" element={<CreateEstate/>}/>
-                <Route path="/estate-change/:id" element={<CreateEstate />} />
                 <Route path="/user-profile/:id" element={<UserProfile/>}/>
                 <Route path="/search-estates" element={<SearchEstate/>}/>
                 <Route path="/estate-page/:id" element={<EstatePage />} /> 

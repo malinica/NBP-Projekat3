@@ -25,6 +25,7 @@ const MapWithMarker: React.FC<Props> = ({ setLat, setLong, long, lat }) => {
     useEffect(() => {
         if(long!=null && lat!=null)
         {
+            console.log(long+"AAAAAAAA");
             const newLocation: GeoCoordinates = { latitude: lat, longitude: long };            
             setLocation(newLocation);
         }

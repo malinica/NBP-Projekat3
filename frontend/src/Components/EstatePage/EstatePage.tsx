@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { addToFavoritesAPI, getEstate, updateEstateAPI } from "../../Services/EstateService";
 import { Estate } from "../../Interfaces/Estate/Estate";
 import { toast } from "react-hot-toast";
@@ -14,9 +14,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart } from '@fortawesome/free-solid-svg-icons';
 import { EstateCategory } from "../../Enums/EstateCategory.ts";
 import noposts from "../../Assets/noposts.png";
+import MapWithMarker from "../Map/MapWithMarker.tsx";
 
 export const EstatePage = () => {
   const { id } = useParams();
+  const location = useLocation();
+  const setEdit = location.state?.setEdit||false;
+  
   const [estate, setEstate] = useState<Estate | null>(null);
   const [isEstateLoading, setIsEstateLoading] = useState<boolean>(true);
   const [isPostsLoading, setIsPostsLoading] = useState<boolean>(true);
@@ -26,7 +30,7 @@ export const EstatePage = () => {
   const [page, setPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
 
-  const [editMode, setEditMode] = useState(false);
+  const [editMode, setEditMode] = useState(setEdit);
   const [updatedName, setUpdatedName] = useState(estate?.title || "");
   const [updatedDescription, setUpdatedDescription] = useState(estate?.description || "");
   const [updatedCategory, setUpdatedCategory] = useState(estate?.category || "");
@@ -35,8 +39,8 @@ export const EstatePage = () => {
   const [updatedRooms, setUpdatedRooms] = useState(estate?.totalRooms || '');
   const [updatedFloor, setUpdatedFloor] = useState(estate?.floorNumber || '');
   const [updatedSize, setUpdatedSize] = useState(estate?.squareMeters || '');
-
-
+  const [long, setLong] = useState<number | null>(null);
+  const [lat, setLat] = useState<number | null>(null);
   useEffect(() => {
     const fetchEstate = async () => {
       try {
@@ -47,7 +51,7 @@ export const EstatePage = () => {
         const estateResponse = await getEstate(id);
         if (estateResponse) {
           setEstate(estateResponse);
-        }
+                  }
       } catch {
         toast.error("Greška pri učitavanju nekretnine");
       } finally {
@@ -61,6 +65,8 @@ export const EstatePage = () => {
 
   useEffect(() => {
     if (estate) {
+      setLat(estate?.latitude ?? null);
+      setLong(estate?.longitude ?? null);
       setUpdatedName(estate.title);
       setUpdatedDescription(estate.description);
       setUpdatedCategory(estate.category);
@@ -250,6 +256,14 @@ export const EstatePage = () => {
                             <h5 className={`text-golden`}>Sprat</h5>
                             <p className={`text-blue fs-5`}>{estate?.floorNumber ?? "N/A"}</p>
                           </div>
+                          <div style={{ width: '100%', height: '500px', overflow: 'hidden' }}>
+                <MapWithMarker
+  lat={lat}
+  long={long}
+  setLat={setLat}
+  setLong={setLong}
+/>
+                </div>
                         </div>
                         {/*<div style={{ width: '100%', height: '500px', overflow: 'hidden' }}>
                         <MapWithMarker
@@ -330,6 +344,17 @@ export const EstatePage = () => {
                             ))}
                           </select>
                         </div>
+
+
+                        <div style={{ width: '100%', height: '500px', overflow: 'hidden' }}>
+                <MapWithMarker
+  lat={lat}
+  long={long}
+  setLat={setLat}
+  setLong={setLong}
+/>
+                </div>
+                        
                         <div className={`mb-3`}>
                           <label className="form-label text-blue">Slike:</label>
                           <input

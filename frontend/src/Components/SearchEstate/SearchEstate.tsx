@@ -48,7 +48,6 @@ useEffect(() => {
             setEstates(result.data);
             setEstatesCount(result.totalLength);
           } else {
-            toast.error("Nema podataka za prikaz!");
             setEstates(null);
             setEstatesCount(0);
           }
@@ -60,6 +59,12 @@ useEffect(() => {
     const handlePaginateChange = async (page: number, pageSize: number) => {
         await loadEstates(page, pageSize);
         setIsLoading(false);
+      }
+
+      const handleDelete=async()=>{
+        if((page*pageSize+1)==totalEstatesCount)
+          setPage(page-1);
+        await loadEstates(page, pageSize);
       }
 
       return (
@@ -138,7 +143,7 @@ useEffect(() => {
                   <div className={`m-3`}>
                     {estates.map((estate) => (
                       <EstateCard
-                      loadEstates={loadEstates}
+                      loadEstates={handleDelete}
                       key={estate.id}
                         estate={estate}
                       />
