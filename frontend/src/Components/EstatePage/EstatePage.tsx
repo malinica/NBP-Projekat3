@@ -256,23 +256,15 @@ export const EstatePage = () => {
                             <h5 className={`text-golden`}>Sprat</h5>
                             <p className={`text-blue fs-5`}>{estate?.floorNumber ?? "N/A"}</p>
                           </div>
-                          <div style={{ width: '100%', height: '500px', overflow: 'hidden' }}>
-                <MapWithMarker
-  lat={lat}
-  long={long}
-  setLat={setLat}
-  setLong={setLong}
-/>
-                </div>
                         </div>
-                        {/*<div style={{ width: '100%', height: '500px', overflow: 'hidden' }}>
-                        <MapWithMarker
-                        /*lat={estate ? estate.latitude : lat}
-                        long={estate ? estate.longitude : long}
-                        setLat={setLat}
-                        setLong={setLong}
-                        />
-                      </div>*/}
+                        <div style={{ width: '100%', height: '500px', overflow: 'hidden' }}>
+                          <MapWithMarker
+                            lat={lat}
+                            long={long}
+                            setLat={setLat}
+                            setLong={setLong}
+                          />
+                        </div>
                       </div>
                     ) : (
                       <div className={`p-3`}>
@@ -344,17 +336,14 @@ export const EstatePage = () => {
                             ))}
                           </select>
                         </div>
-
-
                         <div style={{ width: '100%', height: '500px', overflow: 'hidden' }}>
-                <MapWithMarker
-  lat={lat}
-  long={long}
-  setLat={setLat}
-  setLong={setLong}
-/>
-                </div>
-                        
+                          <MapWithMarker
+                            lat={lat}
+                            long={long}
+                            setLat={setLat}
+                            setLong={setLong}
+                          />
+                        </div>
                         <div className={`mb-3`}>
                           <label className="form-label text-blue">Slike:</label>
                           <input
