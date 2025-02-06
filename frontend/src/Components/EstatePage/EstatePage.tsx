@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getEstate, updateEstateAPI } from "../../Services/EstateService";
+import { addToFavoritesAPI, getEstate, updateEstateAPI } from "../../Services/EstateService";
 import { Estate } from "../../Interfaces/Estate/Estate";
 import { toast } from "react-hot-toast";
 import styles from "./EstatePage.module.css";
@@ -14,7 +14,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart } from '@fortawesome/free-solid-svg-icons';
 import { EstateCategory } from "../../Enums/EstateCategory.ts";
 import noposts from "../../Assets/noposts.png";
-import MapWithMarker from "../Map/MapWithMarker";
 
 export const EstatePage = () => {
   const { id } = useParams();
@@ -72,7 +71,6 @@ export const EstatePage = () => {
     }
   }, [estate]);
 
-
   const handleCreatePost = async (title: string, content: string) => {
     try {
       const postDto: CreatePostDTO = {
@@ -123,6 +121,17 @@ export const EstatePage = () => {
       setUpdatedPictures(e.target.files);
     }
   };
+
+  const handleAddToFavorite = async () => {
+    try {
+      const response = await addToFavoritesAPI(estate!.id);
+      if (response?.status === 200) {
+        toast.success("Nekretnina je dodata u omiljene!");
+      }
+    } catch {
+      toast.error("Došlo je do greške prilikom dodavanja u omiljene.");
+    }
+  }
 
   const handleUpdate = async () => {
     try {
@@ -195,54 +204,54 @@ export const EstatePage = () => {
                     </div>
                   </div>
                   <div className={`col-md-6`}>
-                  {!editMode ? (
-                    <div className={`card-body`}>
-                      <div className={`d-flex justify-content-between align-items-start mb-4`}>
-                        <div>
-                          <h1 className={`mb-4 text-blue`}>{estate?.title}</h1>
-                          <p className={`lead mb-4 text-gray`}>{estate?.description}</p>
+                    {!editMode ? (
+                      <div className={`card-body`}>
+                        <div className={`d-flex justify-content-between align-items-start mb-4`}>
+                          <div>
+                            <h1 className={`mb-4 text-blue`}>{estate?.title}</h1>
+                            <p className={`lead mb-4 text-gray`}>{estate?.description}</p>
+                          </div>
+                          <div className={`mt-1`}>
+                            <button className={`btn btn-outline-danger me-2`} onClick={handleAddToFavorite}>
+                              <FontAwesomeIcon icon={faHeart} />
+                            </button>
+                            <button
+                              className={`btn btn-sm my-2 text-white text-center rounded py-2 px-2 ${styles.dugme1} ${styles.linija_ispod_dugmeta} ${styles.slova}`}
+                              onClick={() => setEditMode(true)}
+                            >
+                              Ažuriraj
+                            </button>
+                            <button
+                              className={`btn btn-sm ms-2 my-2 text-gray text-center rounded py-2 px-2 ${styles.dugme2} ${styles.linija_ispod_dugmeta} ${styles.slova}`}
+                              onClick={() => setEditMode(false)}
+                            >
+                              Obriši
+                            </button>
+                          </div>
                         </div>
-                        <div className={`mt-1`}>
-                          <button className={`btn btn-outline-danger me-2`}>
-                            <FontAwesomeIcon icon={faHeart} />
-                          </button>
-                          <button
-                            className={`btn btn-sm my-2 text-white text-center rounded py-2 px-2 ${styles.dugme1} ${styles.linija_ispod_dugmeta} ${styles.slova}`}
-                            onClick={() => setEditMode(true)}
-                          >
-                            Ažuriraj
-                          </button>
-                          <button
-                            className={`btn btn-sm ms-2 my-2 text-gray text-center rounded py-2 px-2 ${styles.dugme2} ${styles.linija_ispod_dugmeta} ${styles.slova}`}
-                            onClick={() => setEditMode(false)}
-                          >
-                            Obriši
-                          </button>
+                        <div className={`row mb-4`}>
+                          <div className={`col-md-6 mb-3`}>
+                            <h5 className={`text-golden`}>Cena</h5>
+                            <p className={`text-blue fs-5`}>{estate?.price} €</p>
+                          </div>
+                          <div className={`col-md-6 mb-3`}>
+                            <h5 className={`text-golden`}>Veličina</h5>
+                            <p className={`text-blue fs-5`}>{estate?.squareMeters} m²</p>
+                          </div>
+                          <div className={`col-md-6 mb-3`}>
+                            <h5 className={`text-golden`}>Broj soba</h5>
+                            <p className={`text-blue fs-5`}>{estate?.totalRooms}</p>
+                          </div>
+                          <div className={`col-md-6 mb-3`}>
+                            <h5 className={`text-golden`}>Kategorija</h5>
+                            <p className={`text-blue fs-5`}>{estate?.category}</p>
+                          </div>
+                          <div className={`col-md-6 mb-3`}>
+                            <h5 className={`text-golden`}>Sprat</h5>
+                            <p className={`text-blue fs-5`}>{estate?.floorNumber ?? "N/A"}</p>
+                          </div>
                         </div>
-                      </div>
-                      <div className={`row mb-4`}>
-                        <div className={`col-md-6 mb-3`}>
-                          <h5 className={`text-golden`}>Cena</h5>
-                          <p className={`text-blue fs-5`}>{estate?.price} €</p>
-                        </div>
-                        <div className={`col-md-6 mb-3`}>
-                          <h5 className={`text-golden`}>Veličina</h5>
-                          <p className={`text-blue fs-5`}>{estate?.squareMeters} m²</p>
-                        </div>
-                        <div className={`col-md-6 mb-3`}>
-                          <h5 className={`text-golden`}>Broj soba</h5>
-                          <p className={`text-blue fs-5`}>{estate?.totalRooms}</p>
-                        </div>
-                        <div className={`col-md-6 mb-3`}>
-                          <h5 className={`text-golden`}>Kategorija</h5>
-                          <p className={`text-blue fs-5`}>{estate?.category}</p>
-                        </div>
-                        <div className={`col-md-6 mb-3`}>
-                          <h5 className={`text-golden`}>Sprat</h5>
-                          <p className={`text-blue fs-5`}>{estate?.floorNumber ?? "N/A"}</p>
-                        </div>
-                      </div>
-                      {/*<div style={{ width: '100%', height: '500px', overflow: 'hidden' }}>
+                        {/*<div style={{ width: '100%', height: '500px', overflow: 'hidden' }}>
                         <MapWithMarker
                         /*lat={estate ? estate.latitude : lat}
                         long={estate ? estate.longitude : long}
@@ -250,8 +259,8 @@ export const EstatePage = () => {
                         setLong={setLong}
                         />
                       </div>*/}
-                    </div>
-                      ) : (
+                      </div>
+                    ) : (
                       <div className={`p-3`}>
                         <div className={`mb-3`}>
                           <label className="form-label text-blue">Naziv:</label>
@@ -342,13 +351,13 @@ export const EstatePage = () => {
                         >
                           Otkaži
                         </button>
-                      
-                      </div>
-                      )}
-                    </div>
-                  </div>    
 
+                      </div>
+                    )}
+                  </div>
                 </div>
+
+              </div>
             </>
           ) : (
             <p className={`text-center text-muted`}>Nema podataka o nekretnini.</p>
@@ -370,15 +379,15 @@ export const EstatePage = () => {
                 {posts.length > 0 ? posts.map(post => (
                   <PostCard key={post.id} post={post} />
                 )) : <div className={`d-flex justify-content-center`}>
-                      <img src={noposts} alt="noposts" className={`img-fluid ${styles.slika}`}/>
-                    </div>
-}
+                  <img src={noposts} alt="noposts" className={`img-fluid ${styles.slika}`} />
+                </div>
+                }
               </>
             )}
             {totalPostsCount > 0 &&
               <Pagination totalLength={totalPostsCount} onPaginateChange={handlePaginateChange} currentPage={page}
                 perPage={pageSize} />}
-            </div>
+          </div>
 
           <div className={`my-4`}></div>
         </div>

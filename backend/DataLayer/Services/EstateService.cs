@@ -140,7 +140,7 @@
             }
         }
 
-        public async Task<Result<bool, ErrorMessage>> RemoveEstate( string id)
+        public async Task<Result<bool, ErrorMessage>> RemoveEstate(string id)
         {
             try
             {
@@ -296,10 +296,10 @@
                 if (estates == null || !estates.Any())
                 {
                     return (true, new PaginatedResponseDTO<Estate>
-                            {
-                                Data = new List<Estate>(),
-                                TotalLength = 0
-                            }
+                    {
+                        Data = new List<Estate>(),
+                        TotalLength = 0
+                    }
                             , null //new ErrorMessage("No estates found.", 404)
                         );
                 }
@@ -313,11 +313,34 @@
             catch (Exception ex)
             {
                 return (true, new PaginatedResponseDTO<Estate>
-                    {
-                        Data = new List<Estate>(),
-                        TotalLength = 0
-                    }
+                {
+                    Data = new List<Estate>(),
+                    TotalLength = 0
+                }
                     , new ErrorMessage(ex.Message));
+            }
+        }
+
+        public async Task<Result<List<Estate>, ErrorMessage>> GetUserFavoriteEstates(string userId)
+        {
+            try
+            {
+                var user = await _usersCollection.Find(x => x.Id == userId).FirstOrDefaultAsync();
+
+                if (user.FavoriteEstateIds == null || !user.FavoriteEstateIds.Any())
+                {
+                    return "Korisnik nema omiljenih nekretnina.".ToError();
+                }
+
+                var favoriteEstates = await _estatesCollection
+                                    .Find(x => user.FavoriteEstateIds.Contains(x.Id))
+                                    .ToListAsync();
+
+                return favoriteEstates;
+            }
+            catch (Exception)
+            {
+                return "Došlo je do greške prilikom preuzimanja omiljenih nekretnina.".ToError();
             }
         }
     }

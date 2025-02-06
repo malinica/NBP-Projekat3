@@ -106,6 +106,7 @@ export const UserProfile = () => {
   return (
     <div className="container">
       <div className="mb-3">
+        <h1 className="text-center my-4">Podaci i korisniku</h1>
         {isEditing ? (
           <>
             <label className="form-label">Korisničko ime:</label>
@@ -141,7 +142,7 @@ export const UserProfile = () => {
           </>
         )}
       </div>
-
+      <hr className="mt-5"></hr>
       <h1 className="text-center my-4">Nekretnine korisnika</h1>
       <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         {estates.length > 0 ? (

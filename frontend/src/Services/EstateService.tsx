@@ -2,7 +2,7 @@ import axios from "axios";
 import { Estate } from "../Interfaces/Estate/Estate.ts";
 import toast from "react-hot-toast";
 import { PaginatedResponseDTO } from "../Interfaces/Pagination/PaginatedResponseDTO.ts";
-import { EstateCategory } from "../Enums/EstateCategory.ts";
+
 const apiUrl = `${import.meta.env.VITE_API_URL}/Estate`;
 
 export const createEstateAPI = async (createEstate: FormData) => {
@@ -12,18 +12,17 @@ export const createEstateAPI = async (createEstate: FormData) => {
                 'Content-Type': 'multipart/form-data'
             }
         });
-    
+
         if (response.status === 200) {
             toast.success("Nekretnina je uspešno dodata.");
         }
-    
+
         return response;
     }
     catch (error: any) {
         toast.error(error.response.data);
     }
 }
-
 
 export const updateEstateAPI = async (estateId: string, estateDto: FormData) => {
     try {
@@ -38,7 +37,6 @@ export const updateEstateAPI = async (estateId: string, estateDto: FormData) => 
         return undefined;
     }
 };
-    
 
 export const getEstatesCreatedByUserAPI = async (userId: string) => {
     try {
@@ -60,23 +58,22 @@ export const getEstate = async (id: string) => {
     }
 };
 
-
 export const deleteEstateAPI = async (id: string) => {
     try {
-        return await axios.delete<Estate>(apiUrl+`/RemoveEstate/${id}`, {});
+        return await axios.delete<Estate>(apiUrl + `/RemoveEstate/${id}`, {});
     }
-    catch(error:any) {
+    catch (error: any) {
         toast.error(error.response?.data || "Došlo je do greške.");
         return undefined;
     }
 }
 
 export const searchEstatesAPI = async (
-    title?: string, 
+    title?: string,
     priceMin?: number,
     priceMax?: number,
     categories?: string[],
-    pagenumber: number = 1, 
+    pagenumber: number = 1,
     limit: number = 10
 ): Promise<PaginatedResponseDTO<Estate> | null> => {
     try {
@@ -89,7 +86,6 @@ export const searchEstatesAPI = async (
             limit
         };
 
-
         const url = `${apiUrl}/SearchEstates`;
 
         const response = await axios.get<PaginatedResponseDTO<Estate>>(url, { params });
@@ -97,5 +93,14 @@ export const searchEstatesAPI = async (
         return response.data;
     } catch (error: unknown) {
         return null;
+    }
+};
+
+export const addToFavoritesAPI = async (estateId: string) => {
+    try {
+        const response = await axios.post(`${apiUrl}/AddToFavorites/${estateId}`);
+        return response;
+    } catch (error: any) {
+        return undefined;
     }
 };

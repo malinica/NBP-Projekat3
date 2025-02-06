@@ -152,4 +152,15 @@ public class EstateController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("GetUserFavoriteEstates/{userId}")]
+    public async Task<IActionResult> GetUserFavoriteEstates(string userId)
+    {
+        (bool isError, var response, ErrorMessage? error) = await estateService.GetUserFavoriteEstates(userId);
+        if (isError)
+        {
+            return StatusCode(error?.StatusCode ?? 400, error?.Message);
+        }
+        return Ok(response);
+    }
+
 }
