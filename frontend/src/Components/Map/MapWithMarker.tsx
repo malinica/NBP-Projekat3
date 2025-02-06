@@ -22,7 +22,13 @@ const MapWithMarker: React.FC<Props> = ({ setLat, setLong, long, lat }) => {
         iconUrl: locationPin,
         iconSize: [38, 38],
     });
-
+    useEffect(() => {
+        if(long!=null && lat!=null)
+        {
+            const newLocation: GeoCoordinates = { latitude: lat, longitude: long };            
+            setLocation(newLocation);
+        }
+    },[]);
     useEffect(() => {
         if (location) {
             setLong(location.longitude);

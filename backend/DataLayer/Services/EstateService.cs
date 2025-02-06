@@ -299,8 +299,8 @@ return (true, new PaginatedResponseDTO<Estate>
     Data = new List<Estate>(),
     TotalLength = 0
 }
-, new ErrorMessage("No estates found.", 404));
-        }
+,null //new ErrorMessage("No estates found.", 404)
+);}
 
         return (false, new PaginatedResponseDTO<Estate>
 {

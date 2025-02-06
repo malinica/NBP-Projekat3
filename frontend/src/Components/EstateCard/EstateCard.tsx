@@ -1,12 +1,30 @@
 import {useNavigate} from "react-router-dom";
 import {Estate} from "../../Interfaces/Estate/Estate.ts";
+import { useAuth } from "../../Context/useAuth.tsx";
+import { deleteEstateAPI } from "../../Services/EstateService.tsx";
+import toast from "react-hot-toast";
 
 interface EstateCardProps {
   estate:Estate;
+  loadEstates: (pageNumber?: number, pageSizeNumber?: number) => Promise<void>;
 }
 
-export const EstateCard = ({estate}: EstateCardProps) => {
+export const EstateCard = ({ estate, loadEstates }: EstateCardProps) => {
   const navigate = useNavigate();
+  const user=useAuth();
+
+  const handleDelete = async () => {
+    const response = await deleteEstateAPI(estate.id);
+    if (response) {
+      toast.success("Nekretnina uspešno obrisana.");
+      loadEstates(undefined,undefined);
+
+    }
+  };
+  
+  const handleChange = () => {
+  navigate(`/estate-change/${estate.id}`, { state: { estate } });
+  };
 
   const handleNavigate = () => {
     navigate(`/estate-details/${estate.id}`);
@@ -24,6 +42,19 @@ export const EstateCard = ({estate}: EstateCardProps) => {
         <button className="btn btn-primary" onClick={handleNavigate}>
           Pogledaj Detalje
         </button>
+        {user?.user?.id === estate?.userId && (
+  <>
+    <button className="btn btn-primary" onClick={handleDelete}>
+      Obriši
+    </button>
+    <button className="btn btn-primary" onClick={handleChange}>
+      Izmeni
+    </button>
+  </>
+)}
+
+
+        
       </div>
     </div>
   );

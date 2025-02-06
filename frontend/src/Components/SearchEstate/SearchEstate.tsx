@@ -19,17 +19,22 @@ export const SearchEstate=()=>
     const [searchPriceMin,setPriceMinSearch]=useState<number|null>(null);
     const [searchPriceMax,setPriceMaxSearch]=useState<number|null>(null);
     const [searchCategory, setSearchCategory] = useState<EstateCategory[]>([]);
+    
     const handleSearch = () => {
       loadEstates(page, pageSize);
      
       };
 
-      useEffect(() => {
-        loadEstates(page, pageSize);
-      }, []); 
+useEffect(() => {
+  loadEstates(page, pageSize);
+}, []); 
 
-      const loadEstates = async (page: number, pageSize: number) => {
+
+      const loadEstates = async (pageNumber?: number, pageSizeNumber?: number) => {
         setIsLoading(true);
+      
+        if (pageNumber !== null && pageNumber !== undefined) setPage(pageNumber);
+        if (pageSize !== null && pageSizeNumber !== undefined) setPageSize(pageSizeNumber);
         const result = await searchEstatesAPI(
           searchTitle ?? undefined,
     searchPriceMin ?? undefined,
@@ -38,15 +43,17 @@ export const SearchEstate=()=>
     page ?? undefined,
     pageSize ?? undefined
           );
-        if (!result) {
-          toast.error("Nema podataka za prikaz!");
-          setEstates(null);
-          setEstatesCount(0);
-        } else {
-          setEstates(result.data);
-          setEstatesCount(result?.totalLength ?? 0);
-        }
-        setIsLoading(false);
+          
+          if (result && result.totalLength > 0) {
+            setEstates(result.data);
+            setEstatesCount(result.totalLength);
+          } else {
+            toast.error("Nema podataka za prikaz!");
+            setEstates(null);
+            setEstatesCount(0);
+          }
+          setIsLoading(false);
+          
       };
     
 
@@ -129,6 +136,7 @@ onChange={(e) => setPriceMaxSearch(e.target.value ? +e.target.value : null)}
                 <div className="estate-cards-container">
                   {estates.map((estate) => (
                     <EstateCard
+                    loadEstates={loadEstates}
                     key={estate.id}
                       estate={estate}
                     />

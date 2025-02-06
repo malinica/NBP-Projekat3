@@ -11,5 +11,6 @@ export interface Estate {
   floorNumber ?: number;
   images : string[];
   longitude : number;
-  latitude : number
+  latitude : number;
+  userId:string;
 }
