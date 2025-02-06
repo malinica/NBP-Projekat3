@@ -42,3 +42,16 @@ export const getUserByIdAPI = async (id: string) => {
     return undefined;
   }
 }
+
+export const updateUserAPI = async (newUsername: string, newPhoneNumber: string) => {
+  try {
+    return await axios.put<User>(`${apiUrl}/Update`, {
+      username: newUsername,
+      phoneNumber: newPhoneNumber
+    });
+  }
+  catch (error: any) {
+    toast.error(error.response?.data ?? "Neuspešno ažuriranje podataka o korisniku.");
+    return undefined;
+  }
+}

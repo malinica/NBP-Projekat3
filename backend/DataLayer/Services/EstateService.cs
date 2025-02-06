@@ -168,11 +168,7 @@
             try
             {
                 var estates = await _estatesCollection.Find(x => x.UserId == userId).ToListAsync();
-                if (estates.Any())
-                {
-                    return estates;
-                }
-                return "Korisnik trenutno nema nekretnina.".ToError();
+                return estates;
             }
             catch (Exception)
             {

@@ -151,6 +151,33 @@ public class UserService
         }
     }
     
+    public async Task<Result<UserResultDTO, ErrorMessage>> Update(string userId, UpdateUserDTO userDto)
+    {
+        try
+        {
+            var existingUser = await _usersCollection
+                .Find(u => u.Id == userId)
+                .FirstOrDefaultAsync();
+            
+            if(existingUser == null)
+                return "Korisnik nije pronađen.".ToError(404);
+
+            existingUser.Username = userDto.Username;
+            existingUser.PhoneNumber = userDto.PhoneNumber;
+            
+            var updateUserResult = await _usersCollection.ReplaceOneAsync(u => u.Id== userId, existingUser);
+
+            if (updateUserResult.ModifiedCount == 0)
+                return "Neuspešna izmena podataka".ToError();
+
+            return new UserResultDTO(existingUser);
+        }
+        catch (Exception)
+        {
+            return "Došlo je do greške prilikom preuzimanja podataka o korisniku.".ToError();
+        }
+    }
+    
     public async Task<Result<bool, ErrorMessage>> AddCommentToUser(string userId, string commentId)
     {
         try

@@ -49,4 +49,25 @@ public class UserController : ControllerBase
 
         return Ok(response);
     }
+    
+    [HttpPut("Update")]
+    [Authorize]
+    public async Task<IActionResult> Update([FromBody] UpdateUserDTO userDto)
+    {
+        var userResult = _userService.GetCurrentUserId(User);
+
+        if (userResult.IsError)
+        {
+            return StatusCode(userResult.Error?.StatusCode ?? 400, userResult.Error?.Message);
+        }
+        
+        (bool isError, var response, ErrorMessage? error) = await _userService.Update(userResult.Data, userDto);
+
+        if (isError)
+        {
+            return StatusCode(error?.StatusCode ?? 400, error?.Message);
+        }
+
+        return Ok(response);
+    }
 }

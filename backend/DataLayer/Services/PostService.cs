@@ -282,9 +282,6 @@ public class PostService
                 .As<BsonDocument>()
                 .ToListAsync();
 
-            if (!posts.Any())
-                return "Korisnik trenutno nema objava.".ToError(404);
-
             var postDtos = posts.Select(post => new PostResultDTO(post)).ToList();
 
             return postDtos;
