@@ -24,16 +24,21 @@ export const createEstateAPI = async (createEstate: FormData) => {
     }
 }
 
-/*
-export const updateProjectAPI = async (projectId: string, projectDto: FormData) => {
+
+export const updateEstateAPI = async (estateId: string, estateDto: FormData) => {
     try {
-        return await axios.put<Project>(api+`/UpdateProject/${projectId}`, projectDto, {
+        return await axios.put<Estate>(`${apiUrl}/UpdateProject/${estateId}`, estateDto, {
             headers: {
                 "Content-Type": "multipart/form-data"
             }
         });
     }
-    */
+    catch (error: any) {
+        toast.error(error.response?.data ?? "Greška pri ažuriranju nekretnina.");
+        return undefined;
+    }
+};
+    
 
 export const getEstatesCreatedByUserAPI = async (userId: string) => {
     try {

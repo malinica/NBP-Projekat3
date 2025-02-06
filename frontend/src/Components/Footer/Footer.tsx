@@ -21,7 +21,7 @@ export const Footer = () => {
                         </a>
                     </li>
                     <li className={`nav-item`}>
-                        <Link to="/" className={`text-blue mx-2 text-decoration-none`}
+                        <Link to="/search-estates" className={`text-blue mx-2 text-decoration-none`}
                               onClick={scrollToTop}>
                             NEKRETNINE
                         </Link>

@@ -144,8 +144,8 @@ const CreateEstate = () => {
             <div className={`col-xxl-7 col-xl-7 col-lg-8 col-md-10 col-sm-12 m-4 p-4 rounded-3 d-flex flex-column bg-white shadow`}>
               <div className={`row justify-content-center py-3 px-3`}>
               <h1 className={`text-center text-gray pb-5`}>
-  {edit ? 'Izmeni Nekretninu' : 'Kreiraj Nekretninu'}
-</h1>
+                {edit ? 'Izmeni Nekretninu' : 'Kreiraj Nekretninu'}
+              </h1>
                 <div className={`mb-2 row`}>
                   <label className={`col-sm-2 col-form-label text-blue`}>Naziv:</label>
                   <div className={`col-sm-10`}>

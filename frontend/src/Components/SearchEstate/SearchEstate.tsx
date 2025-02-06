@@ -64,97 +64,102 @@ useEffect(() => {
 
       return (
         <>
-          <div className="search-container">
-            <h3>Pretraga Nekretnina</h3>
-      
-            <div>
-              <label htmlFor="title">Naziv:</label>
-              <input
-                id="title"
-                type="text"
-                value={searchTitle}
-                onChange={(e) => setTitleSearch(e.target.value)}
-              />
-            </div>
-      
-            <div>
-              <label htmlFor="priceMin">Minimalna cena:</label>
-              <input
-                id="priceMin"
-                type="number"
-                value={searchPriceMin || ""}
-                onChange={(e) => setPriceMinSearch(e.target.value ? +e.target.value : null)}
-              />
-            </div>
-      
-            <div>
-              <label htmlFor="priceMax">Maksimalna cena:</label>
-              <input
-                id="priceMax"
-                type="number"
-                value={searchPriceMax ?? ""}
-onChange={(e) => setPriceMaxSearch(e.target.value ? +e.target.value : null)}
+        <div className={`container-fluid`}>
+          <div className={`row`}>
+            <div className={`col-md-4 rounded-3 m-3 bg-sand shadow`}>
+              <h3>Pretraga Nekretnina</h3>
+        
+              <div>
+                <label htmlFor="title">Naziv:</label>
+                <input
+                  id="title"
+                  type="text"
+                  value={searchTitle}
+                  onChange={(e) => setTitleSearch(e.target.value)}
+                />
+              </div>
+        
+              <div>
+                <label htmlFor="priceMin">Minimalna cena:</label>
+                <input
+                  id="priceMin"
+                  type="number"
+                  value={searchPriceMin || ""}
+                  onChange={(e) => setPriceMinSearch(e.target.value ? +e.target.value : null)}
+                />
+              </div>
+        
+              <div>
+                <label htmlFor="priceMax">Maksimalna cena:</label>
+                <input
+                  id="priceMax"
+                  type="number"
+                  value={searchPriceMax ?? ""}
+                  onChange={(e) => setPriceMaxSearch(e.target.value ? +e.target.value : null)}
 
-              />
+                />
+              </div>
+        
+              <div>
+                <label>Kategorije:</label>
+                  {Object.values(EstateCategory).map((category) => (
+                  <div key={category}>
+                  <input
+                      type="checkbox"
+                      id={category}
+                      name={category}
+                      value={category}
+                      onChange={(e) => {
+                      if (e.target.checked) {
+                          setSearchCategory((prev) => [...(prev || []), category]);
+                      } else {
+                          setSearchCategory((prev) =>
+                          prev ? prev.filter((item) => item !== category) : []
+                          );
+                      }
+                      }}
+                      checked={searchCategory?.includes(category)}
+                  />
+                  <label htmlFor={category}>{EstateCategoryTranslations[category]}</label>
+                  </div>
+                  ))
+                  }
+                </div>
+        
+              <button onClick={() => handleSearch()}>Pretrazi</button>
             </div>
-      
-            <div>
-              <label>Kategorije:</label>
-                {
-    Object.values(EstateCategory).map((category) => (
-        <div key={category}>
-        <input
-            type="checkbox"
-            id={category}
-            name={category}
-            value={category}
-            onChange={(e) => {
-            if (e.target.checked) {
-                setSearchCategory((prev) => [...(prev || []), category]);
-            } else {
-                setSearchCategory((prev) =>
-                prev ? prev.filter((item) => item !== category) : []
-                );
-            }
-            }}
-            checked={searchCategory?.includes(category)}
-        />
-        <label htmlFor={category}>{EstateCategoryTranslations[category]}</label>
-        </div>
-    ))
-    }
+
+            <div className={`col-md-7 bg-gray m-3 rounded-3`}>
+            {isLoading ? (
+              <div className={`text-center text-muted mt-3`}>Učitava se...</div>
+            ) : (
+              <>
+                {estates != null && estates.length > 0 ? (
+                  <div className={`m-3`}>
+                    {estates.map((estate) => (
+                      <EstateCard
+                      loadEstates={loadEstates}
+                      key={estate.id}
+                        estate={estate}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className={`text-center text-muted mt-3`}>Nemate nijednu nekretninu</div>
+                )}
+        
+                {totalEstatesCount > 0 && (
+                  <div className={`my-4`}>
+                    <Pagination totalLength={totalEstatesCount} onPaginateChange={handlePaginateChange} />
+                  </div>
+                )}
+              </>
+            )}
             </div>
-      
-            <button onClick={() => handleSearch()}>Pretrazi</button>
           </div>
-      
-          {isLoading ? (
-            <div>Učitava se...</div>
-          ) : (
-            <>
-              {estates != null && estates.length > 0 ? (
-                <div className="estate-cards-container">
-                  {estates.map((estate) => (
-                    <EstateCard
-                    loadEstates={loadEstates}
-                    key={estate.id}
-                      estate={estate}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div>Nemate nijednu nekretninu</div>
-              )}
-      
-              {totalEstatesCount > 0 && (
-                <div className="my-4">
-                  <Pagination totalLength={totalEstatesCount} onPaginateChange={handlePaginateChange} />
-                </div>
-              )}
-            </>
-          )}
+        </div>
         </>
       );
-      
-}
+};
+
 export default SearchEstate;

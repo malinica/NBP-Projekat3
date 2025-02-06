@@ -58,9 +58,9 @@ export const Navbar = () => {
                                     <li className={`my-2 text-end`}>
                                         <Link to={"/create-estate"} className={`${getLinkClass("/create-estate")}`}>KREIRAJ NEKRETNINU</Link>
                                     </li>
-                                    {/*<li className={`my-2 text-end`}>
-                                        <Link to={"/"} className={`${getLinkClass("/")}`}>NEKRETNINE</Link>
-                                    </li>*/}
+                                    <li className={`my-2 text-end`}>
+                                        <Link to={"/search-estates"} className={`${getLinkClass("/search-estates")}`}>NEKRETNINE</Link>
+                                    </li>
                                     <li className={`my-2 text-end`}>
                                         <Link to={"/forum"} className={`${getLinkClass("/forum")}`}>FORUM</Link>
                                     </li>
