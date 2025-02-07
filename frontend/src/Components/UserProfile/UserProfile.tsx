@@ -10,6 +10,8 @@ import {User} from "../../Interfaces/User/User.ts";
 import {getUserByIdAPI, updateUserAPI} from "../../Services/UserService.tsx";
 import toast from "react-hot-toast";
 import {useAuth} from "../../Context/useAuth.tsx";
+import styles from './UserProfile.module.css'
+
 
 export const UserProfile = () => {
   const {id} = useParams<{ id: string }>();
@@ -104,69 +106,71 @@ export const UserProfile = () => {
   }
 
   return (
-    <div className="container">
-      <div className="mb-3">
-        <h1 className="text-center my-4">Podaci i korisniku</h1>
-        {isEditing ? (
-          <>
-            <label className="form-label">Korisničko ime:</label>
-            <input
-              type="text"
-              className="form-control mb-2"
-              value={newUsername}
-              onChange={(e) => setNewUsername(e.target.value)}
-            />
-            <label className="form-label">Broj telefona:</label>
-            <input
-              type="tel"
-              className="form-control"
-              value={newPhoneNumber}
-              onChange={handleNewPhoneNumberChange}
-            />
-            <button className="btn btn-success mt-3 me-2" onClick={handleSaveChanges}>
-              Sačuvaj izmene
-            </button>
-            <button className="btn btn-secondary mt-3" onClick={handleCancel}>
-              Otkaži
-            </button>
-          </>
-        ) : (
-          <>
-            <p>Korisničko ime: {profileUser?.username}</p>
-            <p>Broj telefona: {profileUser?.phoneNumber}</p>
-            {user?.id == profileUser?.id &&
-              <button className="btn btn-primary mt-2" onClick={() => setIsEditing(true)}>
-                Izmeni podatke
+    <div className={`container-fluid bg-beige`}>
+      <div className={`container bg-beige`}>
+        <div className={`mb-3`}>
+          <h1 className={`text-center my-4 text-light-blue`}>Podaci o korisniku</h1>
+          {isEditing ? (
+            <>
+              <label className={`form-label text-blue`}>Korisničko ime:</label>
+              <input
+                type="text"
+                className={`form-control mb-2 ${styles.fields}`}
+                value={newUsername}
+                onChange={(e) => setNewUsername(e.target.value)}
+              />
+              <label className={`form-label text-blue`}>Broj telefona:</label>
+              <input
+                type="tel"
+                className={`form-control ${styles.fields}`}
+                value={newPhoneNumber}
+                onChange={handleNewPhoneNumberChange}
+              />
+              <button className={`btn btn-sm text-white text-center rounded py-2 px-2 me-2 ${styles.dugme} ${styles.slova} mt-3`} onClick={handleSaveChanges}>
+                Sačuvaj izmene
               </button>
-            }
-          </>
-        )}
-      </div>
-      <hr className="mt-5"></hr>
-      <h1 className="text-center my-4">Nekretnine korisnika</h1>
-      <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-        {estates.length > 0 ? (
-          estates.map((estate) => (
-            <div key={estate.id} className="col">
-              <EstateCard estate={estate}/>
-            </div>
-          ))
-        ) : (
-          <p className="text-center col-span-3">Korisnik nema nekretnina.</p>
-        )}
-      </div>
-      <hr className="mt-5"/>
-      <h1 className="text-center my-4">Objave korisnika</h1>
-      <div className="row">
-        {posts.length > 0 ? (
-          posts.map((post) => (
-            <div key={post.id} className="col-12">
-              <PostCard post={post}/>
-            </div>
-          ))
-        ) : (
-          <p className="text-center">Korisnik nema objava.</p>
-        )}
+              <button className={`btn btn-sm text-white text-center rounded py-2 px-2 me-2 ${styles.dugme1} ${styles.slova} mt-3`} onClick={handleCancel}>
+                Otkaži
+              </button>
+            </>
+          ) : (
+            <>
+              <p className={`text-blue`}>Korisničko ime: {profileUser?.username}</p>
+              <p className={`text-blue`}>Broj telefona: {profileUser?.phoneNumber}</p>
+              {user?.id == profileUser?.id &&
+                <button className={`btn btn-sm text-white text-center rounded py-2 px-2 me-2 ${styles.dugme1} ${styles.slova}`} onClick={() => setIsEditing(true)}>
+                  Izmeni podatke
+                </button>
+              }
+            </>
+          )}
+        </div>
+        <hr className={`mt-5 text-golden`}></hr>
+        <h1 className={`text-center my-4 text-light-blue`}>Nekretnine korisnika</h1>
+        <div className={`row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4`}>
+          {estates.length > 0 ? (
+            estates.map((estate) => (
+              <div key={estate.id} className={`col`}>
+                <EstateCard estate={estate}/>
+              </div>
+            ))
+          ) : (
+            <p className={`text-center text-muted col-span-3`}>Korisnik nema nekretnina.</p>
+          )}
+        </div>
+        <hr className={`mt-5 text-golden`}/>
+        <h1 className={`text-center my-4 text-light-blue`}>Objave korisnika</h1>
+        <div className={`row`}>
+          {posts.length > 0 ? (
+            posts.map((post) => (
+              <div key={post.id} className={`col-12`}>
+                <PostCard post={post}/>
+              </div>
+            ))
+          ) : (
+            <p className={`text-center text-muted mb-5`}>Korisnik nema objava.</p>
+          )}
+        </div>
       </div>
     </div>
   );

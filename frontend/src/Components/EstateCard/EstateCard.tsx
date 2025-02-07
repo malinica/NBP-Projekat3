@@ -34,7 +34,7 @@ export const EstateCard = ({ estate, loadEstates }: EstateCardProps) => {
   if (!estate) return null;
 
   return (
-    <div className={`card my-2 p-2`} style={{ width: "18rem" }}>
+    <div className={`card my-2 p-2 shadow`} style={{ width: "18rem" }}>
       <img
         src={`${import.meta.env.VITE_SERVER_URL}/${estate.images[0]}`}
         className={`card-img-top`}
@@ -48,12 +48,14 @@ export const EstateCard = ({ estate, loadEstates }: EstateCardProps) => {
         </button>
         {user?.user?.id === estate?.userId && (
           <>
-            <button className={`btn btn-sm text-white text-center rounded py-2 px-2 ${styles.dugme1} ${styles.slova}`} onClick={handleDelete}>
-              Obriši
-            </button>
-            <button className={`btn btn-sm text-white text-center rounded py-2 px-2 ${styles.dugme2} ${styles.slova}`} onClick={handleChange}>
-              Izmeni
-            </button>
+            <div className={`mt-2`}>
+              <button className={`btn btn-sm text-white text-center rounded py-2 px-2 me-2 ${styles.dugme1} ${styles.slova}`} onClick={handleDelete}>
+                Obriši
+              </button>
+              <button className={`btn btn-sm text-gray text-center rounded py-2 px-2 ${styles.dugme2} ${styles.slova}`} onClick={handleChange}>
+                Izmeni
+              </button>
+            </div>
           </>
         )}
       </div>

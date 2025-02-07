@@ -228,7 +228,7 @@ export const EstatePage = () => {
                               Ažuriraj
                             </button>
                             <button
-                              className={`btn btn-sm ms-2 my-2 text-gray text-center rounded py-2 px-2 ${styles.dugme2} ${styles.linija_ispod_dugmeta} ${styles.slova}`}
+                              className={`btn btn-sm ms-2 my-2 text-white text-center rounded py-2 px-2 ${styles.dugme2} ${styles.linija_ispod_dugmeta} ${styles.slova}`}
                               onClick={() => setEditMode(false)}
                             >
                               Obriši
@@ -257,66 +257,58 @@ export const EstatePage = () => {
                             <p className={`text-blue fs-5`}>{estate?.floorNumber ?? "N/A"}</p>
                           </div>
                         </div>
-                        <div style={{ width: '100%', height: '500px', overflow: 'hidden' }}>
-                          <MapWithMarker
-                            lat={lat}
-                            long={long}
-                            setLat={setLat}
-                            setLong={setLong}
-                          />
-                        </div>
                       </div>
                     ) : (
                       <div className={`p-3`}>
                         <div className={`mb-3`}>
-                          <label className="form-label text-blue">Naziv:</label>
+                          <label className={`form-label text-blue`}>Naziv:</label>
                           <input
                             type="text"
-                            className={`form-control`}
+                            className={`form-control ${styles.fields}`}
                             value={updatedName}
                             onChange={(e) => setUpdatedName(e.target.value)}
                           />
                         </div>
                         <div className={`mb-3`}>
-                          <label className="form-label text-blue">Opis:</label>
+                          <label className={`form-label text-blue`}>Opis:</label>
                           <textarea
-                            className={`form-control`}
+                            className={`form-control ${styles.fields}`}
                             value={updatedDescription}
                             onChange={(e) => setUpdatedDescription(e.target.value)}
                           ></textarea>
                         </div>
                         <div className={`mb-3`}>
-                          <label className="form-label text-blue">Cena:</label>
+                          <label className={`form-label text-blue`}>Cena:</label>
                           <input
                             type="number"
-                            className={`form-control`}
+                            className={`form-control ${styles.fields}`}
                             value={updatedPrice}
                             onChange={(e) => setUpdatedPrice(e.target.value)}
                           />
                         </div>
                         <div className={`mb-3`}>
-                          <label className="form-label text-blue">Broj soba:</label>
+                          <label className={`form-label text-blue`}>Broj soba:</label>
                           <input
                             type="number"
-                            className={`form-control`}
+                            className={`form-control ${styles.fields}`}
                             value={updatedRooms}
                             onChange={(e) => setUpdatedRooms(e.target.value)}
                           />
                         </div>
                         <div className={`mb-3`}>
-                          <label className="form-label text-blue">Sprat:</label>
+                          <label className={`form-label text-blue`}>Sprat:</label>
                           <input
                             type="number"
-                            className={`form-control`}
+                            className={`form-control ${styles.fields}`}
                             value={updatedFloor}
                             onChange={(e) => setUpdatedFloor(e.target.value)}
                           />
                         </div>
                         <div className={`mb-3`}>
-                          <label className="form-label text-blue">Površina:</label>
+                          <label className={`form-label text-blue`}>Površina:</label>
                           <input
                             type="number"
-                            className={`form-control`}
+                            className={`form-control ${styles.fields}`}
                             value={updatedSize}
                             onChange={(e) => setUpdatedSize(e.target.value)}
                           />
@@ -336,6 +328,28 @@ export const EstatePage = () => {
                             ))}
                           </select>
                         </div>
+                        <div className={`mb-3`}>
+                          <label className={`form-label text-blue`}>Slike:</label>
+                          <input
+                            type="file"
+                            className={`form-control ${styles.fields}`}
+                            onChange={handlePicturesChange}
+                            multiple
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  {!editMode ? (
+                      <div className={`container-fluid p-0`}>
+                        <MapWithMarker
+                          lat={lat}
+                          long={long}
+                          setLat={setLat}
+                          setLong={setLong}
+                        />
+                      </div>) : (
+                      <>
                         <div style={{ width: '100%', height: '500px', overflow: 'hidden' }}>
                           <MapWithMarker
                             lat={lat}
@@ -344,31 +358,22 @@ export const EstatePage = () => {
                             setLong={setLong}
                           />
                         </div>
-                        <div className={`mb-3`}>
-                          <label className="form-label text-blue">Slike:</label>
-                          <input
-                            type="file"
-                            className={`form-control`}
-                            onChange={handlePicturesChange}
-                            multiple
-                          />
+                        <div className={`m-3`}>
+                          <button
+                            className={`btn btn-sm my-2 text-white text-center rounded py-2 px-2 ${styles.dugme1} ${styles.linija_ispod_dugmeta} ${styles.slova}`}
+                            onClick={handleUpdate}
+                          >
+                            Sačuvaj
+                          </button>
+                          <button
+                            className={`btn btn-sm ms-2 my-2 text-white text-center rounded py-2 px-2 ${styles.dugme2} ${styles.linija_ispod_dugmeta} ${styles.slova}`}
+                            onClick={() => setEditMode(false)}
+                          >
+                            Otkaži
+                          </button>
                         </div>
-                        <button
-                          className={`btn btn-sm my-2 text-white text-center rounded py-2 px-2 ${styles.dugme1} ${styles.linija_ispod_dugmeta} ${styles.slova}`}
-                          onClick={handleUpdate}
-                        >
-                          Sačuvaj
-                        </button>
-                        <button
-                          className={`btn btn-sm ms-2 my-2 text-gray text-center rounded py-2 px-2 ${styles.dugme2} ${styles.linija_ispod_dugmeta} ${styles.slova}`}
-                          onClick={() => setEditMode(false)}
-                        >
-                          Otkaži
-                        </button>
-
-                      </div>
+                      </>
                     )}
-                  </div>
                 </div>
 
               </div>
