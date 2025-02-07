@@ -155,7 +155,7 @@ export const UserProfile = () => {
               </div>
             ))
           ) : (
-            <p className={`text-center text-muted col-span-3`}>Korisnik nema nekretnina.</p>
+            <p className={`text-center text-muted`}>Korisnik nema nekretnina.</p>
           )}
         </div>
         <hr className={`mt-5 text-golden`}/>

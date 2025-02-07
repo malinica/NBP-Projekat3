@@ -15,9 +15,15 @@ import { faHeart } from '@fortawesome/free-solid-svg-icons';
 import { EstateCategory } from "../../Enums/EstateCategory.ts";
 import noposts from "../../Assets/noposts.png";
 import MapWithMarker from "../Map/MapWithMarker.tsx";
+import { useAuth } from "../../Context/useAuth.tsx";
+import { deleteEstateAPI } from "../../Services/EstateService.tsx";
+import { useNavigate } from "react-router-dom";
+
 
 export const EstatePage = () => {
   const { id } = useParams();
+  const user = useAuth();
+  const navigate = useNavigate();
   const location = useLocation();
   const setEdit = location.state?.setEdit||false;
   
@@ -41,6 +47,7 @@ export const EstatePage = () => {
   const [updatedSize, setUpdatedSize] = useState(estate?.squareMeters || '');
   const [long, setLong] = useState<number | null>(null);
   const [lat, setLat] = useState<number | null>(null);
+
   useEffect(() => {
     const fetchEstate = async () => {
       try {
@@ -76,6 +83,14 @@ export const EstatePage = () => {
       setUpdatedSize(estate.squareMeters);
     }
   }, [estate]);
+
+  const handleDelete = async () => {
+    const response = await deleteEstateAPI(estate!.id);
+    if (response) {
+      toast.success("Nekretnina uspešno obrisana.");
+    }
+    navigate(`/search-estates`);
+  };
 
   const handleCreatePost = async (title: string, content: string) => {
     try {
@@ -167,6 +182,8 @@ export const EstatePage = () => {
     }
   };
 
+  //if (!estatee) return null;
+
   return (
     <div className={`container-fluid bg-beige d-flex justify-content-center`}>
       <div className={`container mt-5`}>
@@ -218,21 +235,26 @@ export const EstatePage = () => {
                             <p className={`lead mb-4 text-gray`}>{estate?.description}</p>
                           </div>
                           <div className={`mt-1`}>
-                            <button className={`btn btn-outline-danger me-2`} onClick={handleAddToFavorite}>
-                              <FontAwesomeIcon icon={faHeart} />
-                            </button>
-                            <button
-                              className={`btn btn-sm my-2 text-white text-center rounded py-2 px-2 ${styles.dugme1} ${styles.linija_ispod_dugmeta} ${styles.slova}`}
-                              onClick={() => setEditMode(true)}
-                            >
-                              Ažuriraj
-                            </button>
-                            <button
-                              className={`btn btn-sm ms-2 my-2 text-white text-center rounded py-2 px-2 ${styles.dugme2} ${styles.linija_ispod_dugmeta} ${styles.slova}`}
-                              onClick={() => setEditMode(false)}
-                            >
-                              Obriši
-                            </button>
+                            {user?.user?.id === estate?.userId ? (    
+                              <div>                      
+                                <button
+                                  className={`btn btn-sm my-2 text-white text-center rounded py-2 px-2 ${styles.dugme1} ${styles.linija_ispod_dugmeta} ${styles.slova}`}
+                                  onClick={() => setEditMode(true)}
+                                >
+                                  Ažuriraj
+                                </button>
+                                <button
+                                  className={`btn btn-sm ms-2 my-2 text-white text-center rounded py-2 px-2 ${styles.dugme2} ${styles.linija_ispod_dugmeta} ${styles.slova}`}
+                                  onClick={handleDelete}
+                                >
+                                  Obriši
+                                </button>
+                              </div>) 
+                              : (                                
+                              <button className={`btn btn-outline-danger me-2`} onClick={handleAddToFavorite}>
+                                <FontAwesomeIcon icon={faHeart} />
+                              </button>  
+                            )}
                           </div>
                         </div>
                         <div className={`row mb-4`}>
@@ -348,7 +370,7 @@ export const EstatePage = () => {
                           setLat={setLat}
                           setLong={setLong}
                         />
-                      </div>) : (
+                      </div>) : user?.user?.id === estate?.userId ? (
                       <>
                         <div style={{ width: '100%', height: '500px', overflow: 'hidden' }}>
                           <MapWithMarker
@@ -373,7 +395,15 @@ export const EstatePage = () => {
                           </button>
                         </div>
                       </>
-                    )}
+                    ) : (                      
+                    <div className={`container-fluid p-0`}>
+                      <MapWithMarker
+                        lat={lat}
+                        long={long}
+                        setLat={setLat}
+                        setLong={setLong}
+                      />
+                    </div>)}
                 </div>
 
               </div>

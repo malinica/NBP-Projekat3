@@ -31,7 +31,7 @@ export const EstateCard = ({ estate, loadEstates }: EstateCardProps) => {
     navigate(`/estate-details/${estate.id}`);
   };
 
-  if (!estate) return null;
+  //if (!estate) return null;
 
   return (
     <div className={`card my-2 p-2 shadow`} style={{ width: "18rem" }}>
