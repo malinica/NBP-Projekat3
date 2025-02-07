@@ -27,16 +27,24 @@
             }
         }
 
-        public async Task<Result<Estate, ErrorMessage>> GetEstate(string id)
+        public async Task<Result<EstateResultDTO, ErrorMessage>> GetEstate(string id)
         {
             try
             {
                 var estate = await _estatesCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
-                if (estate != null)
+                if(estate == null)
+                    return "Nije pronađena nekretnina.".ToError();
+
+                var userResult = await userService.GetById(estate.UserId);
+                if (userResult.IsError)
+                    return userResult.Error;
+                
+                var estateDto = new EstateResultDTO(estate)
                 {
-                    return estate;
-                }
-                return "Nije pronadjena nekretnina.".ToError();
+                    User = userResult.Data
+                };
+
+                return estateDto;
             }
             catch (Exception)
             {

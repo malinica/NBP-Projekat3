@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
 import { Estate } from "../../Interfaces/Estate/Estate";
-import { PaginatedResponseDTO } from "../../Interfaces/Pagination/PaginatedResponseDTO";
 import { Pagination } from "../Pagination/Pagination";
 import EstateCard from "../EstateCard/EstateCard";
 import { EstateCategory, EstateCategoryTranslations } from "../../Enums/EstateCategory";
-import toast from "react-hot-toast";
 import { searchEstatesAPI } from "../../Services/EstateService";
 import styles from './SearchEstate.module.css'
 
@@ -114,6 +112,7 @@ useEffect(() => {
                   <div key={category} className={`text-gray my-2 ms-3`}>
                   <input
                       type="checkbox"
+                      className={`form-check-input me-2 cursor-pointer`}
                       id={category}
                       name={category}
                       value={category}
@@ -153,7 +152,7 @@ useEffect(() => {
                     ))}
                   </div>
                 ) : (
-                  <div className={`text-center text-muted mt-3`}>Nemate nijednu nekretninu</div>
+                  <div className={`text-center text-muted mt-3 fs-4`}>Nema rezultata pretrage</div>
                 )}
         
                 {totalEstatesCount > 0 && (

@@ -53,7 +53,7 @@ public class PostService
                 if (estateResult.IsError)
                     return estateResult.Error;
                 
-                estate = new EstateResultDTO(estateResult.Data);
+                estate = estateResult.Data;
             }
 
             var resultDto = new PostResultDTO

@@ -11,6 +11,8 @@ import {getUserByIdAPI, updateUserAPI} from "../../Services/UserService.tsx";
 import toast from "react-hot-toast";
 import {useAuth} from "../../Context/useAuth.tsx";
 import styles from './UserProfile.module.css'
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faPhone, faUser, faUserTag} from "@fortawesome/free-solid-svg-icons";
 
 
 export const UserProfile = () => {
@@ -63,34 +65,34 @@ export const UserProfile = () => {
     if (!user) return;
 
     const trimmedNewUsername = newUsername.trim();
-    if(!trimmedNewUsername) {
+    if (!trimmedNewUsername) {
       toast.error("Unesite korisničko ime.");
       return;
     }
 
     const usernameRegex = /^[a-zA-Z0-9._]+$/;
-    if(!usernameRegex.test(trimmedNewUsername)){
+    if (!usernameRegex.test(trimmedNewUsername)) {
       toast.error("Korisničko ime nije u validnom formatu. Dozvoljena su mala i velika slova abecede, brojevi, _ i .");
       return;
     }
 
     const trimmedNewPhoneNumber = newPhoneNumber.trim();
-    if(!trimmedNewPhoneNumber) {
+    if (!trimmedNewPhoneNumber) {
       toast.error("Unesite broj telefona.")
       return;
     }
 
     try {
-      const response = await updateUserAPI(newUsername, trimmedNewPhoneNumber);
+      const response = await updateUserAPI(trimmedNewUsername, trimmedNewPhoneNumber);
 
       if (response?.status === 200) {
         setProfileUser(response.data);
         toast.success("Podaci su uspešno ažurirani!");
         const currentUser = JSON.parse(localStorage.getItem("user")!);
-        currentUser.username = newUsername;
+        currentUser.username = trimmedNewUsername;
         currentUser.phoneNumber = newPhoneNumber;
         localStorage.setItem("user", JSON.stringify(currentUser));
-        if(profileUser?.username != newUsername)
+        if (profileUser?.username != trimmedNewUsername)
           window.location.reload();
         setIsEditing(false);
       }
@@ -126,23 +128,38 @@ export const UserProfile = () => {
                 value={newPhoneNumber}
                 onChange={handleNewPhoneNumberChange}
               />
-              <button className={`btn btn-sm text-white text-center rounded py-2 px-2 me-2 ${styles.dugme} ${styles.slova} mt-3`} onClick={handleSaveChanges}>
+              <button
+                className={`btn btn-sm text-white text-center rounded py-2 px-2 me-2 ${styles.dugme} ${styles.slova} mt-3`}
+                onClick={handleSaveChanges}>
                 Sačuvaj izmene
               </button>
-              <button className={`btn btn-sm text-white text-center rounded py-2 px-2 me-2 ${styles.dugme1} ${styles.slova} mt-3`} onClick={handleCancel}>
+              <button
+                className={`btn btn-sm text-white text-center rounded py-2 px-2 me-2 ${styles.dugme1} ${styles.slova} mt-3`}
+                onClick={handleCancel}>
                 Otkaži
               </button>
             </>
           ) : (
-            <>
-              <p className={`text-blue`}>Korisničko ime: {profileUser?.username}</p>
-              <p className={`text-blue`}>Broj telefona: {profileUser?.phoneNumber}</p>
+            <div className={`d-flex flex-column align-items-center`}>
+              <p className={`text-blue fs-4`}>
+                <FontAwesomeIcon icon={faUser} className={`me-3`}/>
+                <span className={`fw-bold`}>{profileUser?.username}</span>
+              </p>
+              <p className={`text-blue fs-4`}>
+                <a href={`tel:${profileUser?.phoneNumber}`}
+                   className={`fw-bold text-blue`}>
+                  <FontAwesomeIcon icon={faPhone} className={`me-3`}/>
+                  {profileUser?.phoneNumber}
+                </a>
+              </p>
               {user?.id == profileUser?.id &&
-                <button className={`btn btn-sm text-white text-center rounded py-2 px-2 me-2 ${styles.dugme1} ${styles.slova}`} onClick={() => setIsEditing(true)}>
+                <button
+                  className={`btn btn-sm text-white text-center rounded py-2 px-2 ${styles.dugme1} ${styles.slova}`}
+                  onClick={() => setIsEditing(true)}>
                   Izmeni podatke
                 </button>
               }
-            </>
+            </div>
           )}
         </div>
         <hr className={`mt-5 text-golden`}></hr>
@@ -155,7 +172,7 @@ export const UserProfile = () => {
               </div>
             ))
           ) : (
-            <p className={`text-center text-muted`}>Korisnik nema nekretnina.</p>
+            <p className={`text-center text-muted mx-auto`}>Korisnik nema nekretnina.</p>
           )}
         </div>
         <hr className={`mt-5 text-golden`}/>

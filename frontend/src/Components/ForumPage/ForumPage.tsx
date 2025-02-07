@@ -70,14 +70,17 @@ export const ForumPage = () => {
           </div>
 
           <div className={`col-md-8 my-5`}>
-            <h2 className={`text-blue`}>Objave</h2>
+            <h2 className={`text-blue text-center`}>Objave</h2>
             {isLoading ? (<>
               <p className={`text-center text-muted`}>Učitavanje objava...</p>
             </>) : (
               <>
-                {posts.length > 0 && posts.map(post => (
+                {posts.length > 0 ?
+                  posts.map(post => (
                   <PostCard key={post.id} post={post}/>
-                ))}
+                ))
+                :
+                <p className={`text-center text-blue fs-5 mt-4`}>Trenutno ne postoji nijedna objava.</p>}
               </>
             )}
             {totalPostsCount > 0 &&
