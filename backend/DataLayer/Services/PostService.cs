@@ -8,14 +8,12 @@ public class PostService
         DbConnection.GetDatabase().GetCollection<Post>("posts_collection");
 
     private readonly UserService _userService;
-    private readonly EstateService _estateService;
     private readonly IServiceProvider _serviceProvider;
 
-    public PostService(UserService userService, EstateService estateService,IServiceProvider serviceProvider)
+    public PostService(UserService userService, IServiceProvider serviceProvider)
     {
         _userService = userService;
         _serviceProvider = serviceProvider;
-        _estateService = estateService;
     }
 
     public async Task<Result<PostResultDTO, ErrorMessage>> CreatePost(CreatePostDTO postDto, string userId)
@@ -45,11 +43,12 @@ public class PostService
             EstateResultDTO? estate = null;
             if (postDto.EstateId != null)
             {
-                var estateUpdateResult = await _estateService.AddPostToEstate(postDto.EstateId, newPost.Id!);
+                EstateService estateService = _serviceProvider.GetRequiredService<EstateService>();
+                var estateUpdateResult = await estateService.AddPostToEstate(postDto.EstateId, newPost.Id!);
                 if (estateUpdateResult.IsError)
                     return estateUpdateResult.Error;
                 
-                var estateResult = await _estateService.GetEstate(postDto.EstateId);
+                var estateResult = await estateService.GetEstate(postDto.EstateId);
                 if (estateResult.IsError)
                     return estateResult.Error;
                 
@@ -202,7 +201,8 @@ public class PostService
 
             if (existingPost.EstateId != null)
             {
-                var estateUpdateResult = await _estateService.RemovePostFromEstate(existingPost.EstateId, postId);
+                EstateService estateService = _serviceProvider.GetRequiredService<EstateService>();
+                var estateUpdateResult = await estateService.RemovePostFromEstate(existingPost.EstateId, postId);
                 if (estateUpdateResult.IsError)
                     return estateUpdateResult.Error;
             }

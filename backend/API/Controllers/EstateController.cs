@@ -61,7 +61,7 @@ public class EstateController : ControllerBase
 
     [HttpPut("UpdateEstate/{collectionName}/{id}")]
     [Authorize]
-    public async Task<IActionResult> UpdateEstate(string collectionName, string id, [FromBody] EstateUpdateDTO updatedEstate)
+    public async Task<IActionResult> UpdateEstate(string id, [FromBody] EstateUpdateDTO updatedEstate)
     {
         var userResult = userService.GetCurrentUserId(User);
         if (userResult.IsError)
@@ -69,7 +69,7 @@ public class EstateController : ControllerBase
             return StatusCode(userResult.Error?.StatusCode ?? 400, userResult.Error?.Message);
         }
 
-        (bool isError, _, ErrorMessage? error) = await estateService.UpdateEstate(collectionName, id, updatedEstate);
+        (bool isError, _, ErrorMessage? error) = await estateService.UpdateEstate(id, updatedEstate);
         if (isError)
         {
             return StatusCode(error?.StatusCode ?? 400, error?.Message);

@@ -14,6 +14,7 @@ import "leaflet/dist/leaflet.css";
 import { UserProfile } from './Components/UserProfile/UserProfile.tsx';
 import SearchEstate from './Components/SearchEstate/SearchEstate.tsx';
 import {EstatePage} from './Components/EstatePage/EstatePage.tsx';
+import {ProtectedRoute} from "./Components/ProtectedRoute/ProtectedRoute.tsx";
 
 function App() {
 
@@ -28,14 +29,13 @@ function App() {
                 <Route path="/" element={<Home/>}/>
                 <Route path="/login" element={<LoginPage/>}/>
                 <Route path="/register" element={<RegisterPage/>}/>
-                <Route path="/forum" element={<ForumPage/>} />
-                <Route path="/forum/:postId" element={<PostPage />} />
-                <Route path="/create-estate" element={<CreateEstate/>}/>
-                <Route path="/user-profile/:id" element={<UserProfile/>}/>
+                <Route path="/forum" element={<ProtectedRoute><ForumPage/></ProtectedRoute>} />
+                <Route path="/forum/:postId" element={<ProtectedRoute><PostPage /></ProtectedRoute>} />
+                <Route path="/create-estate" element={<ProtectedRoute><CreateEstate/></ProtectedRoute>}/>
+                <Route path="/user-profile/:id" element={<ProtectedRoute><UserProfile/></ProtectedRoute>}/>
                 <Route path="/search-estates" element={<SearchEstate/>}/>
-                <Route path="/estate-page/:id" element={<EstatePage />} /> 
-                <Route path="/estate-details/:id" element={<EstatePage />} />
-
+                <Route path="/estate-page/:id" element={<ProtectedRoute><EstatePage /></ProtectedRoute>} />
+                <Route path="/estate-details/:id" element={<ProtectedRoute><EstatePage /></ProtectedRoute>} />
               </Routes>
             </div>
             <Footer/>

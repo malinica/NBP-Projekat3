@@ -59,9 +59,6 @@ export const Navbar = () => {
                                         <Link to={"/create-estate"} className={`${getLinkClass("/create-estate")}`}>KREIRAJ NEKRETNINU</Link>
                                     </li>
                                     <li className={`my-2 text-end`}>
-                                        <Link to={"/search-estates"} className={`${getLinkClass("/search-estates")}`}>NEKRETNINE</Link>
-                                    </li>
-                                    <li className={`my-2 text-end`}>
                                         <Link to={"/forum"} className={`${getLinkClass("/forum")}`}>FORUM</Link>
                                     </li>
                                     {/*<li className={`my-2 text-end`}>
@@ -85,6 +82,9 @@ export const Navbar = () => {
                                 </>
                                 :
                                 <>
+                                    <li className={`my-2 text-end`}>
+                                        <Link to={"/search-estates"} className={`${getLinkClass("/search-estates")}`}>NEKRETNINE</Link>
+                                    </li>
                                     <li className={`my-2 text-end`}><Link to="/login"
                                         className={`${getLinkClass("/login")} ${styles.link} ${styles['link-hover']}`}>PRIJAVA</Link>
                                     </li>

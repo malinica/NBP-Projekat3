@@ -5,13 +5,16 @@
 
         private readonly IMongoCollection<Estate> _estatesCollection =
             DbConnection.GetDatabase().GetCollection<Estate>("estates_collection");
-        private readonly UserService userService;
+        private readonly UserService _userService;
         private readonly IMongoCollection<User> _usersCollection =
             DbConnection.GetDatabase().GetCollection<User>("users_collection");
+        
+        private readonly PostService _postService;
 
-        public EstateService(UserService userS)
+        public EstateService(UserService userService, PostService postService)
         {
-            this.userService = userS;
+            _userService = userService;
+            _postService = postService;
         }
 
         public async Task<Result<List<Estate>, ErrorMessage>> GetAllEstatesFromCollection()
@@ -35,7 +38,7 @@
                 if(estate == null)
                     return "Nije pronađena nekretnina.".ToError();
 
-                var userResult = await userService.GetById(estate.UserId);
+                var userResult = await _userService.GetById(estate.UserId);
                 if (userResult.IsError)
                     return userResult.Error;
                 
@@ -115,7 +118,7 @@
         }
 
 
-        public async Task<Result<Estate, ErrorMessage>> UpdateEstate(string collectionName, string id, EstateUpdateDTO updatedEstate)
+        public async Task<Result<Estate, ErrorMessage>> UpdateEstate(string id, EstateUpdateDTO updatedEstate)
         {
             try
             {
@@ -156,6 +159,11 @@
                 if (existingEstate == null)
                 {
                     return "Nije pronadjena nekretnina.".ToError();
+                }
+
+                foreach (var postId in existingEstate.PostIds)
+                {
+                    await _postService.DeletePost(postId);
                 }
 
                 var result = await _estatesCollection.DeleteOneAsync(x => x.Id == id);
@@ -257,7 +265,7 @@
             }
         }
 
-        public async Task<(bool isError, PaginatedResponseDTO<Estate> result, ErrorMessage? error)> SearchEstatesFilter(
+        public async Task<Result<PaginatedResponseDTO<Estate>, ErrorMessage>> SearchEstatesFilter(
             string? title = null,
             int? priceMin = null,
             int? priceMax = null,
@@ -277,21 +285,20 @@
 
                 if (priceMax.HasValue)
                     filter &= Builders<Estate>.Filter.Lte(x => x.Price, priceMax.Value);
-
+                
                 if (categories != null && categories.Any())
-                    if (categories != null && categories.Any())
-                    {
-                        var categoryEnums = categories
-                            .Select(category =>
-                                Enum.TryParse<EstateCategory>(category, true, out var parsedCategory)
-                                    ? parsedCategory
-                                    : (EstateCategory?)null)
-                            .Where(c => c.HasValue)
-                            .Select(c => c.Value)
-                            .ToList();
+                {
+                    var categoryEnums = categories
+                        .Select(category =>
+                            Enum.TryParse<EstateCategory>(category, true, out var parsedCategory)
+                                ? parsedCategory
+                                : (EstateCategory?)null)
+                        .Where(c => c.HasValue)
+                        .Select(c => c.Value)
+                        .ToList();
 
-                        filter &= Builders<Estate>.Filter.In(x => x.Category, categoryEnums);
-                    }
+                    filter &= Builders<Estate>.Filter.In(x => x.Category, categoryEnums);
+                }
 
                 var estates = await _estatesCollection
                     .Find(filter)
@@ -299,33 +306,17 @@
                     .Limit(limit)
                     .ToListAsync();
 
-                var totalCount = await _estatesCollection.CountDocumentsAsync(filter);
+                var totalCount = await _estatesCollection.CountDocumentsAsync(_ => true);
 
-                if (estates == null || !estates.Any())
-                {
-                    return (true, new PaginatedResponseDTO<Estate>
-                    {
-                        Data = new List<Estate>(),
-                        TotalLength = 0
-                    }
-                            , null //new ErrorMessage("No estates found.", 404)
-                        );
-                }
-
-                return (false, new PaginatedResponseDTO<Estate>
+                return new PaginatedResponseDTO<Estate>
                 {
                     Data = estates,
-                    TotalLength = estates.Count()
-                }, null);
+                    TotalLength = totalCount
+                };
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return (true, new PaginatedResponseDTO<Estate>
-                {
-                    Data = new List<Estate>(),
-                    TotalLength = 0
-                }
-                    , new ErrorMessage(ex.Message));
+                return "Došlo je do greške prilikom pretrage nekretnina.".ToError();
             }
         }
 
@@ -335,13 +326,13 @@
             {
                 var user = await _usersCollection.Find(x => x.Id == userId).FirstOrDefaultAsync();
 
-                if (user.FavoriteEstateIds == null || !user.FavoriteEstateIds.Any())
+                if (!user.FavoriteEstateIds.Any())
                 {
                     return "Korisnik nema omiljenih nekretnina.".ToError();
                 }
 
                 var favoriteEstates = await _estatesCollection
-                                    .Find(x => user.FavoriteEstateIds.Contains(x.Id))
+                                    .Find(x => user.FavoriteEstateIds.Contains(x.Id!))
                                     .ToListAsync();
 
                 return favoriteEstates;

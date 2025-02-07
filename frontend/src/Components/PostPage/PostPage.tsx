@@ -88,7 +88,6 @@ export const PostPage = () => {
     try {
       setIsCommentsLoading(true);
       const scrollY = window.scrollY;
-      // const nextPage = page + 1;
       const response = await getCommentsForPostAPI(postId!, comments.length, 5);
       if (response?.status == 200) {
         const newComments = response.data.data;
@@ -99,7 +98,6 @@ export const PostPage = () => {
           ),
         ]);
         setTotalCommentsCount(response.data.totalLength);
-        // setPage(nextPage)
         setIsCommentsLoading(false);
       }
       setScrollPosition(scrollY);

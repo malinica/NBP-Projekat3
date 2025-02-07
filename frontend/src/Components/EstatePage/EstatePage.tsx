@@ -18,6 +18,7 @@ import MapWithMarker from "../Map/MapWithMarker.tsx";
 import { useAuth } from "../../Context/useAuth.tsx";
 import { deleteEstateAPI } from "../../Services/EstateService.tsx";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 
 export const EstatePage = () => {
@@ -83,6 +84,23 @@ export const EstatePage = () => {
       setUpdatedSize(estate.squareMeters);
     }
   }, [estate]);
+
+  const confirmEstateDeletion = async () => {
+    Swal.fire({
+      title: "Da li sigurno želite da obrišete nekretninu?",
+      icon: "warning",
+      position: "top",
+      showCancelButton: true,
+      confirmButtonColor: "#8cc4da",
+      cancelButtonColor: "#d33",
+      cancelButtonText: "Otkaži",
+      confirmButtonText: "Obriši"
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await handleDelete();
+      }
+    });
+  }
 
   const handleDelete = async () => {
     const response = await deleteEstateAPI(estate!.id);
@@ -244,7 +262,7 @@ export const EstatePage = () => {
                                 </button>
                                 <button
                                   className={`btn btn-sm ms-2 my-2 text-white text-center rounded py-2 px-2 ${styles.dugme2} ${styles.linija_ispod_dugmeta} ${styles.slova}`}
-                                  onClick={handleDelete}
+                                  onClick={confirmEstateDeletion}
                                 >
                                   Obriši
                                 </button>
@@ -378,7 +396,7 @@ export const EstatePage = () => {
                           setLat={setLat}
                           setLong={setLong}
                         />
-                      </div>) : user?.user?.id === estate?.userId ? (
+                      </div>) : user?.user?.id === estate?.user?.id ? (
                       <>
                         <div style={{ width: '100%', height: '500px', overflow: 'hidden' }}>
                           <MapWithMarker
