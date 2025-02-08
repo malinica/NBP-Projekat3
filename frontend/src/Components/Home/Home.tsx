@@ -41,7 +41,7 @@ export const Home = () => {
                             komercijalni prostor za tvoj biznis, tu smo da ti pomognemo u pronalaženju nekretnine iz snova.
                         </p>
                         <Link
-                            to="/"
+                            to="/search-estates"
                             className={`btn btn-lg text-white rounded shadow-lg py-3 px-4 ${styles.slova1} ${styles.dugme1} ${styles.linija_ispod_dugmeta}`}>
                             Pronađi Nekretninu
                         </Link>
@@ -78,7 +78,7 @@ export const Home = () => {
                         <h5 className={`mt-3 text-golden`}>Poboljšajte našu uslugu</h5>
                         <p className={`text-blue`}>Svaka povratna informacija nam pomaže da postanemo bolji!</p>
                         <Link
-                                to="/"
+                                to="/forum"
                                 className={`btn-lg text-white text-center rounded py-2 px-2 ${styles.slova} ${styles.dugme2} ${styles.linija_ispod_dugmeta}`}
                             >
                                 Podeli Mišljenje

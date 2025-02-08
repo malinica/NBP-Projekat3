@@ -23,6 +23,12 @@ export const Navbar = () => {
         }
     };
 
+    const handleFavoriteEstatesRedirect = () => {
+        if (user) {
+            navigate(`/favorite-estates/${user!.id}`);
+        }
+    }
+
     const getLinkClass = (path: string) => {
         return location.pathname === path
             ? `${styles.link} ${styles['link-hover']} ${styles.active}`
@@ -66,7 +72,7 @@ export const Navbar = () => {
                                     {/*<li className={`my-2 text-end`}>
                                         <Link to={"/"} className={`${getLinkClass("/")}`}>OMILJENO</Link>
                                     </li>*/}
-                                    
+
                                     <li className={`ms-3 text-end`}>
                                         <Dropdown>
                                             <Dropdown.Toggle className={styles['user-dropdown']} variant="light"
@@ -76,6 +82,8 @@ export const Navbar = () => {
 
                                             <Dropdown.Menu align={'end'}>
                                                 <Dropdown.Item onClick={handleProfileRedirect} className={styles['custom-dropdown-item1']}>MOJ PROFIL</Dropdown.Item>
+                                                <Dropdown.Divider />
+                                                <Dropdown.Item onClick={handleFavoriteEstatesRedirect} className={styles['custom-dropdown-item1']}>OMILJENE NEKRETNINE</Dropdown.Item>
                                                 <Dropdown.Divider />
                                                 <Dropdown.Item onClick={handleLogout} className={styles['custom-dropdown-item1']}>ODJAVI SE</Dropdown.Item>
                                             </Dropdown.Menu>

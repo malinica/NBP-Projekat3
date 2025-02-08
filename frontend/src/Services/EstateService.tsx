@@ -104,3 +104,13 @@ export const addToFavoritesAPI = async (estateId: string) => {
         return undefined;
     }
 };
+
+export const getFavoriteEstatesForUserAPI = async (userId: string) => {
+    try {
+        const response = await axios.get<Estate[]>(`${apiUrl}/GetUserFavoriteEstates/${userId}`);
+        return response.data;
+    } catch (error: any) {
+        toast.error(error.response?.data ?? "Greška pri preuzimanju omiljenih nekretnina.");
+        return undefined;
+    }
+};

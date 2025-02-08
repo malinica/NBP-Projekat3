@@ -6,7 +6,6 @@ import toast from "react-hot-toast";
 import styles from './EstateCard.module.css'
 import Swal from "sweetalert2";
 
-
 interface EstateCardProps {
   estate: Estate;
   canDelete?: boolean;
