@@ -31,7 +31,7 @@ export const PostCard = ({post}:Props) => {
           </button>
         </div>
 
-        {post.estate && <EstateCard estate={post.estate}/>}
+        {post.estate && <EstateCard estate={post.estate} type={1} canDelete={false}/>}
 
       </div>
     </div>

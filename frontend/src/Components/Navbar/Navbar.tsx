@@ -51,7 +51,9 @@ export const Navbar = () => {
                             <li className={`my-2 text-end`}>
                                 <Link to={"/"} className={` ${getLinkClass("#onama")}`}>O NAMA</Link>
                             </li>
-
+                            <li className={`my-2 text-end`}>
+                                <Link to={"/search-estates"} className={`${getLinkClass("/search-estates")}`}>NEKRETNINE</Link>
+                            </li>
                             {isLoggedIn()
                                 ?
                                 <>
@@ -82,9 +84,6 @@ export const Navbar = () => {
                                 </>
                                 :
                                 <>
-                                    <li className={`my-2 text-end`}>
-                                        <Link to={"/search-estates"} className={`${getLinkClass("/search-estates")}`}>NEKRETNINE</Link>
-                                    </li>
                                     <li className={`my-2 text-end`}><Link to="/login"
                                         className={`${getLinkClass("/login")} ${styles.link} ${styles['link-hover']}`}>PRIJAVA</Link>
                                     </li>

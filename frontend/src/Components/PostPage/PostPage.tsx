@@ -20,7 +20,7 @@ export const PostPage = () => {
   const {user} = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const [post, setPost] = useState<Post | null>(location.state?.post || null);
+  const [post, setPost] = useState<Post | null>(null);
   const [isPostLoading, setIsPostLoading] = useState<boolean>(false);
   const [isCommentsLoading, setIsCommentsLoading] = useState<boolean>(false);
   const [comments, setComments] = useState<Comment[]>([]);
@@ -29,13 +29,10 @@ export const PostPage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(post?.title || "");
   const [editedContent, setEditedContent] = useState(post?.content || "");
-  // const [page, setPage] = useState(0);
   const [scrollPosition, setScrollPosition] = useState(0);
 
   useEffect(() => {
-    if (!post) {
-      loadPost();
-    }
+    loadPost();
 
     setComments([]);
     loadMoreComments();
@@ -260,10 +257,9 @@ export const PostPage = () => {
                         </div>
                       }
 
-
                       {post.estate && <>
                         ova nekretnina mozda da se pomeri desno
-                        <EstateCard estate={post.estate}/>
+                        <EstateCard estate={post.estate} type={1} canDelete={false}/>
                       </>}
 
                     </div>

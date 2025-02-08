@@ -28,7 +28,7 @@ export const getAllPostsAPI = async (page: number = 1, pageSize: number = 10) =>
 
 export const getPostById = async (postId: string) => {
   try {
-    return await axios.get<Post>(`${apiUrl}/GetPostById/${postId}`);
+    return await axios.get<Post>(`${apiUrl}/GetById/${postId}`);
   } catch (error: any) {
     toast.error(error.response?.data ?? "Greška pri preuzimanju objave.");
     return undefined;

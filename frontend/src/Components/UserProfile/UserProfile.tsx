@@ -12,7 +12,7 @@ import toast from "react-hot-toast";
 import {useAuth} from "../../Context/useAuth.tsx";
 import styles from './UserProfile.module.css'
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faPhone, faUser, faUserTag} from "@fortawesome/free-solid-svg-icons";
+import {faPhone, faUser} from "@fortawesome/free-solid-svg-icons";
 
 
 export const UserProfile = () => {
@@ -35,7 +35,7 @@ export const UserProfile = () => {
 
   const refreshOnDeleteEstate = (idForDelete: string) => {
     setEstates((prevEstates) => prevEstates.filter(estate => estate.id !== idForDelete));
-};
+  };
 
   const fetchUser = async (userId: string) => {
     try {

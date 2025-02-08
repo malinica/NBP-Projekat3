@@ -8,8 +8,8 @@ import { GeoCoordinates } from "../../Interfaces/GeoCoordinates/GeoCoordinates "
 import locationPin from "../../assets/location-pin.png";
 
 interface Props {
-    setLat: (latitude: number | null) => void;
-    setLong: (longitude: number | null) => void;
+    setLat?: (latitude: number | null) => void;
+    setLong?: (longitude: number | null) => void;
     lat: number | null;
     long: number | null;
 }
@@ -25,15 +25,14 @@ const MapWithMarker: React.FC<Props> = ({ setLat, setLong, long, lat }) => {
     useEffect(() => {
         if(long!=null && lat!=null)
         {
-            console.log(long+"AAAAAAAA");
             const newLocation: GeoCoordinates = { latitude: lat, longitude: long };            
             setLocation(newLocation);
         }
     },[]);
     useEffect(() => {
         if (location) {
-            setLong(location.longitude);
-            setLat(location.latitude);
+            setLong?.(location.longitude);
+            setLat?.(location.latitude);
         }
     }, [location, setLat, setLong]);
 

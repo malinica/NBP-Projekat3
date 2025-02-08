@@ -1,23 +1,22 @@
-import { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
-import { addToFavoritesAPI, getEstateAPI, updateEstateAPI } from "../../Services/EstateService";
-import { Estate } from "../../Interfaces/Estate/Estate";
-import { toast } from "react-hot-toast";
+import {useEffect, useState} from "react";
+import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
+import {addToFavoritesAPI, getEstateAPI, updateEstateAPI} from "../../Services/EstateService";
+import {Estate} from "../../Interfaces/Estate/Estate";
+import {toast} from "react-hot-toast";
 import styles from "./EstatePage.module.css";
-import { CreatePost } from "../CreatePost/CreatePost.tsx";
-import { PostCard } from "../PostCard/PostCard.tsx";
-import { Pagination } from "../Pagination/Pagination.tsx";
-import { Post } from "../../Interfaces/Post/Post.ts";
-import { createPostAPI, getAllPostsForEstateAPI } from "../../Services/PostService.tsx";
-import { CreatePostDTO } from "../../Interfaces/Post/CreatePostDTO.ts";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {CreatePost} from "../CreatePost/CreatePost.tsx";
+import {PostCard} from "../PostCard/PostCard.tsx";
+import {Pagination} from "../Pagination/Pagination.tsx";
+import {Post} from "../../Interfaces/Post/Post.ts";
+import {createPostAPI, getAllPostsForEstateAPI} from "../../Services/PostService.tsx";
+import {CreatePostDTO} from "../../Interfaces/Post/CreatePostDTO.ts";
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faContactCard, faHeart, faPhone} from '@fortawesome/free-solid-svg-icons';
 import {EstateCategory, getEstateCategoryTranslation} from "../../Enums/EstateCategory.ts";
 import noposts from "../../Assets/noposts.png";
 import MapWithMarker from "../Map/MapWithMarker.tsx";
-import { useAuth } from "../../Context/useAuth.tsx";
-import { deleteEstateAPI } from "../../Services/EstateService.tsx";
-import { useNavigate } from "react-router-dom";
+import {useAuth} from "../../Context/useAuth.tsx";
+import {deleteEstateAPI} from "../../Services/EstateService.tsx";
 import Swal from "sweetalert2";
 
 
@@ -107,7 +106,7 @@ export const EstatePage = () => {
     if (response) {
       toast.success("Nekretnina uspešno obrisana.");
     }
-    navigate(`/search-estates`);
+    navigate(`..`);
   };
 
   const handleCreatePost = async (title: string, content: string) => {
@@ -297,9 +296,10 @@ export const EstatePage = () => {
                           </div>
                           <div className={`col-md-6 mb-3`}>
                             <h5 className={`text-golden`}>Kontakt</h5>
-                            <span className={`text-blue fs-5 me-2`}>
+                            <Link className={`text-blue text-decoration-none fs-5 me-2`} to={`/user-profile/${estate?.user?.id}`}>
                               <FontAwesomeIcon icon={faContactCard} className={`me-2`}/>
-                              {estate?.user?.username}</span>
+                              {estate?.user?.username}
+                            </Link>
                             <a href={`tel:${estate?.user?.phoneNumber}`} className={`text-blue text-decoration-none fs-5`}>
                               <FontAwesomeIcon icon={faPhone} className={`me-2`}/>
                               {estate?.user?.phoneNumber}</a>
@@ -343,15 +343,16 @@ export const EstatePage = () => {
                             onChange={(e) => setUpdatedRooms(e.target.value)}
                           />
                         </div>
-                        <div className={`mb-3`}>
-                          <label className={`form-label text-blue`}>Sprat:</label>
-                          <input
-                            type="number"
-                            className={`form-control ${styles.fields}`}
-                            value={updatedFloor}
-                            onChange={(e) => setUpdatedFloor(e.target.value)}
-                          />
-                        </div>
+                        {updatedCategory != EstateCategory.House &&
+                          <div className={`mb-3`}>
+                            <label className={`form-label text-blue`}>Sprat:</label>
+                            <input
+                              type="number"
+                              className={`form-control ${styles.fields}`}
+                              value={updatedFloor}
+                              onChange={(e) => setUpdatedFloor(e.target.value)}
+                            />
+                          </div>}
                         <div className={`mb-3`}>
                           <label className={`form-label text-blue`}>Površina:</label>
                           <input
@@ -388,13 +389,14 @@ export const EstatePage = () => {
                       </div>
                     )}
                   </div>
+                  <h3 className={`text-center text-blue mb-3`}>Lokacija</h3>
                   {!editMode ? (
                       <div className={`container-fluid p-0`}>
                         <MapWithMarker
-                          lat={lat}
-                          long={long}
-                          setLat={setLat}
-                          setLong={setLong}
+                          lat={estate.latitude}
+                          long={estate.longitude}
+                          // setLat={setLat}
+                          // setLong={setLong}
                         />
                       </div>) : user?.user?.id === estate?.user?.id ? (
                       <>
@@ -406,7 +408,7 @@ export const EstatePage = () => {
                             setLong={setLong}
                           />
                         </div>
-                        <div className={`m-3`}>
+                        <div className={`d-flex justify-content-end`}>
                           <button
                             className={`btn btn-sm my-2 text-white text-center rounded py-2 px-2 ${styles.dugme1} ${styles.linija_ispod_dugmeta} ${styles.slova}`}
                             onClick={handleUpdate}

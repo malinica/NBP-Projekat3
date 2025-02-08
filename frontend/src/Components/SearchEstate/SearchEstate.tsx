@@ -6,7 +6,6 @@ import { EstateCategory, EstateCategoryTranslations } from "../../Enums/EstateCa
 import { searchEstatesAPI } from "../../Services/EstateService";
 import styles from './SearchEstate.module.css'
 
-
 export const SearchEstate=()=>
 {
     const [estates, setEstates] = useState<Estate[] | null>(null);
@@ -153,8 +152,8 @@ useEffect(() => {
                       type={1}
                       loadEstates={handleDelete}
                       key={estate.id}
-                        estate={estate}
-                        refreshOnDeleteEstate={null}
+                      estate={estate}
+                      refreshOnDeleteEstate={null}
                       />
                     ))}
                   </div>
