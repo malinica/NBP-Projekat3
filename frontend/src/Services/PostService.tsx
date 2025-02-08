@@ -15,10 +15,10 @@ export const createPostAPI = async (postDto: CreatePostDTO) => {
   }
 };
 
-export const getAllPostsAPI = async (page: number = 1, pageSize: number = 10) => {
+export const getAllPostsAPI = async (title: string = "", page: number = 1, pageSize: number = 10) => {
   try {
     return await axios.get<PaginatedResponseDTO<Post>>(`${apiUrl}/GetAll`, {
-      params: { page, pageSize }
+      params: { title, page, pageSize }
     });
   } catch (error: any) {
     toast.error(error.response?.data ?? "Greška pri preuzimanju objava.");

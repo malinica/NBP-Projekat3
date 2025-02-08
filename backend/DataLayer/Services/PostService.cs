@@ -47,11 +47,11 @@ public class PostService
                 var estateUpdateResult = await estateService.AddPostToEstate(postDto.EstateId, newPost.Id!);
                 if (estateUpdateResult.IsError)
                     return estateUpdateResult.Error;
-                
+
                 var estateResult = await estateService.GetEstate(postDto.EstateId);
                 if (estateResult.IsError)
                     return estateResult.Error;
-                
+
                 estate = estateResult.Data;
             }
 
@@ -73,11 +73,13 @@ public class PostService
         }
     }
 
-    public async Task<Result<PaginatedResponseDTO<PostResultDTO>, ErrorMessage>> GetAllPosts(int page = 1, int pageSize = 10)
+    public async Task<Result<PaginatedResponseDTO<PostResultDTO>, ErrorMessage>> GetAllPosts(string title = "",
+        int page = 1, int pageSize = 10)
     {
         try
         {
             var posts = await _postsCollection.Aggregate()
+                .Match(post => post.Title.ToLower().Contains((title.ToLower())))
                 .Sort(Builders<Post>.Sort.Descending(p => p.CreatedAt))
                 .Skip((page - 1) * pageSize)
                 .Limit(pageSize)
@@ -89,7 +91,8 @@ public class PostService
 
             var postsDtos = posts.Select(post => new PostResultDTO(post)).ToList();
 
-            var totalCount = await _postsCollection.CountDocumentsAsync(_ => true);
+            var totalCount =
+                await _postsCollection.CountDocumentsAsync(post => post.Title.ToLower().Contains((title.ToLower())));
 
             return new PaginatedResponseDTO<PostResultDTO>()
             {
@@ -127,7 +130,8 @@ public class PostService
         }
     }
 
-    public async Task<Result<PaginatedResponseDTO<PostResultDTO>, ErrorMessage>> GetAllPostsForEstate(string estateId, int page = 1, int pageSize = 10)
+    public async Task<Result<PaginatedResponseDTO<PostResultDTO>, ErrorMessage>> GetAllPostsForEstate(string estateId,
+        int page = 1, int pageSize = 10)
     {
         try
         {
@@ -213,7 +217,7 @@ public class PostService
             {
                 await commentService.DeleteComment(commentId);
             }
-            
+
             var deleteResult = await _postsCollection.DeleteOneAsync(p => p.Id == postId);
 
             if (deleteResult.DeletedCount == 0)
@@ -291,5 +295,4 @@ public class PostService
             return "Došlo je do greške prilikom preuzimanja objava.".ToError();
         }
     }
-
 }

@@ -36,9 +36,10 @@ public class PostController : ControllerBase
 
     [HttpGet("GetAll")]
     [Authorize]
-    public async Task<IActionResult> GetAll([FromQuery] int? page, [FromQuery] int? pageSize)
+    public async Task<IActionResult> GetAll([FromQuery] string? title, [FromQuery] int? page, [FromQuery] int? pageSize)
     {
-        (bool isError, var response, ErrorMessage? error) = await _postService.GetAllPosts(page ?? 1, pageSize ?? 1);
+        (bool isError, var response, ErrorMessage? error) =
+            await _postService.GetAllPosts(title ?? "", page ?? 1, pageSize ?? 1);
 
         if (isError)
         {
