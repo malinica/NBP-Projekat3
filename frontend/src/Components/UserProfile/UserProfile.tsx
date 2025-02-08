@@ -33,6 +33,10 @@ export const UserProfile = () => {
     }
   }, [id]);
 
+  const refreshOnDeleteEstate = (idForDelete: string) => {
+    setEstates((prevEstates) => prevEstates.filter(estate => estate.id !== idForDelete));
+};
+
   const fetchUser = async (userId: string) => {
     try {
       const response = await getUserByIdAPI(userId);
@@ -168,7 +172,7 @@ export const UserProfile = () => {
           {estates.length > 0 ? (
             estates.map((estate) => (
               <div key={estate.id} className={`col`}>
-                <EstateCard estate={estate}/>
+                <EstateCard estate={estate} type={2} loadEstates={null} refreshOnDeleteEstate={refreshOnDeleteEstate}/>
               </div>
             ))
           ) : (

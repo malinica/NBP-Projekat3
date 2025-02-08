@@ -302,15 +302,13 @@
 
                 var estates = await _estatesCollection
                     .Find(filter)
-                    .Skip(skip)
-                    .Limit(limit)
                     .ToListAsync();
 
                 var totalCount = await _estatesCollection.CountDocumentsAsync(_ => true);
 
                 return new PaginatedResponseDTO<Estate>
                 {
-                    Data = estates,
+                    Data = estates.Skip(skip).Take(limit).ToList(),
                     TotalLength = totalCount
                 };
             }

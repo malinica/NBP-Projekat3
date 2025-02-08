@@ -29,18 +29,18 @@ useEffect(() => {
 }, []); 
 
 
-      const loadEstates = async (pageNumber?: number, pageSizeNumber?: number) => {
+      const loadEstates = async (pageNumber: number, pageSizeNumber: number) => {
         setIsLoading(true);
       
-        if (pageNumber !== null && pageNumber !== undefined) setPage(pageNumber);
-        if (pageSize !== null && pageSizeNumber !== undefined) setPageSize(pageSizeNumber);
+        setPage(pageNumber);
+        setPageSize(pageSizeNumber);
         const result = await searchEstatesAPI(
           searchTitle ?? undefined,
     searchPriceMin ?? undefined,
     searchPriceMax ?? undefined,
     searchCategory ?? undefined,
-    page ?? undefined,
-    pageSize ?? undefined
+    pageNumber ?? undefined,
+    pageSizeNumber ?? undefined
           );
           
           if (result && result.totalLength > 0) {
@@ -57,14 +57,19 @@ useEffect(() => {
 
     const handlePaginateChange = async (page: number, pageSize: number) => {
         await loadEstates(page, pageSize);
-        setIsLoading(false);
       }
 
-      const handleDelete=async()=>{
-        if((page*pageSize+1)==totalEstatesCount)
-          setPage(page-1);
-        await loadEstates(page, pageSize);
-      }
+      const handleDelete = async () => {
+        console.log(page * pageSize + 1 + " = " + pageSize);
+    
+            if (((page !== 1)) && ((page - 1) * pageSize + 1) === totalEstatesCount) {
+                await loadEstates(page - 1, pageSize);
+            } else 
+                await loadEstates(page, pageSize);
+            
+        
+    };
+    
 
       return (
         <>
@@ -145,9 +150,11 @@ useEffect(() => {
                   <div className={`d-flex flex-wrap justify-content-center gap-2 p-3`}>
                     {estates.map((estate) => (
                       <EstateCard
+                      type={1}
                       loadEstates={handleDelete}
                       key={estate.id}
                         estate={estate}
+                        refreshOnDeleteEstate={null}
                       />
                     ))}
                   </div>
@@ -157,7 +164,7 @@ useEffect(() => {
         
                 {totalEstatesCount > 0 && (
                   <div className={`my-4`}>
-                    <Pagination totalLength={totalEstatesCount} onPaginateChange={handlePaginateChange} />
+                    <Pagination totalLength={totalEstatesCount} onPaginateChange={handlePaginateChange} currentPage={page} perPage={pageSize}/>
                   </div>
                 )}
               </>

@@ -8,10 +8,13 @@ import styles from './EstateCard.module.css'
 
 interface EstateCardProps {
   estate: Estate;
-  loadEstates: () => Promise<void>;
+  type: number; // 1 za pretragu, 2 za profil
+  loadEstates?: (() => Promise<void>) | null; 
+  refreshOnDeleteEstate?: ((id: string) => void) | null;
+
 }
 
-export const EstateCard = ({ estate, loadEstates }: EstateCardProps) => {
+export const EstateCard = ({ estate, loadEstates,type,refreshOnDeleteEstate }: EstateCardProps) => {
   const navigate = useNavigate();
   const user = useAuth();
 
@@ -19,7 +22,10 @@ export const EstateCard = ({ estate, loadEstates }: EstateCardProps) => {
     const response = await deleteEstateAPI(estate.id);
     if (response) {
       toast.success("Nekretnina uspešno obrisana.");
-      await loadEstates();
+      if(type==1)
+      await loadEstates!();
+    else if (type==2)
+      refreshOnDeleteEstate!(estate.id);
     }
   };
 
