@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {ChangeEvent, useEffect, useState} from "react";
 import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
 import {addToFavoritesAPI, getEstateAPI, updateEstateAPI} from "../../Services/EstateService";
 import {Estate} from "../../Interfaces/Estate/Estate";
@@ -21,12 +21,12 @@ import Swal from "sweetalert2";
 
 
 export const EstatePage = () => {
-  const { id } = useParams();
+  const {id} = useParams();
   const user = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const setEdit = location.state?.setEdit||false;
-  
+  const setEdit = location.state?.setEdit || false;
+
   const [estate, setEstate] = useState<Estate | null>(null);
   const [isEstateLoading, setIsEstateLoading] = useState<boolean>(true);
   const [isPostsLoading, setIsPostsLoading] = useState<boolean>(true);
@@ -37,16 +37,16 @@ export const EstatePage = () => {
   const [pageSize, setPageSize] = useState<number>(10);
 
   const [editMode, setEditMode] = useState(setEdit);
-  const [updatedName, setUpdatedName] = useState(estate?.title || "");
+  const [updatedTitle, setUpdatedTitle] = useState(estate?.title || "");
   const [updatedDescription, setUpdatedDescription] = useState(estate?.description || "");
   const [updatedCategory, setUpdatedCategory] = useState(estate?.category || "");
   const [updatedPictures, setUpdatedPictures] = useState<FileList | null>(null);
   const [updatedPrice, setUpdatedPrice] = useState(estate?.price || '');
-  const [updatedRooms, setUpdatedRooms] = useState(estate?.totalRooms || '');
-  const [updatedFloor, setUpdatedFloor] = useState(estate?.floorNumber || '');
-  const [updatedSize, setUpdatedSize] = useState(estate?.squareMeters || '');
-  const [long, setLong] = useState<number | null>(null);
-  const [lat, setLat] = useState<number | null>(null);
+  const [updatedTotalRooms, setUpdatedTotalRooms] = useState(estate?.totalRooms || '');
+  const [updatedFloorNumber, setUpdatedFloorNumber] = useState(estate?.floorNumber || '');
+  const [updatedSquareMeters, setUpdatedSquareMeters] = useState(estate?.squareMeters || '');
+  const [updatedLongitude, setUpdatedLongitude] = useState<number | null>(estate?.longitude ?? null);
+  const [updatedLatitude, setUpdatedLatitude] = useState<number | null>(estate?.latitude ?? null);
 
   useEffect(() => {
     const fetchEstate = async () => {
@@ -71,17 +71,7 @@ export const EstatePage = () => {
   }, [id]);
 
   useEffect(() => {
-    if (estate) {
-      setLat(estate?.latitude ?? null);
-      setLong(estate?.longitude ?? null);
-      setUpdatedName(estate.title);
-      setUpdatedDescription(estate.description);
-      setUpdatedCategory(estate.category);
-      setUpdatedPrice(estate.price);
-      setUpdatedRooms(estate.totalRooms);
-      setUpdatedFloor(estate.floorNumber ?? 0);
-      setUpdatedSize(estate.squareMeters);
-    }
+    resetUpdatedFields();
   }, [estate]);
 
   const confirmEstateDeletion = async () => {
@@ -150,11 +140,11 @@ export const EstatePage = () => {
     }
   }
 
-  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleCategoryChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setUpdatedCategory(e.target.value);
   };
 
-  const handlePicturesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePicturesChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setUpdatedPictures(e.target.files);
     }
@@ -176,28 +166,60 @@ export const EstatePage = () => {
       if (!estate) return;
 
       const formData = new FormData();
-      formData.append('title', updatedName);
+      formData.append('title', updatedTitle);
       formData.append('description', updatedDescription);
+      formData.append('price', updatedPrice.toString());
+      formData.append('squareMeters', updatedSquareMeters.toString());
+      formData.append('totalRooms', updatedTotalRooms.toString());
       formData.append('category', updatedCategory);
-      /*formData.append za ostalo */
+
+      if (updatedCategory != EstateCategory.House)
+        formData.append('floorNumber', updatedFloorNumber.toString());
 
       if (updatedPictures) {
         for (let i = 0; i < updatedPictures.length; i++) {
-          formData.append('pictures', updatedPictures[i]);
+          formData.append('images', updatedPictures[i]);
         }
       }
+
+      formData.append('longitude', updatedLongitude!.toString());
+      formData.append('latitude', updatedLatitude!.toString());
 
       const response = await updateEstateAPI(estate.id, formData);
 
       if (response?.status === 200) {
         toast.success("Nekretnina je uspešno ažurirana.");
-        setEstate(response.data);
+        setEstate(prevEstate => {
+          return prevEstate ? {
+            ...estate,
+            ...response.data
+          } : null;
+        });
         setEditMode(false);
       }
     } catch {
       toast.error("Došlo je do greške prilikom ažuriranja nekretnine.");
     }
   };
+
+  const handleCancelUpdate = () => {
+    setEditMode(false);
+    resetUpdatedFields();
+  }
+
+  const resetUpdatedFields = () => {
+    if (estate) {
+      setUpdatedTitle(estate.title);
+      setUpdatedDescription(estate.description);
+      setUpdatedPrice(estate.price);
+      setUpdatedTotalRooms(estate.totalRooms);
+      setUpdatedSquareMeters(estate.squareMeters);
+      setUpdatedFloorNumber(estate.floorNumber ?? '');
+      setUpdatedCategory(estate.category);
+      setUpdatedLongitude(estate.longitude);
+      setUpdatedLatitude(estate.latitude);
+    }
+  }
 
 
   return (
@@ -217,25 +239,25 @@ export const EstatePage = () => {
                         <div className={`carousel-indicators`}>
                           {estate.images.map((_, i) =>
                             <button type="button" key={i} data-bs-target="#carouselExampleIndicators"
-                              data-bs-slide-to={`${i}`} className={`${i == 0 ? 'active' : ''}`}></button>
+                                    data-bs-slide-to={`${i}`} className={`${i == 0 ? 'active' : ''}`}></button>
                           )}
                         </div>
                         <div className={`carousel-inner`}>
                           {estate.images.map((pictureName, i) => (
-                            <div className={`carousel-item ${i === 0 ? "active" : ""}`} key={i}>
-                              <img src={`${import.meta.env.VITE_SERVER_URL}${pictureName}`} className={`d-block w-100`}
-                                alt="..." />
-                            </div>
-                          )
+                              <div className={`carousel-item ${i === 0 ? "active" : ""}`} key={i}>
+                                <img src={`${import.meta.env.VITE_SERVER_URL}${pictureName}`} className={`d-block w-100`}
+                                     alt="..."/>
+                              </div>
+                            )
                           )}
                         </div>
                         <button className={`carousel-control-prev`} type="button"
-                          data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+                                data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
                           <span className={`carousel-control-prev-icon`} aria-hidden="true"></span>
                           <span className={`visually-hidden`}>Previous</span>
                         </button>
                         <button className={`carousel-control-next`} type="button"
-                          data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+                                data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
                           <span className={`carousel-control-next-icon`} aria-hidden="true"></span>
                           <span className={`visually-hidden`}>Next</span>
                         </button>
@@ -252,25 +274,25 @@ export const EstatePage = () => {
                           </div>
                           <div className={`mt-1`}>
                             {user?.user?.id === estate?.user?.id ? (
-                              <div>                      
-                                <button
-                                  className={`btn btn-sm my-2 text-white text-center rounded py-2 px-2 ${styles.dugme1} ${styles.linija_ispod_dugmeta} ${styles.slova}`}
-                                  onClick={() => setEditMode(true)}
-                                >
-                                  Ažuriraj
+                                <div>
+                                  <button
+                                    className={`btn btn-sm my-2 text-white text-center rounded py-2 px-2 ${styles.dugme1} ${styles.linija_ispod_dugmeta} ${styles.slova}`}
+                                    onClick={() => setEditMode(true)}
+                                  >
+                                    Ažuriraj
+                                  </button>
+                                  <button
+                                    className={`btn btn-sm ms-2 my-2 text-white text-center rounded py-2 px-2 ${styles.dugme2} ${styles.linija_ispod_dugmeta} ${styles.slova}`}
+                                    onClick={confirmEstateDeletion}
+                                  >
+                                    Obriši
+                                  </button>
+                                </div>)
+                              : (
+                                <button className={`btn btn-outline-danger me-2`} onClick={handleAddToFavorite}>
+                                  <FontAwesomeIcon icon={faHeart}/>
                                 </button>
-                                <button
-                                  className={`btn btn-sm ms-2 my-2 text-white text-center rounded py-2 px-2 ${styles.dugme2} ${styles.linija_ispod_dugmeta} ${styles.slova}`}
-                                  onClick={confirmEstateDeletion}
-                                >
-                                  Obriši
-                                </button>
-                              </div>) 
-                              : (                                
-                              <button className={`btn btn-outline-danger me-2`} onClick={handleAddToFavorite}>
-                                <FontAwesomeIcon icon={faHeart} />
-                              </button>  
-                            )}
+                              )}
                           </div>
                         </div>
                         <div className={`row mb-4`}>
@@ -296,11 +318,13 @@ export const EstatePage = () => {
                           </div>
                           <div className={`col-md-6 mb-3`}>
                             <h5 className={`text-golden`}>Kontakt</h5>
-                            <Link className={`text-blue text-decoration-none fs-5 me-2`} to={`/user-profile/${estate?.user?.id}`}>
+                            <Link className={`text-blue text-decoration-none fs-5 me-2`}
+                                  to={`/user-profile/${estate?.user?.id}`}>
                               <FontAwesomeIcon icon={faContactCard} className={`me-2`}/>
                               {estate?.user?.username}
                             </Link>
-                            <a href={`tel:${estate?.user?.phoneNumber}`} className={`text-blue text-decoration-none fs-5`}>
+                            <a href={`tel:${estate?.user?.phoneNumber}`}
+                               className={`text-blue text-decoration-none fs-5`}>
                               <FontAwesomeIcon icon={faPhone} className={`me-2`}/>
                               {estate?.user?.phoneNumber}</a>
                           </div>
@@ -313,8 +337,8 @@ export const EstatePage = () => {
                           <input
                             type="text"
                             className={`form-control ${styles.fields}`}
-                            value={updatedName}
-                            onChange={(e) => setUpdatedName(e.target.value)}
+                            value={updatedTitle}
+                            onChange={(e) => setUpdatedTitle(e.target.value)}
                           />
                         </div>
                         <div className={`mb-3`}>
@@ -339,8 +363,8 @@ export const EstatePage = () => {
                           <input
                             type="number"
                             className={`form-control ${styles.fields}`}
-                            value={updatedRooms}
-                            onChange={(e) => setUpdatedRooms(e.target.value)}
+                            value={updatedTotalRooms}
+                            onChange={(e) => setUpdatedTotalRooms(e.target.value)}
                           />
                         </div>
                         {updatedCategory != EstateCategory.House &&
@@ -349,8 +373,8 @@ export const EstatePage = () => {
                             <input
                               type="number"
                               className={`form-control ${styles.fields}`}
-                              value={updatedFloor}
-                              onChange={(e) => setUpdatedFloor(e.target.value)}
+                              value={updatedFloorNumber}
+                              onChange={(e) => setUpdatedFloorNumber(e.target.value)}
                             />
                           </div>}
                         <div className={`mb-3`}>
@@ -358,8 +382,8 @@ export const EstatePage = () => {
                           <input
                             type="number"
                             className={`form-control ${styles.fields}`}
-                            value={updatedSize}
-                            onChange={(e) => setUpdatedSize(e.target.value)}
+                            value={updatedSquareMeters}
+                            onChange={(e) => setUpdatedSquareMeters(e.target.value)}
                           />
                         </div>
                         <div>
@@ -391,45 +415,45 @@ export const EstatePage = () => {
                   </div>
                   <h3 className={`text-center text-blue mb-3`}>Lokacija</h3>
                   {!editMode ? (
-                      <div className={`container-fluid p-0`}>
-                        <MapWithMarker
-                          lat={estate.latitude}
-                          long={estate.longitude}
-                          // setLat={setLat}
-                          // setLong={setLong}
-                        />
-                      </div>) : user?.user?.id === estate?.user?.id ? (
-                      <>
-                        <div style={{ width: '100%', height: '500px', overflow: 'hidden' }}>
-                          <MapWithMarker
-                            lat={lat}
-                            long={long}
-                            setLat={setLat}
-                            setLong={setLong}
-                          />
-                        </div>
-                        <div className={`d-flex justify-content-end`}>
-                          <button
-                            className={`btn btn-sm my-2 text-white text-center rounded py-2 px-2 ${styles.dugme1} ${styles.linija_ispod_dugmeta} ${styles.slova}`}
-                            onClick={handleUpdate}
-                          >
-                            Sačuvaj
-                          </button>
-                          <button
-                            className={`btn btn-sm ms-2 my-2 text-white text-center rounded py-2 px-2 ${styles.dugme2} ${styles.linija_ispod_dugmeta} ${styles.slova}`}
-                            onClick={() => setEditMode(false)}
-                          >
-                            Otkaži
-                          </button>
-                        </div>
-                      </>
-                    ) : (                      
                     <div className={`container-fluid p-0`}>
                       <MapWithMarker
-                        lat={lat}
-                        long={long}
-                        setLat={setLat}
-                        setLong={setLong}
+                        lat={estate.latitude}
+                        long={estate.longitude}
+                        // setLat={setLat}
+                        // setLong={setLong}
+                      />
+                    </div>) : user?.user?.id === estate?.user?.id ? (
+                    <>
+                      <div style={{width: '100%', height: '500px', overflow: 'hidden'}}>
+                        <MapWithMarker
+                          lat={updatedLatitude}
+                          long={updatedLongitude}
+                          setLat={setUpdatedLatitude}
+                          setLong={setUpdatedLongitude}
+                        />
+                      </div>
+                      <div className={`d-flex justify-content-end`}>
+                        <button
+                          className={`btn btn-sm my-2 text-white text-center rounded py-2 px-2 ${styles.dugme1} ${styles.linija_ispod_dugmeta} ${styles.slova}`}
+                          onClick={handleUpdate}
+                        >
+                          Sačuvaj
+                        </button>
+                        <button
+                          className={`btn btn-sm ms-2 my-2 text-white text-center rounded py-2 px-2 ${styles.dugme2} ${styles.linija_ispod_dugmeta} ${styles.slova}`}
+                          onClick={() => handleCancelUpdate}
+                        >
+                          Otkaži
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <div className={`container-fluid p-0`}>
+                      <MapWithMarker
+                        lat={updatedLatitude}
+                        long={updatedLongitude}
+                        setLat={setUpdatedLatitude}
+                        setLong={setUpdatedLongitude}
                       />
                     </div>)}
                 </div>
@@ -444,7 +468,7 @@ export const EstatePage = () => {
         {/*Objave*/}
         <div className={`row`}>
           <div className={`col-md-4`}>
-            <CreatePost onCreatePost={handleCreatePost} />
+            <CreatePost onCreatePost={handleCreatePost}/>
           </div>
 
           <div className={`col-md-8 my-5`}>
@@ -454,16 +478,16 @@ export const EstatePage = () => {
             </>) : (
               <>
                 {posts.length > 0 ? posts.map(post => (
-                  <PostCard key={post.id} post={post} />
+                  <PostCard key={post.id} post={post}/>
                 )) : <div className={`d-flex justify-content-center`}>
-                  <img src={noposts} alt="noposts" className={`img-fluid ${styles.slika}`} />
+                  <img src={noposts} alt="noposts" className={`img-fluid ${styles.slika}`}/>
                 </div>
                 }
               </>
             )}
             {totalPostsCount > 0 &&
               <Pagination totalLength={totalPostsCount} onPaginateChange={handlePaginateChange} currentPage={page}
-                perPage={pageSize} />}
+                          perPage={pageSize}/>}
           </div>
 
           <div className={`my-4`}></div>

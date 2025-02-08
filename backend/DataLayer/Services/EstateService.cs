@@ -67,14 +67,6 @@
                     {
                         var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
                         var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "EstateImages");
-                        /* 
-                        Vec dodato u program.cs
-                        if (!Directory.Exists(path))
-                        {
-                            Directory.CreateDirectory(path);
-                        }
-
-                        */
 
                         var filePath = Path.Combine(path, fileName);
 
@@ -122,13 +114,41 @@
         {
             try
             {
-
                 var existingEstate = await _estatesCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
                 if (existingEstate == null)
                 {
-                    return "Nije pronadjena nekretnina.".ToError();
+                    return "Nije pronađena nekretnina.".ToError();
                 }
+                
+                if (updatedEstate.Images != null && updatedEstate.Images.Any())
+                {
+                    foreach (var existingImagePath in existingEstate.Images)
+                    {
+                        var imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", existingImagePath);
+                        if(File.Exists(imagePath))
+                            File.Delete(imagePath);
+                    }
+                    
+                    List<string> newImagesPaths = new List<string>();
+                    
+                    foreach (var file in updatedEstate.Images)
+                    {
+                        var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                        var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "EstateImages");
 
+                        var filePath = Path.Combine(path, fileName);
+
+                        await using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await file.CopyToAsync(stream);
+                        }
+
+                        newImagesPaths.Add("/EstateImages/" + fileName);
+                    }
+
+                    existingEstate.Images = newImagesPaths;
+                }
+                
                 existingEstate.Title = updatedEstate.Title;
                 existingEstate.Description = updatedEstate.Description;
                 existingEstate.Price = updatedEstate.Price;
@@ -136,10 +156,8 @@
                 existingEstate.TotalRooms = updatedEstate.TotalRooms;
                 existingEstate.Category = updatedEstate.Category;
                 existingEstate.FloorNumber = updatedEstate.FloorNumber;
-                existingEstate.Images = updatedEstate.Images;
                 existingEstate.Longitude = updatedEstate.Longitude;
                 existingEstate.Latitude = updatedEstate.Latitude;
-                existingEstate.UserId = updatedEstate.UserId;
 
                 await _estatesCollection.ReplaceOneAsync(x => x.Id == id, existingEstate);
 
