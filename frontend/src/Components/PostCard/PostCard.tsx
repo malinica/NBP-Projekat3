@@ -15,7 +15,7 @@ export const PostCard = ({post}:Props) => {
   return (
     <div className={`card mb-4 shadow`}>
       <div className={`card-body d-flex justify-content-between`}>
-        <div className={`left-content`}>
+        <div className={`left-content me-3`}>
           <h3 className={`text-gray`}>{post.title}</h3>
           <p className={`text-golden`} style={{ cursor: "pointer" }} onClick={() => navigate(`/user-profile/${post.author.id}`)}>
             <FontAwesomeIcon icon={faUser} className={`me-1`}/>

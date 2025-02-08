@@ -6,6 +6,8 @@ import {ChangeEvent, useEffect, useState} from "react";
 import {Post} from "../../Interfaces/Post/Post.ts";
 import {PostCard} from "../PostCard/PostCard.tsx";
 import {Pagination} from "../Pagination/Pagination.tsx";
+import styles from './ForumPage.module.css'
+
 
 export const ForumPage = () => {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -80,14 +82,14 @@ export const ForumPage = () => {
             <div className={`form-floating mb-3`}>
               <input
                 type="text"
-                className={`form-control`}
+                className={`form-control ${styles.fields} ${styles.input_placeholder}`}
                 id="searchTitle"
                 placeholder="Pretražite objave po naslovu"
                 onChange={handleSearchTitleChange}
                 name="searchTitle"
                 value={searchTitle}
               />
-              <label htmlFor="searchTitle" className={``}>
+              <label htmlFor="searchTitle" className={`text-gray`}>
                 Pretražite objave po naslovu
               </label>
             </div>

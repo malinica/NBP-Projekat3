@@ -237,31 +237,33 @@ export const PostPage = () => {
                 ) : (
                   <>
                     <div className={`card rounded-3 p-4 shadow my-4`}>
-                      <h2 className={`text-blue`}>{post.title}</h2>
-                      <p className={`text-golden`}>
-                        <FontAwesomeIcon icon={faUser} className={`me-1`}/>
-                        {post?.author.username}
-                      </p>
-                      <p className={`content-text`}>{post.content}</p>
+                      <div className={`card-body d-flex justify-content-between`}>
+                        <div className={`left-content me-3`}>
+                          <h2 className={`text-blue`}>{post.title}</h2>
+                          <p className={`text-golden`}>
+                            <FontAwesomeIcon icon={faUser} className={`me-1`}/>
+                            {post?.author.username}
+                          </p>
+                          <p className={`content-text`}>{post.content}</p>
 
-                      {post?.author.id == user?.id &&
-                        <div className={`d-flex`}>
-                          <button onClick={() => setIsEditing(true)}
-                                  className={`btn-lg text-white text-center rounded-3 border-0 py-2 px-2 me-1 ${styles.slova} ${styles.dugme1} ${styles.linija_ispod_dugmeta}`}>
-                            Izmeni
-                          </button>
-                          <button onClick={confirmPostDeletion}
-                                  className={`btn-lg text-gray text-center rounded-3 border-0 py-2 px-2 ${styles.slova} ${styles.dugme2} ${styles.linija_ispod_dugmeta}`}>
-                            Obriši
-                          </button>
+                          {post?.author.id == user?.id &&
+                            <div className={`d-flex`}>
+                              <button onClick={() => setIsEditing(true)}
+                                      className={`btn-lg text-white text-center rounded-3 border-0 py-2 px-2 me-1 ${styles.slova} ${styles.dugme1} ${styles.linija_ispod_dugmeta}`}>
+                                Izmeni
+                              </button>
+                              <button onClick={confirmPostDeletion}
+                                      className={`btn-lg text-gray text-center rounded-3 border-0 py-2 px-2 ${styles.slova} ${styles.dugme2} ${styles.linija_ispod_dugmeta}`}>
+                                Obriši
+                              </button>
+                            </div>
+                          }
                         </div>
-                      }
 
-                      {post.estate && <>
-                        ova nekretnina mozda da se pomeri desno
-                        <EstateCard estate={post.estate} type={1} canDelete={false}/>
-                      </>}
-
+                          {post.estate && <>
+                            <EstateCard estate={post.estate} type={1} canDelete={false}/>
+                          </>}
+                      </div>
                     </div>
                   </>
                 )}

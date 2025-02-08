@@ -318,13 +318,13 @@ export const EstatePage = () => {
                           </div>
                           <div className={`col-md-6 mb-3`}>
                             <h5 className={`text-golden`}>Kontakt</h5>
-                            <Link className={`text-blue text-decoration-none fs-5 me-2`}
+                            <Link className={`text-blue text-decoration-none fs-5 me-2 d-block`}
                                   to={`/user-profile/${estate?.user?.id}`}>
                               <FontAwesomeIcon icon={faContactCard} className={`me-2`}/>
                               {estate?.user?.username}
                             </Link>
                             <a href={`tel:${estate?.user?.phoneNumber}`}
-                               className={`text-blue text-decoration-none fs-5`}>
+                               className={`text-blue text-decoration-none fs-5 d-block`}>
                               <FontAwesomeIcon icon={faPhone} className={`me-2`}/>
                               {estate?.user?.phoneNumber}</a>
                           </div>
@@ -413,7 +413,7 @@ export const EstatePage = () => {
                       </div>
                     )}
                   </div>
-                  <h3 className={`text-center text-blue mb-3`}>Lokacija</h3>
+                  <h3 className={`text-center text-golden mb-3`}>Lokacija</h3>
                   {!editMode ? (
                     <div className={`container-fluid p-0`}>
                       <MapWithMarker
@@ -432,7 +432,7 @@ export const EstatePage = () => {
                           setLong={setUpdatedLongitude}
                         />
                       </div>
-                      <div className={`d-flex justify-content-end`}>
+                      <div className={`d-flex justify-content-end me-auto pe-3 my-1`}>
                         <button
                           className={`btn btn-sm my-2 text-white text-center rounded py-2 px-2 ${styles.dugme1} ${styles.linija_ispod_dugmeta} ${styles.slova}`}
                           onClick={handleUpdate}
