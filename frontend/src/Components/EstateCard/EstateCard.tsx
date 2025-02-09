@@ -88,11 +88,11 @@ export const EstateCard = ({estate, loadEstates, canDelete = true, type, refresh
                 onClick={handleNavigate}>
           Pogledaj Detalje
         </button>
-        {user?.user?.id === estate?.userId && (
+        {user?.user?.id !== estate?.userId && (
           <button className={`btn ${isFavorite ? "btn-danger" : "btn-outline-danger"} ms-2`} onClick={handleAddToFavorite}>
             <FontAwesomeIcon icon={faHeart}/>
           </button>)}
-        {user?.user?.id !== estate?.userId && (
+        {user?.user?.id === estate?.userId && (
           <>
             <div className={`mt-2`}>
               {canDelete &&

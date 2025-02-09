@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Icon } from "leaflet";
 import { MapContainer, Marker, TileLayer } from "react-leaflet";
 
-import MapMarker from "./MapMarker";
+import MapMarker from "../Map/MapMarker";
 import { GeoCoordinates } from "../../Interfaces/GeoCoordinates/GeoCoordinates ";
 
 import locationPin from "../../assets/location-pin.png";
@@ -12,10 +12,9 @@ interface Props {
     setLong?: (longitude: number | null) => void;
     lat: number | null;
     long: number | null;
-    edit:boolean
 }
 
-const MapWithMarker: React.FC<Props> = ({ setLat, setLong, long, lat,edit }) => {
+const MapWithMarker: React.FC<Props> = ({ setLat, setLong, long, lat }) => {
     const [location, setLocation] = useState<GeoCoordinates | null>(null);
     const mapaCentar = { lat: 43.32083030, lng: 21.89544071 };
 
@@ -31,7 +30,7 @@ const MapWithMarker: React.FC<Props> = ({ setLat, setLong, long, lat,edit }) => 
         }
     },[]);
     useEffect(() => {
-        if (location && edit) {
+        if (location) {
             setLong?.(location.longitude);
             setLat?.(location.latitude);
         }
@@ -48,7 +47,7 @@ const MapWithMarker: React.FC<Props> = ({ setLat, setLong, long, lat,edit }) => 
                     attributionControl={false}
                 >
                     <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                    <MapMarker setLocation={setLocation} edit={edit} />
+                    <MapMarker setLocation={setLocation} />
                     {location != null && lat != null && long != null && (
                         <Marker
                             position={{ lat: location.latitude, lng: location.longitude }}
