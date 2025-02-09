@@ -112,8 +112,8 @@ export const UserProfile = () => {
   }
 
   return (
-    <div className={`container-fluid bg-beige`}>
-      <div className={`container bg-beige`}>
+    <div className={`container-fluid bg-beige d-flex justify-content-center`}>
+      <div className={`container bg-beige `}>
         <div className={`mb-3`}>
           <h1 className={`text-center my-4 text-light-blue`}>Podaci o korisniku</h1>
           {isEditing ? (
@@ -168,16 +168,18 @@ export const UserProfile = () => {
         </div>
         <hr className={`mt-5 text-golden`}></hr>
         <h1 className={`text-center my-4 text-light-blue`}>Nekretnine korisnika</h1>
-        <div className={`row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4`}>
-          {estates.length > 0 ? (
-            estates.map((estate) => (
-              <div key={estate.id} className={`col`}>
-                <EstateCard estate={estate} type={2} loadEstates={null} refreshOnDeleteEstate={refreshOnDeleteEstate}/>
-              </div>
-            ))
-          ) : (
-            <p className={`text-center text-muted mx-auto`}>Korisnik nema nekretnina.</p>
-          )}
+        <div className={`container`}>
+          <div className={`row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 justify-content-center`}>
+            {estates.length > 0 ? (
+              estates.map((estate) => (
+                <div key={estate.id} className={`col d-flex justify-content-center`}>
+                  <EstateCard estate={estate} type={2} loadEstates={null} refreshOnDeleteEstate={refreshOnDeleteEstate}/>
+                </div>
+              ))
+            ) : (
+              <p className={`text-center text-muted mx-auto`}>Korisnik nema nekretnina.</p>
+            )}
+          </div>
         </div>
         <hr className={`mt-5 text-golden`}/>
         <h1 className={`text-center my-4 text-light-blue`}>Objave korisnika</h1>

@@ -169,6 +169,7 @@
             }
         }
 
+
         public async Task<Result<bool, ErrorMessage>> RemoveEstate(string id)
         {
             try
@@ -176,12 +177,23 @@
                 var existingEstate = await _estatesCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
                 if (existingEstate == null)
                 {
-                    return "Nije pronadjena nekretnina.".ToError();
+                    return "Nije pronađena nekretnina.".ToError();
                 }
 
                 foreach (var postId in existingEstate.PostIds)
                 {
                     await _postService.DeletePost(postId);
+                }
+
+                foreach (var imagePath in existingEstate.Images)
+                {
+                    string webRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                    string fullPath = Path.Combine(webRootPath, imagePath.TrimStart('/')); 
+
+                    if (File.Exists(fullPath))
+                    {
+                        File.Delete(fullPath);
+                    }
                 }
 
                 var result = await _estatesCollection.DeleteOneAsync(x => x.Id == id);
@@ -193,9 +205,10 @@
             }
             catch (Exception)
             {
-                return "Došlo je do greške prilikom brisanja nekretnine.".ToError();
+                return "Došlo je do greške prilikom brisanja nekretnine i povezanih podataka.".ToError();
             }
         }
+
 
         public async Task<Result<List<Estate>, ErrorMessage>> GetEstatesCreatedByUser(string userId)
         {

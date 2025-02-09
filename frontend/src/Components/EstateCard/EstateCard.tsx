@@ -5,6 +5,11 @@ import {deleteEstateAPI} from "../../Services/EstateService.tsx";
 import toast from "react-hot-toast";
 import styles from './EstateCard.module.css'
 import Swal from "sweetalert2";
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faHeart} from '@fortawesome/free-solid-svg-icons';
+import {addToFavoritesAPI} from "../../Services/EstateService";
+import {useState} from "react";
+
 
 interface EstateCardProps {
   estate: Estate;
@@ -18,6 +23,8 @@ export const EstateCard = ({estate, loadEstates, canDelete = true, type, refresh
   const navigate = useNavigate();
   const user = useAuth();
 
+  const [isFavorite, setIsFavorite] = useState(false);
+  
   const confirmEstateDeletion = async () => {
     Swal.fire({
       title: "Da li sigurno želite da obrišete nekretninu?",
@@ -55,6 +62,18 @@ export const EstateCard = ({estate, loadEstates, canDelete = true, type, refresh
     navigate(`/estate-details/${estate.id}`);
   };
 
+  const handleAddToFavorite = async () => {
+    try {
+      const response = await addToFavoritesAPI(estate!.id);
+      if (response?.status === 200) {
+        setIsFavorite(true);
+        toast.success("Nekretnina je dodata u omiljene!");
+      }
+    } catch {
+      toast.error("Došlo je do greške prilikom dodavanja u omiljene.");
+    }
+  };
+
   return (
     <div className={`card my-2 p-2 shadow`} style={{width: "18rem"}}>
       <img
@@ -70,6 +89,10 @@ export const EstateCard = ({estate, loadEstates, canDelete = true, type, refresh
           Pogledaj Detalje
         </button>
         {user?.user?.id === estate?.userId && (
+          <button className={`btn ${isFavorite ? "btn-danger" : "btn-outline-danger"} ms-2`} onClick={handleAddToFavorite}>
+            <FontAwesomeIcon icon={faHeart}/>
+          </button>)}
+        {user?.user?.id !== estate?.userId && (
           <>
             <div className={`mt-2`}>
               {canDelete &&

@@ -27,6 +27,8 @@ export const EstatePage = () => {
   const location = useLocation();
   const setEdit = location.state?.setEdit || false;
 
+  const [isFavorite, setIsFavorite] = useState(false);
+
   const [estate, setEstate] = useState<Estate | null>(null);
   const [isEstateLoading, setIsEstateLoading] = useState<boolean>(true);
   const [isPostsLoading, setIsPostsLoading] = useState<boolean>(true);
@@ -154,6 +156,7 @@ export const EstatePage = () => {
     try {
       const response = await addToFavoritesAPI(estate!.id);
       if (response?.status === 200) {
+        setIsFavorite(true);
         toast.success("Nekretnina je dodata u omiljene!");
       }
     } catch {
@@ -289,7 +292,7 @@ export const EstatePage = () => {
                                   </button>
                                 </div>)
                               : (
-                                <button className={`btn btn-outline-danger me-2`} onClick={handleAddToFavorite}>
+                                <button className={`btn ${isFavorite ? "btn-danger" : "btn-outline-danger"} me-2`} onClick={handleAddToFavorite}>
                                   <FontAwesomeIcon icon={faHeart}/>
                                 </button>
                               )}
