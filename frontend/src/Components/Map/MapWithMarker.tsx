@@ -12,9 +12,10 @@ interface Props {
     setLong?: (longitude: number | null) => void;
     lat: number | null;
     long: number | null;
+    edit:boolean
 }
 
-const MapWithMarker: React.FC<Props> = ({ setLat, setLong, long, lat }) => {
+const MapWithMarker: React.FC<Props> = ({ setLat, setLong, long, lat,edit }) => {
     const [location, setLocation] = useState<GeoCoordinates | null>(null);
     const mapaCentar = { lat: 43.32083030, lng: 21.89544071 };
 
@@ -30,7 +31,7 @@ const MapWithMarker: React.FC<Props> = ({ setLat, setLong, long, lat }) => {
         }
     },[]);
     useEffect(() => {
-        if (location) {
+        if (location && edit) {
             setLong?.(location.longitude);
             setLat?.(location.latitude);
         }
@@ -47,7 +48,7 @@ const MapWithMarker: React.FC<Props> = ({ setLat, setLong, long, lat }) => {
                     attributionControl={false}
                 >
                     <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                    <MapMarker setLocation={setLocation} />
+                    <MapMarker setLocation={setLocation} edit={edit} />
                     {location != null && lat != null && long != null && (
                         <Marker
                             position={{ lat: location.latitude, lng: location.longitude }}

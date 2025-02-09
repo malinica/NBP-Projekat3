@@ -75,6 +75,7 @@ export const EstatePage = () => {
   useEffect(() => {
     resetUpdatedFields();
   }, [estate]);
+  useEffect(()=>{  },[updatedLatitude,updatedLongitude]);
 
   const confirmEstateDeletion = async () => {
     Swal.fire({
@@ -206,8 +207,8 @@ export const EstatePage = () => {
   };
 
   const handleCancelUpdate = () => {
-    setEditMode(false);
     resetUpdatedFields();
+    setEditMode(false);
   }
 
   const resetUpdatedFields = () => {
@@ -218,9 +219,9 @@ export const EstatePage = () => {
       setUpdatedTotalRooms(estate.totalRooms);
       setUpdatedSquareMeters(estate.squareMeters);
       setUpdatedFloorNumber(estate.floorNumber ?? '');
-      setUpdatedCategory(estate.category);
       setUpdatedLongitude(estate.longitude);
       setUpdatedLatitude(estate.latitude);
+      setUpdatedCategory(estate.category);
     }
   }
 
@@ -417,48 +418,35 @@ export const EstatePage = () => {
                     )}
                   </div>
                   <h3 className={`text-center text-golden mb-3`}>Lokacija</h3>
-                  {!editMode ? (
-                    <div className={`container-fluid p-0`}>
-                      <MapWithMarker
-                        lat={estate.latitude}
-                        long={estate.longitude}
-                        // setLat={setLat}
-                        // setLong={setLong}
-                      />
-                    </div>) : user?.user?.id === estate?.user?.id ? (
-                    <>
-                      <div style={{width: '100%', height: '500px', overflow: 'hidden'}}>
-                        <MapWithMarker
-                          lat={updatedLatitude}
-                          long={updatedLongitude}
-                          setLat={setUpdatedLatitude}
-                          setLong={setUpdatedLongitude}
-                        />
-                      </div>
-                      <div className={`d-flex justify-content-end me-auto pe-3 my-1`}>
-                        <button
-                          className={`btn btn-sm my-2 text-white text-center rounded py-2 px-2 ${styles.dugme1} ${styles.linija_ispod_dugmeta} ${styles.slova}`}
-                          onClick={handleUpdate}
-                        >
-                          Sačuvaj
-                        </button>
-                        <button
-                          className={`btn btn-sm ms-2 my-2 text-white text-center rounded py-2 px-2 ${styles.dugme2} ${styles.linija_ispod_dugmeta} ${styles.slova}`}
-                          onClick={() => handleCancelUpdate}
-                        >
-                          Otkaži
-                        </button>
-                      </div>
-                    </>
-                  ) : (
-                    <div className={`container-fluid p-0`}>
-                      <MapWithMarker
-                        lat={updatedLatitude}
-                        long={updatedLongitude}
-                        setLat={setUpdatedLatitude}
-                        setLong={setUpdatedLongitude}
-                      />
-                    </div>)}
+                 
+                 <div className="container-fluid p-0">
+  <MapWithMarker
+     lat={updatedLatitude}
+     long={updatedLongitude}
+   
+    setLat={setUpdatedLatitude }
+    setLong={setUpdatedLongitude}
+    edit={editMode}
+  />
+</div>
+
+{editMode && user?.user?.id === estate?.user?.id && (
+  <div className="d-flex justify-content-end me-auto pe-3 my-1">
+    <button
+      className={`btn btn-sm my-2 text-white text-center rounded py-2 px-2 ${styles.dugme1} ${styles.linija_ispod_dugmeta} ${styles.slova}`}
+      onClick={handleUpdate}
+    >
+      Sačuvaj
+    </button>
+    <button
+      className={`btn btn-sm ms-2 my-2 text-white text-center rounded py-2 px-2 ${styles.dugme2} ${styles.linija_ispod_dugmeta} ${styles.slova}`}
+      onClick={handleCancelUpdate}
+    >
+      Otkaži
+    </button>
+  </div>
+)}
+
                 </div>
 
               </div>

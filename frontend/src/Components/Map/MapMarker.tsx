@@ -4,13 +4,15 @@ import { LeafletMouseEvent } from "leaflet";
 import {GeoCoordinates} from "../../Interfaces/GeoCoordinates/GeoCoordinates "
 interface Props {
     setLocation: (loc: GeoCoordinates | null) => void;
+    edit:boolean;
 }
 
-const MapMarker: React.FC<Props> = ({ setLocation }) => {
+const MapMarker: React.FC<Props> = ({ setLocation ,edit}) => {
     useMapEvents({
         click: (e: LeafletMouseEvent) => {
             const { lat, lng } = e.latlng;
-            const newLocation: GeoCoordinates = { latitude: lat, longitude: lng };            
+            const newLocation: GeoCoordinates = { latitude: lat, longitude: lng };   
+            if(edit)         
             setLocation(newLocation);
         }
     });
