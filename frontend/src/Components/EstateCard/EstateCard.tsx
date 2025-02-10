@@ -10,7 +10,6 @@ import {faHeart} from '@fortawesome/free-solid-svg-icons';
 import {useEffect, useState} from "react";
 import {addToFavoritesAPI, canAddEstateToFavoriteAPI, removeFromFavoritesAPI} from "../../Services/UserService.tsx";
 
-
 interface EstateCardProps {
   estate: Estate;
   canDelete?: boolean;
@@ -22,12 +21,22 @@ interface EstateCardProps {
 
 export const EstateCard = ({estate, loadEstates, canDelete = true, type, refreshOnDeleteEstate, onRemoveFromFavorite}: EstateCardProps) => {
   const navigate = useNavigate();
-  const user = useAuth();
+  const {user} = useAuth();
 
   const [canAddToFavorite, setCanAddToFavorite] = useState(true);
+  const [isOwnEstate, setIsOwnEstate] = useState<boolean>(false);
 
   useEffect(() => {
     checkIfCanAddToFavorite();
+
+    if(estate.userId) {
+      setIsOwnEstate(estate.userId == user?.id);
+    }
+    else if(estate.user) {
+      setIsOwnEstate(estate.user.id == user?.id);
+    }
+    else
+      setIsOwnEstate(false);
   }, [])
 
   const checkIfCanAddToFavorite = async () => {
@@ -117,7 +126,7 @@ export const EstateCard = ({estate, loadEstates, canDelete = true, type, refresh
                 onClick={handleNavigate}>
           Pogledaj Detalje
         </button>
-        { user?.user?.id !== estate?.userId &&
+        { !isOwnEstate &&
           (
             canAddToFavorite ? (<>
                 <button className={`btn btn-outline-danger ms-2`} onClick={handleAddToFavorite}>
@@ -130,7 +139,7 @@ export const EstateCard = ({estate, loadEstates, canDelete = true, type, refresh
                 </button>
               </>)
           )}
-        {user?.user?.id === estate?.userId && (
+        {isOwnEstate && (
           <>
             <div className={`mt-2`}>
               {canDelete &&

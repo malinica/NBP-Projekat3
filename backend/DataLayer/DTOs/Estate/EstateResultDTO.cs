@@ -13,7 +13,6 @@ public class EstateResultDTO
     public required List<string> Images { get; set; }
     public double Longitude { get; set; }
     public double Latitude { get; set; }
-
     public UserResultDTO? User { get; set; }
 
     [SetsRequiredMembers]
@@ -30,6 +29,15 @@ public class EstateResultDTO
         Images = estateDocument["Images"].AsBsonArray.Select(img => img.AsString).ToList();
         Longitude = estateDocument["Longitude"].AsDouble;
         Latitude = estateDocument["Latitude"].AsDouble;
+        User = new UserResultDTO()
+        {
+            Id = estateDocument["UserId"].AsObjectId.ToString(),
+            // ne mogu direktno da se procitaju iz estateDocument ako nije spojen sa user
+            // a required su pa mora string.Empty
+            Username = string.Empty,
+            Email = string.Empty,
+            PhoneNumber = string.Empty
+        };
     }
     
     [SetsRequiredMembers]

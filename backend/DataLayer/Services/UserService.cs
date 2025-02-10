@@ -286,6 +286,13 @@ public class UserService
                 x => x.Id == userId,
                 user
             );
+            
+            var estateService = _serviceProvider.GetRequiredService<EstateService>();
+
+            var updateEstateResult = await estateService.AddFavoriteUserToEstate(estateId, userId);
+            
+            if(updateEstateResult.IsError)
+                return updateEstateResult.Error;
 
             if (updateResult.ModifiedCount > 0)
             {
@@ -317,6 +324,13 @@ public class UserService
                 x => x.Id == userId,
                 user
             );
+            
+            var estateService = _serviceProvider.GetRequiredService<EstateService>();
+
+            var updateEstateResult = await estateService.RemoveFavoriteUserFromEstate(estateId, userId);
+            
+            if(updateEstateResult.IsError)
+                return updateEstateResult.Error;
 
             if (updateResult.ModifiedCount > 0)
             {

@@ -185,6 +185,11 @@
                 {
                     await _postService.DeletePost(postId);
                 }
+                
+                foreach (var favoriteUserId in existingEstate.FavoritedByUsersIds)
+                {
+                    await _userService.RemoveFavoriteEstate(favoriteUserId, id);
+                }
 
                 foreach (var imagePath in existingEstate.Images)
                 {
@@ -328,6 +333,48 @@
             catch (Exception)
             {
                 return "Došlo je do greške prilikom pretrage nekretnina.".ToError();
+            }
+        }
+        
+        public async Task<Result<bool, ErrorMessage>> AddFavoriteUserToEstate(string estateId, string userId)
+        {
+            try
+            {
+                var updateResult = await _estatesCollection.UpdateOneAsync(
+                    e => e.Id == estateId,
+                    Builders<Estate>.Update.Push(e => e.FavoritedByUsersIds, userId)
+                );
+
+                if (updateResult.ModifiedCount == 0)
+                {
+                    return "Nekretnina nije pronađena ili nije ažurirana.".ToError();
+                }
+
+                return true;
+            }
+            catch (Exception)
+            {
+                return "Došlo je do greške prilikom dodavanja korisnika kod omiljene nekretnine.".ToError();
+            }
+        }
+
+        public async Task<Result<bool, ErrorMessage>> RemoveFavoriteUserFromEstate(string estateId, string userId)
+        {
+            try
+            {
+                var filter = Builders<Estate>.Filter.Eq(e => e.Id, estateId);
+                var update = Builders<Estate>.Update.Pull(e => e.FavoritedByUsersIds, userId);
+
+                var updateResult = await _estatesCollection.UpdateOneAsync(filter, update);
+
+                if (updateResult.ModifiedCount == 0)
+                    return "Korisnik nije pronađen kod nekretnine.".ToError();
+
+                return true;
+            }
+            catch (Exception)
+            {
+                return "Došlo je do greške prilikom uklanjanja korisnika sa omiljene nekretnine.".ToError();
             }
         }
         

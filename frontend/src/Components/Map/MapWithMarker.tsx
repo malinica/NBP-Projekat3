@@ -14,7 +14,7 @@ interface Props {
     long: number | null;
 }
 
-const MapWithMarker: React.FC<Props & {editMode?: boolean}> = ({ setLat, setLong, long, lat, editMode = false }) => {
+const MapWithMarker: React.FC<Props & {editMode?: boolean}> = ({ setLat, setLong, long, lat, editMode = true }) => {
     const [location, setLocation] = useState<GeoCoordinates | null>(null);
     const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number }>({
         lat: 43.32083030,

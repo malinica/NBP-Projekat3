@@ -24,4 +24,7 @@ public class Estate
 
     [BsonRepresentation(BsonType.ObjectId)]
     public List<string> PostIds { get; set; } = new(); // Lista ID-ova postova o nekretnini
+
+    [BsonRepresentation(BsonType.ObjectId)]
+    public List<string> FavoritedByUsersIds { get; set; } = new();  // Lista ID-ova korisnika koji su oznacili nekretninu kao omiljenu
 }
