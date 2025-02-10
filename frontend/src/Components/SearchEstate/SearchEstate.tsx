@@ -151,7 +151,7 @@ export const SearchEstate = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className={`text-center text-muted mt-3 fs-4`}>Nema rezultata pretrage</div>
+                  <div className={`text-center text-muted mt-3 fs-4 pb-3`}>Nema rezultata pretrage</div>
                 )}
 
                 {totalEstatesCount > 0 && (

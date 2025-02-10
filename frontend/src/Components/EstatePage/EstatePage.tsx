@@ -353,10 +353,12 @@ export const EstatePage = () => {
                             <h5 className={`text-golden`}>Kategorija</h5>
                             <p className={`text-blue fs-5`}>{getEstateCategoryTranslation(estate?.category)}</p>
                           </div>
-                          <div className={`col-md-6 mb-3`}>
-                            <h5 className={`text-golden`}>Sprat</h5>
-                            <p className={`text-blue fs-5`}>{estate?.floorNumber ?? "N/A"}</p>
-                          </div>
+                          {estate?.floorNumber != null && (
+                            <div className={`col-md-6 mb-3`}>
+                              <h5 className={`text-golden`}>Sprat</h5>
+                              <p className={`text-blue fs-5`}>{estate?.floorNumber}</p>
+                            </div>
+                          )}
                           <div className={`col-md-6 mb-3`}>
                             <h5 className={`text-golden`}>Kontakt</h5>
                             <Link className={`text-blue text-decoration-none fs-5 me-2 d-block`}
