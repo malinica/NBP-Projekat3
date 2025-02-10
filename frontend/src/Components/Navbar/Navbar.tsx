@@ -25,7 +25,7 @@ export const Navbar = () => {
 
     const handleFavoriteEstatesRedirect = () => {
         if (user) {
-            navigate(`/favorite-estates/${user!.id}`);
+            navigate(`/favorite-estates`);
         }
     }
 

@@ -4,44 +4,49 @@ public class UserService
 {
     private readonly IMongoCollection<User> _usersCollection =
         DbConnection.GetDatabase().GetCollection<User>("users_collection");
+
     private readonly PasswordHasher<User> _passwordHasher = new PasswordHasher<User>();
     private readonly TokenService _tokenService;
+    private readonly IServiceProvider _serviceProvider;
 
-    public UserService(TokenService tokenService)
+    public UserService(TokenService tokenService, IServiceProvider serviceProvider)
     {
-        this._tokenService = tokenService;
+        _tokenService = tokenService;
+        _serviceProvider = serviceProvider;
     }
-    
+
     public async Task<Result<AuthResponseDTO, ErrorMessage>> Register(CreateUserDTO userDto)
     {
         try
         {
             string usernamePattern = @"^[a-zA-Z0-9._]+$";
             Regex usernameRegex = new Regex(usernamePattern);
-            
+
             if (!usernameRegex.IsMatch(userDto.Username))
-                return "Korisničko ime nije u validnom formatu. Dozvoljena su mala i velika slova abecede, brojevi, _ i .".ToError();
-            
+                return
+                    "Korisničko ime nije u validnom formatu. Dozvoljena su mala i velika slova abecede, brojevi, _ i ."
+                        .ToError();
+
             string emailPattern = @"^[^\s@]+@[^\s@]+\.[^\s@]+$";
             Regex emailRegex = new Regex(emailPattern);
-            
+
             if (!emailRegex.IsMatch(userDto.Email))
                 return "E-mail nije u ispravnom formatu.".ToError();
-            
+
             var existingUserByUsername = await _usersCollection
                 .Find(u => u.Username == userDto.Username)
                 .FirstOrDefaultAsync();
 
             if (existingUserByUsername != null)
                 return "Već postoji korisnik sa unetim korisničkim imenom.".ToError();
-            
+
             var existingUserByEmail = await _usersCollection
                 .Find(u => u.Email == userDto.Email)
                 .FirstOrDefaultAsync();
 
             if (existingUserByEmail != null)
                 return "Već postoji korisnik sa unetim e-mail-om.".ToError();
-            
+
             var newUser = new User
             {
                 Username = userDto.Username,
@@ -68,7 +73,7 @@ public class UserService
             return "Došlo je do greške prilikom registracije korisnika.".ToError();
         }
     }
-    
+
     public async Task<Result<AuthResponseDTO, ErrorMessage>> Login(LoginRequestDTO request)
     {
         try
@@ -76,16 +81,16 @@ public class UserService
             var user = await _usersCollection
                 .Find(u => u.Email == request.Email)
                 .FirstOrDefaultAsync();
-            
+
             if (user == null)
                 return "Neispravan email ili lozinka.".ToError(403);
-            
+
             var verificationResult = _passwordHasher.VerifyHashedPassword(null!, user.PasswordHash!, request.Password);
             if (verificationResult == PasswordVerificationResult.Failed)
                 return "Neispravan email ili lozinka.".ToError(403);
-            
+
             var accessToken = _tokenService.CreateToken(user);
-            
+
             return new AuthResponseDTO
             {
                 Id = user.Id!,
@@ -102,7 +107,8 @@ public class UserService
         }
     }
 
-    public Result<string, ErrorMessage> GetCurrentUserId(ClaimsPrincipal user) {
+    public Result<string, ErrorMessage> GetCurrentUserId(ClaimsPrincipal user)
+    {
         try
         {
             var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -116,12 +122,13 @@ public class UserService
             return "Došlo je do greške prilikom učitavanja korisnika.".ToError();
         }
     }
-    
-    public async Task<Result<UserResultDTO, ErrorMessage>> GetCurrentUser(ClaimsPrincipal user) {
+
+    public async Task<Result<UserResultDTO, ErrorMessage>> GetCurrentUser(ClaimsPrincipal user)
+    {
         try
         {
             var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if(userId != null)
+            if (userId != null)
                 return await GetById(userId);
 
             return "Došlo je do greške prilikom učitavanja korisnika.".ToError();
@@ -131,16 +138,16 @@ public class UserService
             return "Došlo je do greške prilikom učitavanja korisnika.".ToError();
         }
     }
-    
+
     public async Task<Result<UserResultDTO, ErrorMessage>> GetById(string id)
     {
         try
         {
             var user = await _usersCollection
-                            .Find(u => u.Id == id)
-                            .FirstOrDefaultAsync();
-            
-            if(user == null)
+                .Find(u => u.Id == id)
+                .FirstOrDefaultAsync();
+
+            if (user == null)
                 return "Korisnik nije pronađen.".ToError(404);
 
             return new UserResultDTO(user);
@@ -150,7 +157,7 @@ public class UserService
             return "Došlo je do greške prilikom preuzimanja podataka o korisniku.".ToError();
         }
     }
-    
+
     public async Task<Result<UserResultDTO, ErrorMessage>> Update(string userId, UpdateUserDTO userDto)
     {
         try
@@ -158,14 +165,14 @@ public class UserService
             var existingUser = await _usersCollection
                 .Find(u => u.Id == userId)
                 .FirstOrDefaultAsync();
-            
-            if(existingUser == null)
+
+            if (existingUser == null)
                 return "Korisnik nije pronađen.".ToError(404);
 
             existingUser.Username = userDto.Username;
             existingUser.PhoneNumber = userDto.PhoneNumber;
-            
-            var updateUserResult = await _usersCollection.ReplaceOneAsync(u => u.Id== userId, existingUser);
+
+            var updateUserResult = await _usersCollection.ReplaceOneAsync(u => u.Id == userId, existingUser);
 
             if (updateUserResult.ModifiedCount == 0)
                 return "Neuspešna izmena podataka".ToError();
@@ -177,7 +184,7 @@ public class UserService
             return "Došlo je do greške prilikom preuzimanja podataka o korisniku.".ToError();
         }
     }
-    
+
     public async Task<Result<bool, ErrorMessage>> AddCommentToUser(string userId, string commentId)
     {
         try
@@ -219,7 +226,7 @@ public class UserService
             return "Došlo je do greške prilikom uklanjanja korisnikovog komentara.".ToError();
         }
     }
-    
+
     public async Task<Result<bool, ErrorMessage>> AddPostToUser(string userId, string postId)
     {
         try
@@ -259,6 +266,97 @@ public class UserService
         catch (Exception)
         {
             return "Došlo je do greške prilikom uklanjanja korisnikove objave.".ToError();
+        }
+    }
+
+    public async Task<Result<bool, ErrorMessage>> AddFavoriteEstate(string userId, string estateId)
+    {
+        try
+        {
+            var user = await _usersCollection.Find(x => x.Id == userId).FirstOrDefaultAsync();
+
+            if (user.FavoriteEstateIds.Contains(estateId))
+            {
+                return "Nekretnina je već u omiljenim.".ToError();
+            }
+
+            user.FavoriteEstateIds.Add(estateId);
+
+            var updateResult = await _usersCollection.ReplaceOneAsync(
+                x => x.Id == userId,
+                user
+            );
+
+            if (updateResult.ModifiedCount > 0)
+            {
+                return true;
+            }
+
+            return "Došlo je do greške prilikom ažuriranja omiljenih nekretnina.".ToError();
+        }
+        catch (Exception)
+        {
+            return "Došlo je do greške prilikom dodavanja nekretnine u omiljene.".ToError();
+        }
+    }
+
+    public async Task<Result<bool, ErrorMessage>> RemoveFavoriteEstate(string userId, string estateId)
+    {
+        try
+        {
+            var user = await _usersCollection.Find(x => x.Id == userId).FirstOrDefaultAsync();
+
+            if (!user.FavoriteEstateIds.Contains(estateId))
+            {
+                return "Nekretnina se ne nalazi u omiljenim.".ToError();
+            }
+
+            user.FavoriteEstateIds.Remove(estateId);
+
+            var updateResult = await _usersCollection.ReplaceOneAsync(
+                x => x.Id == userId,
+                user
+            );
+
+            if (updateResult.ModifiedCount > 0)
+            {
+                return true;
+            }
+
+            return "Došlo je do greške prilikom ažuriranja omiljenih nekretnina.".ToError();
+        }
+        catch (Exception)
+        {
+            return "Došlo je do greške prilikom uklanjanja nekretnine iz omiljenih.".ToError();
+        }
+    }
+    
+    public async Task<Result<bool, ErrorMessage>> CanAddToFavorite(string userId, string estateId)
+    {
+        try
+        {
+            var user = await _usersCollection.Find(x => x.Id == userId).FirstOrDefaultAsync();
+
+            if (user == null)
+            {
+                return "Korisnik nije pronađen.".ToError();
+            }
+
+            var estateService = _serviceProvider.GetRequiredService<EstateService>();
+
+            (bool isError, var estate, ErrorMessage? error) = await estateService.GetEstate(estateId);
+
+            if (isError)
+                return error!;
+
+            if (estate!.User!.Id == userId)
+                return false;
+
+            return !user.FavoriteEstateIds.Contains(estateId);
+        }
+        catch (Exception)
+        {
+            return "Došlo je do greške prilikom određivanja da li korisnik može da doda nekretninu u omiljene.".ToError();
         }
     }
 }

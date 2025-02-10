@@ -101,15 +101,6 @@ export const searchEstatesAPI = async (
     }
 };
 
-export const addToFavoritesAPI = async (estateId: string) => {
-    try {
-        return await axios.post(`${apiUrl}/AddToFavorites/${estateId}`);
-    } catch (error: any) {
-        toast.error(error?.response?.data || "Došlo je do greške prilikom dodavanja nekretnine u omiljene.");
-        return undefined;
-    }
-};
-
 export const getFavoriteEstatesForUserAPI = async (userId: string, page: number = 1, pageSize: number = 10) => {
     try {
         const response = await axios.get<PaginatedResponseDTO<Estate>>(`${apiUrl}/GetUserFavoriteEstates/${userId}`, {

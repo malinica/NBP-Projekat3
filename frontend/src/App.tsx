@@ -37,7 +37,7 @@ function App() {
                 <Route path="/search-estates" element={<SearchEstate />} />
                 <Route path="/estate-page/:id" element={<ProtectedRoute><EstatePage /></ProtectedRoute>} />
                 <Route path="/estate-details/:id" element={<ProtectedRoute><EstatePage /></ProtectedRoute>} />
-                <Route path="/favorite-estates/:id" element={<ProtectedRoute><FavoriteEstates /></ProtectedRoute>} />
+                <Route path="/favorite-estates" element={<ProtectedRoute><FavoriteEstates /></ProtectedRoute>} />
               </Routes>
             </div>
             <Footer />

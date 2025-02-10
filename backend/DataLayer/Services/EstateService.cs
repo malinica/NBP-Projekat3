@@ -330,38 +330,7 @@
                 return "Došlo je do greške prilikom pretrage nekretnina.".ToError();
             }
         }
-
-        public async Task<Result<bool, ErrorMessage>> AddFavoriteEstate(string userId, string estateId)
-        {
-            try
-            {
-                var user = await _usersCollection.Find(x => x.Id == userId).FirstOrDefaultAsync();
-
-                if (user.FavoriteEstateIds.Contains(estateId))
-                {
-                    return "Nekretnina je već u omiljenim.".ToError();
-                }
-
-                user.FavoriteEstateIds.Add(estateId);
-
-                var updateResult = await _usersCollection.ReplaceOneAsync(
-                    x => x.Id == userId,
-                    user
-                );
-
-                if (updateResult.ModifiedCount > 0)
-                {
-                    return true;
-                }
-
-                return "Došlo je do greške prilikom ažuriranja omiljenih nekretnina.".ToError();
-            }
-            catch (Exception)
-            {
-                return "Došlo je do greške prilikom dodavanja nekretnine u omiljene.".ToError();
-            }
-        }
-
+        
         public async Task<Result<PaginatedResponseDTO<Estate>, ErrorMessage>> GetUserFavoriteEstates(string userId,
             int page = 1, int pageSize = 10)
         {

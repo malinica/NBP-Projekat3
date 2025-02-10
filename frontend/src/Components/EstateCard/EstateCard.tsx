@@ -7,8 +7,8 @@ import styles from './EstateCard.module.css'
 import Swal from "sweetalert2";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faHeart} from '@fortawesome/free-solid-svg-icons';
-import {addToFavoritesAPI} from "../../Services/EstateService";
-import {useState} from "react";
+import {useEffect, useState} from "react";
+import {addToFavoritesAPI, canAddEstateToFavoriteAPI, removeFromFavoritesAPI} from "../../Services/UserService.tsx";
 
 
 interface EstateCardProps {
@@ -17,14 +17,30 @@ interface EstateCardProps {
   type: number; // 1 za pretragu, 2 za profil
   loadEstates?: (() => Promise<void>) | null;
   refreshOnDeleteEstate?: ((id: string) => void) | null;
+  onRemoveFromFavorite?: (estateId: string) => void;
 }
 
-export const EstateCard = ({estate, loadEstates, canDelete = true, type, refreshOnDeleteEstate}: EstateCardProps) => {
+export const EstateCard = ({estate, loadEstates, canDelete = true, type, refreshOnDeleteEstate, onRemoveFromFavorite}: EstateCardProps) => {
   const navigate = useNavigate();
   const user = useAuth();
 
-  const [isFavorite, setIsFavorite] = useState(false);
-  
+  const [canAddToFavorite, setCanAddToFavorite] = useState(true);
+
+  useEffect(() => {
+    checkIfCanAddToFavorite();
+  }, [])
+
+  const checkIfCanAddToFavorite = async () => {
+    try {
+      const response = await canAddEstateToFavoriteAPI(estate.id!);
+      if (response?.status == 200) {
+        setCanAddToFavorite(response.data);
+      }
+    } catch {
+      toast.error("Došlo je do greške prilikom određivanja da li korisnik može da doda nekretninu u omiljene.");
+    }
+  }
+
   const confirmEstateDeletion = async () => {
     Swal.fire({
       title: "Da li sigurno želite da obrišete nekretninu?",
@@ -65,12 +81,25 @@ export const EstateCard = ({estate, loadEstates, canDelete = true, type, refresh
   const handleAddToFavorite = async () => {
     try {
       const response = await addToFavoritesAPI(estate!.id);
-      if (response?.status === 200) {
-        setIsFavorite(true);
+      if (response?.status === 200 && response.data) {
+        setCanAddToFavorite(false);
         toast.success("Nekretnina je dodata u omiljene!");
       }
     } catch {
       toast.error("Došlo je do greške prilikom dodavanja u omiljene.");
+    }
+  };
+
+  const handleRemoveFromFavorite = async () => {
+    try {
+      const response = await removeFromFavoritesAPI(estate!.id);
+      if (response?.status === 200 && response.data) {
+        setCanAddToFavorite(true);
+        toast.success("Nekretnina je uklonjena iz omiljenih!");
+        onRemoveFromFavorite?.(estate!.id);
+      }
+    } catch {
+      toast.error("Došlo je do greške prilikom uklanjanja nekretnine iz omiljenih.");
     }
   };
 
@@ -88,10 +117,19 @@ export const EstateCard = ({estate, loadEstates, canDelete = true, type, refresh
                 onClick={handleNavigate}>
           Pogledaj Detalje
         </button>
-        {user?.user?.id !== estate?.userId && (
-          <button className={`btn ${isFavorite ? "btn-danger" : "btn-outline-danger"} ms-2`} onClick={handleAddToFavorite}>
-            <FontAwesomeIcon icon={faHeart}/>
-          </button>)}
+        { user?.user?.id !== estate?.userId &&
+          (
+            canAddToFavorite ? (<>
+                <button className={`btn btn-outline-danger ms-2`} onClick={handleAddToFavorite}>
+                  <FontAwesomeIcon icon={faHeart}/>
+                </button>
+              </>) :
+              (<>
+                <button className={`btn btn-danger ms-2`} onClick={handleRemoveFromFavorite}>
+                  <FontAwesomeIcon icon={faHeart}/>
+                </button>
+              </>)
+          )}
         {user?.user?.id === estate?.userId && (
           <>
             <div className={`mt-2`}>

@@ -108,27 +108,6 @@ public class EstateController : ControllerBase
         return Ok(response);
     }
 
-    [HttpPost("AddToFavorites/{estateId}")]
-    [Authorize]
-    public async Task<IActionResult> AddToFavorites(string estateId)
-    {
-        var userResult = userService.GetCurrentUserId(User);
-        if (userResult.IsError)
-        {
-            return StatusCode(userResult.Error?.StatusCode ?? 400, userResult.Error?.Message);
-        }
-
-        var userId = userResult.Data;
-        (bool isError, var isSuccessful, ErrorMessage? error) = await estateService.AddFavoriteEstate(userId, estateId);
-
-        if (isError)
-        {
-            return StatusCode(error?.StatusCode ?? 400, error?.Message);
-        }
-
-        return Ok(isSuccessful);
-    }
-
     [HttpGet("SearchEstates")]
     public async Task<IActionResult> SearchEstates(
         [FromQuery] string? title = null,

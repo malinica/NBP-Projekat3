@@ -17,3 +17,4 @@ global using DataLayer.DTOs.Pagination;
 global using DataLayer.DTOs.Post;
 global using MongoDB.Bson.Serialization.Attributes;
 global using System.Text.RegularExpressions;
+global using Microsoft.Extensions.DependencyInjection;

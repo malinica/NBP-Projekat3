@@ -15,7 +15,6 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPhone, faUser} from "@fortawesome/free-solid-svg-icons";
 import {Pagination} from "../Pagination/Pagination.tsx";
 
-
 export const UserProfile = () => {
   const {id} = useParams<{ id: string }>();
   const [profileUser, setProfileUser] = useState<User | null>(null);
