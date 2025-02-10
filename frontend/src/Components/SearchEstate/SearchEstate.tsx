@@ -1,9 +1,9 @@
-import {useEffect, useState} from "react";
-import {Estate} from "../../Interfaces/Estate/Estate";
-import {Pagination} from "../Pagination/Pagination";
+import { useEffect, useState } from "react";
+import { Estate } from "../../Interfaces/Estate/Estate";
+import { Pagination } from "../Pagination/Pagination";
 import EstateCard from "../EstateCard/EstateCard";
-import {EstateCategory, EstateCategoryTranslations} from "../../Enums/EstateCategory";
-import {searchEstatesAPI} from "../../Services/EstateService";
+import { EstateCategory, EstateCategoryTranslations } from "../../Enums/EstateCategory";
+import { searchEstatesAPI } from "../../Services/EstateService";
 import styles from './SearchEstate.module.css'
 
 export const SearchEstate = () => {
@@ -23,12 +23,10 @@ export const SearchEstate = () => {
 
   useEffect(() => {
     loadEstates(page, pageSize);
-  }, []);
+  }, [page, pageSize]);
 
   const loadEstates = async (pageNumber: number, pageSizeNumber: number) => {
     setIsLoading(true);
-    setPage(pageNumber);
-    setPageSize(pageSizeNumber);
     const result = await searchEstatesAPI(
       searchTitle ?? undefined,
       searchPriceMin ?? undefined,
@@ -48,9 +46,10 @@ export const SearchEstate = () => {
     setIsLoading(false);
   };
 
-  const handlePaginateChange = async (page: number, pageSize: number) => {
-    await loadEstates(page, pageSize);
-  }
+  const handlePaginateChange = (newPage: number, newPageSize: number) => {
+    setPage(newPage);
+    setPageSize(newPageSize);
+  };
 
   const handleDelete = async () => {
     console.log(page * pageSize + 1 + " = " + pageSize);
@@ -60,7 +59,6 @@ export const SearchEstate = () => {
     } else
       await loadEstates(page, pageSize);
   };
-
 
   return (
     <>
@@ -159,7 +157,7 @@ export const SearchEstate = () => {
                 {totalEstatesCount > 0 && (
                   <div className={`my-4`}>
                     <Pagination totalLength={totalEstatesCount} onPaginateChange={handlePaginateChange}
-                                currentPage={page} perPage={pageSize}/>
+                      currentPage={page} perPage={pageSize} />
                   </div>
                 )}
               </>

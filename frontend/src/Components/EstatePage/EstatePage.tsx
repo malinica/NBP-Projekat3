@@ -460,6 +460,7 @@ export const EstatePage = () => {
                       <MapWithMarker
                         lat={estate.latitude}
                         long={estate.longitude}
+                        editMode={false}
                       />
                     </div>) : user?.user?.id === estate?.user?.id ? (
                     <>
@@ -469,6 +470,7 @@ export const EstatePage = () => {
                           long={updatedLongitude}
                           setLat={setUpdatedLatitude}
                           setLong={setUpdatedLongitude}
+                          editMode={true}
                         />
                       </div>
                       <div className={`d-flex justify-content-end me-auto pe-3 my-1`}>
@@ -493,6 +495,7 @@ export const EstatePage = () => {
                         long={updatedLongitude}
                         setLat={setUpdatedLatitude}
                         setLong={setUpdatedLongitude}
+                        editMode={false}
                       />
                     </div>)}
                 </div>
