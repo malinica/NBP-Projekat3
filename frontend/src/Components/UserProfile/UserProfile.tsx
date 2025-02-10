@@ -13,6 +13,7 @@ import {useAuth} from "../../Context/useAuth.tsx";
 import styles from './UserProfile.module.css'
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPhone, faUser} from "@fortawesome/free-solid-svg-icons";
+import {Pagination} from "../Pagination/Pagination.tsx";
 
 
 export const UserProfile = () => {
@@ -20,7 +21,9 @@ export const UserProfile = () => {
   const [profileUser, setProfileUser] = useState<User | null>(null);
   const {user} = useAuth();
   const [estates, setEstates] = useState<Estate[]>([]);
+  const [totalEstatesCount, setTotalEstatesCount] = useState<number>(0);
   const [posts, setPosts] = useState<Post[]>([]);
+  const [totalPostsCount, setTotalPostsCount] = useState<number>(0);
   const [isEditing, setIsEditing] = useState(false);
   const [newUsername, setNewUsername] = useState(user?.username || "");
   const [newPhoneNumber, setNewPhoneNumber] = useState(user?.phoneNumber || "");
@@ -28,8 +31,8 @@ export const UserProfile = () => {
   useEffect(() => {
     if (id) {
       fetchUser(id);
-      fetchEstates(id);
-      fetchPosts(id);
+      fetchEstates(id, 1, 10);
+      fetchPosts(id, 1, 10);
     }
   }, [id]);
 
@@ -50,14 +53,24 @@ export const UserProfile = () => {
     }
   };
 
-  const fetchEstates = async (userId: string) => {
-    const estates = await getEstatesCreatedByUserAPI(userId);
-    setEstates(estates || []);
+  const handleEstatesPaginateChange = async (page: number, pageSize: number) => {
+    await fetchEstates(id!, page, pageSize);
+  }
+
+  const fetchEstates = async (userId: string, page: number, pageSize: number) => {
+    const estatesResponse = await getEstatesCreatedByUserAPI(userId, page, pageSize);
+    setEstates(estatesResponse?.data ?? []);
+    setTotalEstatesCount(estatesResponse?.totalLength ?? 0);
   };
 
-  const fetchPosts = async (userId: string) => {
-    const posts = await getUserPosts(userId);
-    setPosts(posts || []);
+  const handlePostsPaginateChange = async (page: number, pageSize: number) => {
+    await fetchPosts(id!, page, pageSize);
+  }
+
+  const fetchPosts = async (userId: string, page: number, pageSize: number) => {
+    const postsResponse = await getUserPosts(userId, page, pageSize);
+    setPosts(postsResponse?.data ?? []);
+    setTotalPostsCount(postsResponse?.totalLength ?? 0);
   };
 
   const handleNewPhoneNumberChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -65,7 +78,7 @@ export const UserProfile = () => {
     setNewPhoneNumber(value);
   };
 
-  const handleSaveChanges = async () => {
+  const handleSaveUserDataChanges = async () => {
     if (!user) return;
 
     const trimmedNewUsername = newUsername.trim();
@@ -105,7 +118,7 @@ export const UserProfile = () => {
     }
   };
 
-  const handleCancel = () => {
+  const handleCancelUserDataEdit = () => {
     setIsEditing(false);
     setNewUsername(profileUser?.username || "");
     setNewPhoneNumber(profileUser?.phoneNumber || "");
@@ -134,12 +147,12 @@ export const UserProfile = () => {
               />
               <button
                 className={`btn btn-sm text-white text-center rounded py-2 px-2 me-2 ${styles.dugme} ${styles.slova} mt-3`}
-                onClick={handleSaveChanges}>
+                onClick={handleSaveUserDataChanges}>
                 Sačuvaj izmene
               </button>
               <button
                 className={`btn btn-sm text-white text-center rounded py-2 px-2 me-2 ${styles.dugme1} ${styles.slova} mt-3`}
-                onClick={handleCancel}>
+                onClick={handleCancelUserDataEdit}>
                 Otkaži
               </button>
             </>
@@ -180,6 +193,9 @@ export const UserProfile = () => {
               <p className={`text-center text-muted mx-auto`}>Korisnik nema nekretnina.</p>
             )}
           </div>
+          {totalEstatesCount > 0 &&
+            <Pagination totalLength={totalEstatesCount} onPaginateChange={handleEstatesPaginateChange} />
+          }
         </div>
         <hr className={`mt-5 text-golden`}/>
         <h1 className={`text-center my-4 text-light-blue`}>Objave korisnika</h1>
@@ -193,6 +209,11 @@ export const UserProfile = () => {
           ) : (
             <p className={`text-center text-muted mb-5`}>Korisnik nema objava.</p>
           )}
+        </div>
+        <div className="mb-3">
+          {totalPostsCount > 0 &&
+            <Pagination totalLength={totalPostsCount} onPaginateChange={handlePostsPaginateChange}/>
+          }
         </div>
       </div>
     </div>

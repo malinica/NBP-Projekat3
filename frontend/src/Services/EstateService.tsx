@@ -38,9 +38,14 @@ export const updateEstateAPI = async (estateId: string, estateDto: FormData) => 
     }
 };
 
-export const getEstatesCreatedByUserAPI = async (userId: string) => {
+export const getEstatesCreatedByUserAPI = async (userId: string, page: number = 1, pageSize: number = 10) => {
     try {
-        const response = await axios.get<Estate[]>(`${apiUrl}/GetEstatesCreatedByUser/${userId}`);
+        const response = await axios.get<PaginatedResponseDTO<Estate>>(`${apiUrl}/GetEstatesCreatedByUser/${userId}`, {
+            params: {
+                page,
+                pageSize
+            }
+        });
         return response.data;
     } catch (error: any) {
         toast.error(error.response?.data ?? "Greška pri preuzimanju nekretnina.");
@@ -105,9 +110,14 @@ export const addToFavoritesAPI = async (estateId: string) => {
     }
 };
 
-export const getFavoriteEstatesForUserAPI = async (userId: string) => {
+export const getFavoriteEstatesForUserAPI = async (userId: string, page: number = 1, pageSize: number = 10) => {
     try {
-        const response = await axios.get<Estate[]>(`${apiUrl}/GetUserFavoriteEstates/${userId}`);
+        const response = await axios.get<PaginatedResponseDTO<Estate>>(`${apiUrl}/GetUserFavoriteEstates/${userId}`, {
+            params: {
+                page,
+                pageSize
+            }
+        });
         return response.data;
     } catch (error: any) {
         toast.error(error.response?.data ?? "Greška pri preuzimanju omiljenih nekretnina.");

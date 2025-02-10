@@ -67,7 +67,7 @@ public class EstateController : ControllerBase
     {
         (bool isError, var updatedEstateResponse, ErrorMessage? error) =
             await estateService.UpdateEstate(id, updatedEstate);
-        
+
         if (isError)
         {
             return StatusCode(error?.StatusCode ?? 400, error?.Message);
@@ -96,9 +96,10 @@ public class EstateController : ControllerBase
     }
 
     [HttpGet("GetEstatesCreatedByUser/{userId}")]
-    public async Task<IActionResult> GetEstatesCreatedByUser(string userId)
+    public async Task<IActionResult> GetEstatesCreatedByUser(string userId, [FromQuery] int? page,
+        [FromQuery] int? pageSize)
     {
-        (bool isError, var response, ErrorMessage? error) = await estateService.GetEstatesCreatedByUser(userId);
+        (bool isError, var response, ErrorMessage? error) = await estateService.GetEstatesCreatedByUser(userId, page ?? 1, pageSize ?? 10);
         if (isError)
         {
             return StatusCode(error?.StatusCode ?? 400, error?.Message);
@@ -118,14 +119,14 @@ public class EstateController : ControllerBase
         }
 
         var userId = userResult.Data;
-        (bool isError, var response, ErrorMessage? error) = await estateService.AddFavoriteEstate(userId, estateId);
+        (bool isError, var isSuccessful, ErrorMessage? error) = await estateService.AddFavoriteEstate(userId, estateId);
 
         if (isError)
         {
             return StatusCode(error?.StatusCode ?? 400, error?.Message);
         }
 
-        return Ok("Estate added to favorites.");
+        return Ok(isSuccessful);
     }
 
     [HttpGet("SearchEstates")]
@@ -154,9 +155,11 @@ public class EstateController : ControllerBase
     }
 
     [HttpGet("GetUserFavoriteEstates/{userId}")]
-    public async Task<IActionResult> GetUserFavoriteEstates(string userId)
+    public async Task<IActionResult> GetUserFavoriteEstates(string userId, [FromQuery] int? page,
+        [FromQuery] int? pageSize)
     {
-        (bool isError, var response, ErrorMessage? error) = await estateService.GetUserFavoriteEstates(userId);
+        (bool isError, var response, ErrorMessage? error) =
+            await estateService.GetUserFavoriteEstates(userId, page ?? 1, pageSize ?? 10);
         if (isError)
         {
             return StatusCode(error?.StatusCode ?? 400, error?.Message);

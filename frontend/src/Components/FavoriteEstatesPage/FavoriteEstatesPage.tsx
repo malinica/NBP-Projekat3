@@ -3,20 +3,27 @@ import { useAuth } from "../../Context/useAuth";
 import { Estate } from "../../Interfaces/Estate/Estate";
 import { getFavoriteEstatesForUserAPI } from "../../Services/EstateService";
 import EstateCard from "../EstateCard/EstateCard";
+import {Pagination} from "../Pagination/Pagination.tsx";
 
 export const FavoriteEstates = () => {
     const { user } = useAuth();
     const [favoriteEstates, setFavoriteEstates] = useState<Estate[]>([]);
+    const [totalEstatesCount, setTotalEstatesCount] = useState<number>(0);
 
     useEffect(() => {
         if (user) {
-            fetchEstates(user.id);
+            fetchEstates(user.id, 1, 10);
         }
     }, [user]);
 
-    const fetchEstates = async (userId: string) => {
-        const favoriteEstates = await getFavoriteEstatesForUserAPI(userId);
-        setFavoriteEstates(favoriteEstates || []);
+    const handlePaginateChange = async (page: number, pageSize: number) => {
+        await fetchEstates(user!.id, page, pageSize);
+    }
+
+    const fetchEstates = async (userId: string, page:number, pageSize: number) => {
+        const favoriteEstates = await getFavoriteEstatesForUserAPI(userId, page, pageSize);
+        setFavoriteEstates(favoriteEstates?.data ?? []);
+        setTotalEstatesCount(favoriteEstates?.totalLength ?? 0);
     }
 
     return (
@@ -34,7 +41,11 @@ export const FavoriteEstates = () => {
                         ) : (
                             <p className={`text-center text-muted mx-auto`}>Korisnik trenutno nema omiljenih nekretnina.</p>
                         )}
+
                     </div>
+                    {totalEstatesCount > 0 && (
+                        <Pagination totalLength={totalEstatesCount} onPaginateChange={handlePaginateChange} />
+                    )}
                 </div>
             </div>
         </div>

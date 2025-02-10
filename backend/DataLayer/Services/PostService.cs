@@ -275,20 +275,29 @@ public class PostService
         }
     }
 
-    public async Task<Result<List<PostResultDTO>, ErrorMessage>> GetUserPosts(string userId)
+    public async Task<Result<PaginatedResponseDTO<PostResultDTO>, ErrorMessage>> GetUserPosts(string userId, int page = 1, int pageSize = 10)
     {
         try
         {
             var posts = await _postsCollection.Aggregate()
-                .Match(Builders<Post>.Filter.Eq("AuthorId", ObjectId.Parse(userId)))
+                .Match(p => p.AuthorId == userId)
+                .SortByDescending(p => p.CreatedAt)
+                .Skip((page-1)*pageSize)
+                .Limit(pageSize)
                 .Lookup("users_collection", "AuthorId", "_id", "AuthorData")
                 .Lookup("estates_collection", "EstateId", "_id", "EstateData")
                 .As<BsonDocument>()
                 .ToListAsync();
 
             var postDtos = posts.Select(post => new PostResultDTO(post)).ToList();
+            
+            var totalCount = await _postsCollection.CountDocumentsAsync(p => p.AuthorId == userId);
 
-            return postDtos;
+            return new PaginatedResponseDTO<PostResultDTO>
+            {
+                Data = postDtos,
+                TotalLength = totalCount
+            };
         }
         catch (Exception)
         {

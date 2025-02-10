@@ -2,13 +2,14 @@
 {
     public class EstateService
     {
-
         private readonly IMongoCollection<Estate> _estatesCollection =
             DbConnection.GetDatabase().GetCollection<Estate>("estates_collection");
+
         private readonly UserService _userService;
+
         private readonly IMongoCollection<User> _usersCollection =
             DbConnection.GetDatabase().GetCollection<User>("users_collection");
-        
+
         private readonly PostService _postService;
 
         public EstateService(UserService userService, PostService postService)
@@ -35,13 +36,13 @@
             try
             {
                 var estate = await _estatesCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
-                if(estate == null)
+                if (estate == null)
                     return "Nije pronađena nekretnina.".ToError();
 
                 var userResult = await _userService.GetById(estate.UserId);
                 if (userResult.IsError)
                     return userResult.Error;
-                
+
                 var estateDto = new EstateResultDTO(estate)
                 {
                     User = userResult.Data
@@ -119,18 +120,18 @@
                 {
                     return "Nije pronađena nekretnina.".ToError();
                 }
-                
+
                 if (updatedEstate.Images != null && updatedEstate.Images.Any())
                 {
                     foreach (var existingImagePath in existingEstate.Images)
                     {
                         var imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", existingImagePath);
-                        if(File.Exists(imagePath))
+                        if (File.Exists(imagePath))
                             File.Delete(imagePath);
                     }
-                    
+
                     List<string> newImagesPaths = new List<string>();
-                    
+
                     foreach (var file in updatedEstate.Images)
                     {
                         var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
@@ -148,7 +149,7 @@
 
                     existingEstate.Images = newImagesPaths;
                 }
-                
+
                 existingEstate.Title = updatedEstate.Title;
                 existingEstate.Description = updatedEstate.Description;
                 existingEstate.Price = updatedEstate.Price;
@@ -188,7 +189,7 @@
                 foreach (var imagePath in existingEstate.Images)
                 {
                     string webRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-                    string fullPath = Path.Combine(webRootPath, imagePath.TrimStart('/')); 
+                    string fullPath = Path.Combine(webRootPath, imagePath.TrimStart('/'));
 
                     if (File.Exists(fullPath))
                     {
@@ -201,6 +202,7 @@
                 {
                     return true;
                 }
+
                 return false;
             }
             catch (Exception)
@@ -210,12 +212,23 @@
         }
 
 
-        public async Task<Result<List<Estate>, ErrorMessage>> GetEstatesCreatedByUser(string userId)
+        public async Task<Result<PaginatedResponseDTO<Estate>, ErrorMessage>> GetEstatesCreatedByUser(string userId, int page = 1, int pageSize = 10)
         {
             try
             {
-                var estates = await _estatesCollection.Find(x => x.UserId == userId).ToListAsync();
-                return estates;
+                var estates = await _estatesCollection
+                    .Find(x => x.UserId == userId)
+                    .Skip((page-1)*pageSize)
+                    .Limit(pageSize)
+                    .ToListAsync();
+                
+                var totalUserEstatesCount = await _estatesCollection.CountDocumentsAsync(x => x.UserId == userId);
+                
+                return new PaginatedResponseDTO<Estate>
+                {
+                    Data = estates,
+                    TotalLength = totalUserEstatesCount
+                };
             }
             catch (Exception)
             {
@@ -265,37 +278,6 @@
             }
         }
 
-        public async Task<Result<bool, ErrorMessage>> AddFavoriteEstate(string userId, string estateId)
-        {
-            try
-            {
-                var user = await _usersCollection.Find(x => x.Id == userId).FirstOrDefaultAsync();
-                var estate = await _estatesCollection.Find(x => x.Id == estateId).FirstOrDefaultAsync();
-
-                if (user.FavoriteEstateIds.Contains(estateId))
-                {
-                    return "Nekretnina je već u omiljenim.".ToError();
-                }
-
-                user.FavoriteEstateIds.Add(estateId);
-
-                var updateResult = await _usersCollection.ReplaceOneAsync(
-                    x => x.Id == userId,
-                    user
-                );
-
-                if (updateResult.ModifiedCount > 0)
-                {
-                    return true;
-                }
-                return "Došlo je do greške prilikom ažuriranja omiljenih nekretnina.".ToError();
-            }
-            catch (Exception)
-            {
-                return "Došlo je do greške prilikom dodavanja nekretnine u omiljene.".ToError();
-            }
-        }
-
         public async Task<Result<PaginatedResponseDTO<Estate>, ErrorMessage>> SearchEstatesFilter(
             string? title = null,
             int? priceMin = null,
@@ -316,7 +298,7 @@
 
                 if (priceMax.HasValue)
                     filter &= Builders<Estate>.Filter.Lte(x => x.Price, priceMax.Value);
-                
+
                 if (categories != null && categories.Any())
                 {
                     var categoryEnums = categories
@@ -335,7 +317,7 @@
                     .Find(filter)
                     .ToListAsync();
 
-                var totalCount = await _estatesCollection.CountDocumentsAsync(_ => true);
+                var totalCount = await _estatesCollection.CountDocumentsAsync(filter);
 
                 return new PaginatedResponseDTO<Estate>
                 {
@@ -349,22 +331,55 @@
             }
         }
 
-        public async Task<Result<List<Estate>, ErrorMessage>> GetUserFavoriteEstates(string userId)
+        public async Task<Result<bool, ErrorMessage>> AddFavoriteEstate(string userId, string estateId)
         {
             try
             {
                 var user = await _usersCollection.Find(x => x.Id == userId).FirstOrDefaultAsync();
 
-                if (!user.FavoriteEstateIds.Any())
+                if (user.FavoriteEstateIds.Contains(estateId))
                 {
-                    return "Korisnik nema omiljenih nekretnina.".ToError();
+                    return "Nekretnina je već u omiljenim.".ToError();
                 }
 
-                var favoriteEstates = await _estatesCollection
-                                    .Find(x => user.FavoriteEstateIds.Contains(x.Id!))
-                                    .ToListAsync();
+                user.FavoriteEstateIds.Add(estateId);
 
-                return favoriteEstates;
+                var updateResult = await _usersCollection.ReplaceOneAsync(
+                    x => x.Id == userId,
+                    user
+                );
+
+                if (updateResult.ModifiedCount > 0)
+                {
+                    return true;
+                }
+
+                return "Došlo je do greške prilikom ažuriranja omiljenih nekretnina.".ToError();
+            }
+            catch (Exception)
+            {
+                return "Došlo je do greške prilikom dodavanja nekretnine u omiljene.".ToError();
+            }
+        }
+
+        public async Task<Result<PaginatedResponseDTO<Estate>, ErrorMessage>> GetUserFavoriteEstates(string userId,
+            int page = 1, int pageSize = 10)
+        {
+            try
+            {
+                var user = await _usersCollection.Find(x => x.Id == userId).FirstOrDefaultAsync();
+
+                var favoriteEstates = await _estatesCollection
+                    .Find(x => user.FavoriteEstateIds.Contains(x.Id!))
+                    .Skip((page-1)*pageSize)
+                    .Limit(pageSize)
+                    .ToListAsync();
+
+                return new PaginatedResponseDTO<Estate>
+                {
+                    Data = favoriteEstates,
+                    TotalLength = user.FavoriteEstateIds.Count
+                };
             }
             catch (Exception)
             {

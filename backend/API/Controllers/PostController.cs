@@ -108,10 +108,10 @@ public class PostController : ControllerBase
     }
 
     [HttpGet("GetUserPosts/{userId}")]
-    // [Authorize]
-    public async Task<IActionResult> GetUserPosts(string userId)
+    [Authorize]
+    public async Task<IActionResult> GetUserPosts(string userId, [FromQuery] int? page, [FromQuery] int? pageSize)
     {
-        (bool isError, var response, ErrorMessage? error) = await _postService.GetUserPosts(userId);
+        (bool isError, var response, ErrorMessage? error) = await _postService.GetUserPosts(userId, page ?? 1, pageSize ?? 10);
 
         if (isError)
         {

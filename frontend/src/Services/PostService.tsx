@@ -64,9 +64,14 @@ export const deletePostAPI = async (postId: string) => {
   }
 };
 
-export const getUserPosts = async (userId: string) => {
+export const getUserPosts = async (userId: string, page: number = 1, pageSize: number = 10) => {
   try {
-    const response = await axios.get<Post[]>(`${apiUrl}/GetUserPosts/${userId}`);
+    const response = await axios.get<PaginatedResponseDTO<Post>>(`${apiUrl}/GetUserPosts/${userId}`, {
+      params: {
+        page,
+        pageSize
+      }
+    });
     return response.data;
   } catch (error: any) {
     toast.error(error.response?.data ?? "Greška pri preuzimanju objava.");

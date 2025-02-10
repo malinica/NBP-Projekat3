@@ -69,9 +69,6 @@ export const Navbar = () => {
                                     <li className={`my-2 text-end`}>
                                         <Link to={"/forum"} className={`${getLinkClass("/forum")}`}>FORUM</Link>
                                     </li>
-                                    {/*<li className={`my-2 text-end`}>
-                                        <Link to={"/"} className={`${getLinkClass("/")}`}>OMILJENO</Link>
-                                    </li>*/}
 
                                     <li className={`ms-3 text-end`}>
                                         <Dropdown>
@@ -82,7 +79,6 @@ export const Navbar = () => {
 
                                             <Dropdown.Menu align={'end'}>
                                                 <Dropdown.Item onClick={handleProfileRedirect} className={styles['custom-dropdown-item1']}>MOJ PROFIL</Dropdown.Item>
-                                                <Dropdown.Divider />
                                                 <Dropdown.Item onClick={handleFavoriteEstatesRedirect} className={styles['custom-dropdown-item1']}>OMILJENE NEKRETNINE</Dropdown.Item>
                                                 <Dropdown.Divider />
                                                 <Dropdown.Item onClick={handleLogout} className={styles['custom-dropdown-item1']}>ODJAVI SE</Dropdown.Item>
