@@ -110,7 +110,6 @@
             }
         }
 
-
         public async Task<Result<Estate, ErrorMessage>> UpdateEstate(string id, EstateUpdateDTO updatedEstate)
         {
             try
